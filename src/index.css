@@ -25,9 +25,30 @@ body {
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.75em;
+  }
 }
 
 button {

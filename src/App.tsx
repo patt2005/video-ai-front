@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Components/Header';
-import Home from './Pages/Home';
-import Image from './Pages/Image.tsx';
-import Explore from './Pages/Explore.tsx';
-import Video from './Pages/Video.tsx';
-import Edit from './Pages/Edit.tsx';
-import Login from './Pages/Login.tsx';
-import Signup from './Pages/Signup.tsx';
-import Admin from './Pages/Admin';
-import Profile from './Pages/Profile';
-import Pricing from './Pages/Pricing';
+import Home from './Pages/Home/Home';
+import Image from './Pages/Image/Image';
+import Explore from './Pages/Explore/Explore';
+import Video from './Pages/Video/Video';
+import Edit from './Pages/Edit/Edit';
+import Login from './Pages/Login/Login';
+import Signup from './Pages/Signup/Signup';
+import Admin from './Pages/Admin/Admin';
+import Profile from './Pages/Profile/Profile';
+import Pricing from './Pages/Pricing/Pricing';
 import './App.css';
 
 function App() {
