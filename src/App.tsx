@@ -1,0 +1,39 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './Components/Header';
+import Home from './Pages/Home';
+import Image from './Pages/Image.tsx';
+import Explore from './Pages/Explore.tsx';
+import Video from './Pages/Video.tsx';
+import Edit from './Pages/Edit.tsx';
+import Login from './Pages/Login.tsx';
+import Signup from './Pages/Signup.tsx';
+import Admin from './Pages/Admin';
+import Profile from './Pages/Profile';
+import Pricing from './Pages/Pricing';
+import './App.css';
+
+function App() {
+    return (
+        <Router>
+            <div className="app-shell">
+                <Header />
+                <main className="page-content">
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/explore" element={<Explore />} />
+                        <Route path="/image" element={<Image />} />
+                        <Route path="/video" element={<Video />} />
+                        <Route path="/edit" element={<Edit />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
+                        <Route path="/admin" element={<Admin />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/pricing" element={<Pricing />} />
+                    </Routes>
+                </main>
+            </div>
+        </Router>
+    );
+}
+
+export default App;
