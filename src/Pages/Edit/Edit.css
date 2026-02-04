@@ -1,0 +1,18 @@
+/*
+ * Pagina Edit – componenta: Edit.tsx
+ * Stiluri pentru pagina Edit (wrapper, titlu, descriere).
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Text descriere Edit */
+.edit-description {
+  color: #9ca3af;
+}

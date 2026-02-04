@@ -1,0 +1,18 @@
+/*
+ * Pagina Image – componenta: Image.tsx
+ * Stiluri pentru pagina de generare imagini (wrapper, titlu, descriere).
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Descrierea secțiunii Image */
+.image-description {
+  color: #9ca3af;
+}

@@ -1,0 +1,13 @@
+/*
+ * Pagina Sign up – componenta: Signup.tsx
+ * Stiluri pentru pagina de înregistrare (wrapper, titlu).
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}

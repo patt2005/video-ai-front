@@ -1,0 +1,21 @@
+/*
+ * Pagina Home – componenta: Home.tsx
+ * Stiluri pentru pagina principală (layout wrapper, titlu, text home).
+ */
+
+/* Container principal pagină – folosit și în App.css pentru pagini generice */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+/* Titlul paginii */
+.page-title {
+  color: #f9fafb;
+}
+
+/* Bloc text specific paginii Home */
+.home-page {
+  color: #f9fafb;
+  font-size: 20px;
+  font-weight: 500;
+}

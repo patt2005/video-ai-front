@@ -1,0 +1,99 @@
+/*
+ * Pagina Admin – componenta: Admin.tsx
+ * Stiluri pentru panoul de control: wrapper, titlu, tabel, status, buton șterge.
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Wrapper specific Admin */
+.admin-wrapper {
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .admin-wrapper {
+    padding: 20px 16px;
+  }
+
+  .admin-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+}
+
+.admin-title {
+  margin-bottom: 20px;
+}
+
+/* Container tabel */
+.admin-table-container {
+  background: #141414;
+  border-radius: 12px;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+/* Tabelul cu videouri */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: white;
+}
+
+.admin-table thead {
+  background: #1a1a1a;
+}
+
+.admin-table thead tr {
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+.admin-table th {
+  padding: 15px;
+}
+
+.admin-table tbody tr {
+  border-bottom: 1px solid #222;
+}
+
+.admin-table td {
+  padding: 15px;
+}
+
+/* Status „Terminat” (verde) */
+.status-completed {
+  color: #4caf50;
+}
+
+/* Status „În procesare” (portocaliu) */
+.status-processing {
+  color: #ff9800;
+}
+
+/* Buton șterge */
+.admin-delete-btn {
+  background: none;
+  border: 1px solid #ff4444;
+  color: #ff4444;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-delete-btn:hover {
+  background: rgba(255, 68, 68, 0.1);
+}

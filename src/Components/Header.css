@@ -1,0 +1,292 @@
+/*
+ * Header.css – componenta: Header.tsx
+ * Stiluri pentru bara de navigare: header, logo, linkuri, butoane.
+ */
+
+.top-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f5e6c8; /* bej */
+  border-bottom: 1px solid #e0d2b5;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+.promo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 16px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: linear-gradient(90deg, #ec4899, #f97316, #eab308);
+}
+
+.promo-pill {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background-color: rgba(15, 23, 42, 0.95);
+  font-weight: 600;
+}
+
+.promo-text {
+  font-weight: 500;
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  backdrop-filter: blur(16px);
+  gap: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.logo-image {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.logo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #22c55e, #16a34a);
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #1f2933;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(31, 41, 55, 0.12);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.header-link {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #1f2933;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.header-link:hover {
+  background: rgba(31, 41, 55, 0.08);
+}
+
+.header-link.is-active {
+  background: rgba(31, 41, 55, 0.12);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.header-btn--ghost {
+  color: #1f2933;
+  border: 1px solid rgba(31, 41, 55, 0.18);
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.header-btn--ghost:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.header-btn--primary {
+  color: #ffffff;
+  border: 1px solid rgba(31, 41, 55, 0.18);
+  background: #1f2933;
+}
+
+.header-btn--primary:hover {
+  filter: brightness(1.05);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Buton hamburger – ascuns pe desktop */
+.header-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(31, 41, 55, 0.15);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.header-hamburger:hover {
+  background: rgba(31, 41, 55, 0.25);
+}
+
+.hamburger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: #1f2933;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* Meniu mobil – ascuns implicit */
+.header-mobile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #f5e6c8;
+  border-bottom: 1px solid #e0d2b5;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.header-mobile-menu.is-open {
+  max-height: 400px;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px 20px;
+  gap: 4px;
+}
+
+.mobile-link {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #1f2933;
+  font-size: 15px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.mobile-link:hover,
+.mobile-link.is-active {
+  background: rgba(31, 41, 55, 0.1);
+}
+
+.mobile-link--primary {
+  background: #1f2933;
+  color: #ffffff;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.mobile-link--primary:hover {
+  filter: brightness(1.05);
+}
+
+/* ========== RESPONSIVE – Tablete și telefoane ========== */
+@media (max-width: 900px) {
+  .header-nav,
+  .header-actions {
+    display: none;
+  }
+
+  .header-hamburger {
+    display: flex;
+  }
+
+  .header-mobile-menu {
+    display: block;
+  }
+
+  .header-main {
+    padding: 12px 20px;
+  }
+
+  .header-left {
+    gap: 16px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-main {
+    padding: 10px 16px;
+  }
+
+  .logo-badge {
+    padding: 4px 8px;
+  }
+
+  .logo-image {
+    width: 20px;
+    height: 20px;
+  }
+
+  .logo-text {
+    font-size: 16px;
+  }
+}

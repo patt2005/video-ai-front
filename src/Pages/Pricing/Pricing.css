@@ -1,0 +1,51 @@
+/*
+ * Pagina Pricing – componenta: Pricing.tsx
+ * Stiluri pentru prețuri: wrapper, titlu, descriere, carduri planuri (Free, Pro).
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Descrierea secțiunii Pricing */
+.pricing-description {
+  color: #9ca3af;
+  margin-bottom: 24px;
+}
+
+/* Container planuri (flex) */
+.pricing-plans {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Card un plan (Free / Pro) */
+.pricing-plan {
+  flex: 1;
+  min-width: 220px;
+  background: #141414;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #333;
+}
+
+.plan-description {
+  color: #9ca3af;
+}
+
+@media (max-width: 600px) {
+  .pricing-plans {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .pricing-plan {
+    min-width: unset;
+  }
+}

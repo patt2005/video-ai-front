@@ -1,0 +1,56 @@
+/*
+ * Pagina Profile – componenta: Profile.tsx
+ * Stiluri pentru profilul utilizatorului: wrapper, titlu, card profil, nume, email, rol.
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Wrapper specific Profile */
+.profile-wrapper {
+  padding: 40px;
+}
+
+/* Titlul „Profilul Meu” (accent violet) */
+.profile-title {
+  color: #8b5cf6;
+}
+
+/* Cardul negru cu datele utilizatorului */
+.profile-card {
+  background: #141414;
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #333;
+  margin-top: 20px;
+}
+
+/* Conținut card: icon + text */
+.profile-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-name {
+  margin: 0;
+}
+
+.profile-email {
+  color: #9ca3af;
+  margin: 5px 0;
+}
+
+/* Badge rol (User/Admin) */
+.profile-role {
+  background: #8b5cf6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}

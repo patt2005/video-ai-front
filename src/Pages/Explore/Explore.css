@@ -1,0 +1,32 @@
+/*
+ * Pagina Explore – componenta: Explore.tsx
+ * Stiluri pentru pagina Explore (wrapper, titlu, descriere).
+ */
+
+/* Container principal pagină */
+.page-wrapper {
+  color: #f9fafb;
+}
+
+.page-title {
+  color: #f9fafb;
+}
+
+/* Wrapper specific Explore – centrat, lățime limitată */
+.explore-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-top: 50px;
+}
+
+@media (max-width: 768px) {
+  .explore-wrapper {
+    padding-top: 24px;
+  }
+}
+
+/* Text descriere Explore */
+.explore-description {
+  color: #9ca3af;
+  margin-bottom: 30px;
+}
