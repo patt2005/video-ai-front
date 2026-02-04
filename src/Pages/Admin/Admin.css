@@ -5,11 +5,11 @@
 
 /* Container principal pagină */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Wrapper specific Admin */
@@ -40,9 +40,9 @@
 
 /* Container tabel */
 .admin-table-container {
-  background: #141414;
+  background: var(--bg-panel);
   border-radius: 12px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   overflow: hidden;
 }
 
@@ -50,16 +50,16 @@
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  color: white;
+  color: var(--text);
 }
 
 .admin-table thead {
-  background: #1a1a1a;
+  background: var(--bg-muted);
 }
 
 .admin-table thead tr {
   text-align: left;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border);
 }
 
 .admin-table th {
@@ -67,7 +67,7 @@
 }
 
 .admin-table tbody tr {
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--border);
 }
 
 .admin-table td {

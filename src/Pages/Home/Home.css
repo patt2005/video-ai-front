@@ -5,17 +5,21 @@
 
 /* Container principal pagină – folosit și în App.css pentru pagini generice */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Titlul paginii */
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Bloc text specific paginii Home */
 .home-page {
-  color: #f9fafb;
+  color: var(--text);
   font-size: 20px;
   font-weight: 500;
+}
+
+.home-intro {
+  color: var(--text-muted);
 }

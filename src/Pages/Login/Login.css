@@ -5,9 +5,9 @@
 
 /* Container principal pagină */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }

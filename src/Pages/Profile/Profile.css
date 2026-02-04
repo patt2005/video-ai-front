@@ -5,11 +5,11 @@
 
 /* Container principal pagină */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Wrapper specific Profile */
@@ -19,15 +19,15 @@
 
 /* Titlul „Profilul Meu” (accent violet) */
 .profile-title {
-  color: #8b5cf6;
+  color: var(--accent);
 }
 
-/* Cardul negru cu datele utilizatorului */
+/* Cardul cu datele utilizatorului */
 .profile-card {
-  background: #141414;
+  background: var(--bg-panel);
   padding: 30px;
   border-radius: 15px;
-  border: 1px solid #333;
+  border: 1px solid var(--border);
   margin-top: 20px;
 }
 
@@ -43,13 +43,13 @@
 }
 
 .profile-email {
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 5px 0;
 }
 
 /* Badge rol (User/Admin) */
 .profile-role {
-  background: #8b5cf6;
+  background: var(--accent);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;

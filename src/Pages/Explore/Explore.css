@@ -5,11 +5,11 @@
 
 /* Container principal pagină */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Wrapper specific Explore – centrat, lățime limitată */
@@ -27,6 +27,6 @@
 
 /* Text descriere Explore */
 .explore-description {
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 30px;
 }

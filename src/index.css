@@ -1,28 +1,99 @@
-:root {
-  --bg-dark: #0a0a0a;
-  --panel-dark: #141414;
-  --accent-purple: #8b5cf6;
-  --text-gray: #9ca3af;
+/* ========== TEMA ÎNTUNECATĂ (implicit) ========== */
+:root,
+[data-theme='dark'] {
+  --bg: #050505;
+  --bg-panel: #141414;
+  --bg-muted: #1a1a1a;
+  --text: #f9fafb;
+  --text-muted: #9ca3af;
+  --border: #333;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --accent: #8b5cf6;
+  --link: #646cff;
+  --link-hover: #535bf2;
+  --header-bg: #1a1a1a;
+  --header-border: #333;
+  --header-text: #f9fafb;
+  --header-nav-bg: rgba(255, 255, 255, 0.08);
+  --header-btn-ghost-bg: rgba(255, 255, 255, 0.1);
+  --header-btn-ghost-hover: rgba(255, 255, 255, 0.18);
+  --header-btn-primary-bg: #f9fafb;
+  --header-btn-primary-text: #1a1a1a;
+  --scrollbar-track: #1a1a1a;
+  --scrollbar-thumb: #4b5563;
+  --scrollbar-thumb-hover: #6b7280;
+}
+
+/* ========== TEMA DESCHISĂ ========== */
+[data-theme='light'] {
+  --bg: #f8f9fa;
+  --bg-panel: #ffffff;
+  --bg-muted: #f1f3f4;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --border-light: rgba(0, 0, 0, 0.08);
+  --accent: #7c3aed;
+  --link: #4f46e5;
+  --link-hover: #4338ca;
+  --header-bg: #f5e6c8;
+  --header-border: #e0d2b5;
+  --header-text: #1f2933;
+  --header-nav-bg: rgba(255, 255, 255, 0.55);
+  --header-btn-ghost-bg: rgba(255, 255, 255, 0.25);
+  --header-btn-ghost-hover: rgba(255, 255, 255, 0.4);
+  --header-btn-primary-bg: #1f2933;
+  --header-btn-primary-text: #ffffff;
+  --scrollbar-track: #f1f3f4;
+  --scrollbar-thumb: #c4c8cc;
+  --scrollbar-thumb-hover: #9ca3af;
+}
+
+/* ========== SCROLLBAR GLOBAL ========== */
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--link);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--link-hover);
 }
 
 body {
   margin: 0;
-  background-color: var(--bg-dark);
-  color: white;
+  background-color: var(--bg);
+  color: var(--text);
   font-family: 'Inter', system-ui, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 html {
@@ -53,32 +124,20 @@ h1 {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--bg-muted);
+  color: var(--text);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--link);
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }

@@ -5,14 +5,14 @@
 
 /* Container principal pagină */
 .page-wrapper {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 .page-title {
-  color: #f9fafb;
+  color: var(--text);
 }
 
 /* Text descriere Edit */
 .edit-description {
-  color: #9ca3af;
+  color: var(--text-muted);
 }

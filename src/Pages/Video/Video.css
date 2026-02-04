@@ -18,7 +18,7 @@
 /* Titlul coloanei (Features / Models) */
 .col-title {
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   margin: 10px 0 12px;
   letter-spacing: 0.02em;
 }
@@ -38,8 +38,8 @@
   align-items: center;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
   backdrop-filter: blur(10px);
 }
 
@@ -48,8 +48,8 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-muted);
+  border: 1px solid var(--border-light);
 }
 
 .row-body {
@@ -63,14 +63,14 @@
   gap: 10px;
   font-size: 18px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--text);
 }
 
 /* Descrierea rândului */
 .row-desc {
   margin-top: 4px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--text-muted);
 }
 
 /* Badge generic (pill) */
