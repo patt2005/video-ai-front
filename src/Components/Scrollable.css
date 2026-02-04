@@ -1,0 +1,36 @@
+/*
+ * Scrollable.css – componenta: Scrollable.tsx
+ * Container scrollabil cu scrollbar vizibil.
+ */
+
+.scrollable {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollable--x {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scrollable--y {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+/* Înălțime fixă opțională – folosește scrollable-h-* */
+.scrollable-h-sm {
+  max-height: 200px;
+}
+
+.scrollable-h-md {
+  max-height: 400px;
+}
+
+.scrollable-h-lg {
+  max-height: 600px;
+}
+
+.scrollable-h-full {
+  max-height: 100%;
+}
