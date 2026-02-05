@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './Components/Header';
-import Home from './Pages/Home/Home';
+
 import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
 import Video from './Pages/Video/Video';
@@ -19,8 +19,7 @@ function App() {
                 <Header />
                 <main className="page-content">
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/explore" element={<Explore />} />
+                        <Route path="/" element={<Explore />} />
                         <Route path="/image" element={<Image />} />
                         <Route path="/video" element={<Video />} />
                         <Route path="/edit" element={<Edit />} />

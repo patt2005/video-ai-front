@@ -1,6 +1,6 @@
 /*
  * Pagina Explore – componenta: Explore.tsx
- * Stiluri pentru pagina Explore (wrapper, titlu, descriere).
+ * Stiluri pentru pagina Explore (wrapper, titlu, descriere + carduri video scrollabile).
  */
 
 /* Container principal pagină */
@@ -12,7 +12,127 @@
   color: var(--text);
 }
 
-.image-description {
+/* Text descriere Explore */
+.explore-description {
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  max-width: 640px;
+}
+
+/* Rând cu carduri video scrollabile sub header */
+.explore-cards-row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.explore-cards-row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.explore-cards-row::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+.explore-card {
+  flex: 0 0 380px;
+  background: var(--bg-panel);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px;
+}
+
+.explore-card-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  background-color: #111827; /* simplu, fără efecte „bubble” */
+  margin-bottom: 8px;
+}
+
+.explore-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.explore-card-text {
+  font-size: 13px;
   color: var(--text-muted);
 }
 
+@media (min-width: 768px) {
+  .explore-card {
+    flex-basis: 530px;
+  }
+}
+
+.explore-full-card {
+  margin-top: 16px;
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #1a1a1a 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  padding: 20px;
+  box-shadow: 0 10px 40px rgba(220, 38, 38, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.explore-full-thumb {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.explore-full-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  animation: shimmer 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.explore-full-icon {
+  width: 180px;
+  height: 120px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.explore-full-title {
+  font-family: 'Bebas Neue';
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #d7cece;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.explore-full-text {
+  font-family: 'Poppins';
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
