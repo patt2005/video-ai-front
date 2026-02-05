@@ -1,9 +1,3 @@
-/*
- * App.css – componenta: App.tsx
- * Doar stiluri comune: root, shell aplicație, zonă conținut, butoane comune.
- * Stilurile specifice sunt în: Components/Header.css, Pages/.../...css
- */
-
 #root {
   margin: 0;
   padding: 0;
