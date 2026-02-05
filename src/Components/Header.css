@@ -226,20 +226,6 @@
   transition: max-height 0.3s ease;
 }
 
-.header-mobile-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--header-border);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
 .header-mobile-menu.is-open {
   max-height: 400px;
 }
