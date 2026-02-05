@@ -23,9 +23,12 @@
   flex: 1;
 }
 
-/* Zona de conținut a paginilor */
+/* Zona de conținut a paginilor – conținutul la început, sub header */
 .page-content {
   padding: 24px 40px 40px;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  width: 100%;
 }
 
 @media (max-width: 768px) {

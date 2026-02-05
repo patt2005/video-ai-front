@@ -12,21 +12,7 @@
   color: var(--text);
 }
 
-/* Wrapper specific Explore – centrat, lățime limitată */
-.explore-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  padding-top: 50px;
-}
-
-@media (max-width: 768px) {
-  .explore-wrapper {
-    padding-top: 24px;
-  }
-}
-
-/* Text descriere Explore */
-.explore-description {
+.image-description {
   color: var(--text-muted);
-  margin-bottom: 30px;
 }
+
