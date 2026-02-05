@@ -1,18 +1,316 @@
 /*
- * Pagina Image – componenta: Image.tsx
- * Stiluri pentru pagina de generare imagini (wrapper, titlu, descriere).
+ * Image page – create section: prompt area, options row, model selection, generate button
  */
 
-/* Container principal pagină */
-.page-wrapper {
+.image-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem 2rem;
   color: var(--text);
 }
 
-.page-title {
+.image-page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.image-page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
   color: var(--text);
 }
 
-/* Descrierea secțiunii Image */
-.image-description {
+.image-page-subtitle {
+  font-size: 0.95rem;
   color: var(--text-muted);
+  margin: 0;
+}
+
+/* Main creation panel – dark rounded container */
+.image-create-panel {
+  width: 100%;
+  max-width: 960px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.image-create-left {
+  flex: 1;
+  min-width: 280px;
+}
+
+.image-create-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Prompt area – left side */
+.prompt-area {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.prompt-add-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.prompt-add-btn:hover {
+  background: var(--border-light);
+  color: var(--text);
+}
+
+.prompt-input {
+  flex: 1;
+  min-height: 88px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.prompt-input::placeholder {
+  color: var(--text-muted);
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Generation options row */
+.generation-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.option-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.option-btn:hover {
+  background: var(--border-light);
+  border-color: var(--border);
+}
+
+.option-btn.option-toggle.on {
+  border-color: var(--image-generate-accent);
+  color: var(--image-generate-accent);
+}
+
+.option-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+
+.count-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.count-btn:hover {
+  background: var(--border-light);
+  color: var(--text);
+}
+
+.count-value {
+  font-size: 0.875rem;
+  min-width: 2.5rem;
+  text-align: center;
+}
+
+/* Right column – model selection & generate */
+.model-add-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.model-add-btn:hover {
+  background: var(--border-light);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.model-select-card {
+  width: 140px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  overflow: hidden;
+}
+
+.model-select-header {
+  padding: 0.35rem 0.5rem 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.model-change-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.model-change-btn:hover {
+  background: var(--border-light);
+  color: var(--text);
+}
+
+.model-select-preview {
+  padding: 0.5rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.model-preview-placeholder {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.model-select-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* Generate button – lime green accent */
+.image-page {
+  --image-generate-accent: #a3e635;
+  --image-generate-accent-hover: #bef264;
+}
+
+.generate-btn {
+  width: 100%;
+  max-width: 160px;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--image-generate-accent);
+  color: #0a0a0a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.generate-btn:hover {
+  background: var(--image-generate-accent-hover);
+}
+
+.generate-btn:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+  .image-create-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .image-create-right {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .model-add-btn {
+    width: 64px;
+    height: 64px;
+    font-size: 0.65rem;
+  }
+
+  .model-select-card {
+    width: 120px;
+  }
+
+  .generate-btn {
+    max-width: none;
+  }
 }
