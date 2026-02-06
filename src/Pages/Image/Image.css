@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1.5rem 2rem;
+  padding: 1.5rem 0.5rem;
   color: var(--text);
 }
 
@@ -29,63 +29,127 @@
   margin: 0;
 }
 
-/* Main creation panel – dark rounded container */
-.image-create-panel {
+/* Row: create panel (left) + tutorial (right) */
+.image-page-row {
   width: 100%;
-  max-width: 960px;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.image-create-panel {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 360px;
+  min-height: 560px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 1rem;
   display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .image-create-left {
+  width: 100%;
   flex: 1;
-  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.image-create-right {
+.prompt-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+/* Character / prompt image container – full width on top */
+.prompt-image-picker {
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 160px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  overflow: hidden;
+  position: relative;
+}
+
+.prompt-image-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prompt-image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 160px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-}
-
-/* Prompt area – left side */
-.prompt-area {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
-}
-
-.prompt-add-btn {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-muted);
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
   justify-content: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.prompt-add-btn:hover {
+.prompt-image-placeholder:hover {
   background: var(--border-light);
   color: var(--text);
 }
 
+.prompt-image-preview-wrap {
+  position: relative;
+  width: 100%;
+  min-height: 160px;
+  height: 180px;
+}
+
+.prompt-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.prompt-image-clear {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.prompt-image-clear:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
 .prompt-input {
-  flex: 1;
-  min-height: 88px;
+  width: 100%;
+  min-height: 140px;
   padding: 0.75rem 1rem;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -95,6 +159,7 @@
   font-size: 0.95rem;
   resize: vertical;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .prompt-input::placeholder {
@@ -128,152 +193,188 @@
   transition: background 0.2s, border-color 0.2s;
 }
 
+.option-btn .iconify,
+.option-btn svg,
+.model-select-card-row svg {
+  color: var(--accent);
+}
+
 .option-btn:hover {
   background: var(--border-light);
   border-color: var(--border);
 }
 
-.option-btn.option-toggle.on {
-  border-color: var(--image-generate-accent);
-  color: var(--image-generate-accent);
-}
-
-.option-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-muted);
-}
-
-.count-btn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-
-.count-btn:hover {
-  background: var(--border-light);
-  color: var(--text);
-}
-
-.count-value {
-  font-size: 0.875rem;
-  min-width: 2.5rem;
-  text-align: center;
-}
-
-/* Right column – model selection & generate */
-.model-add-btn {
+.model-select-wrapper {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 0.35rem;
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-muted);
+}
+
+.model-select-field-label {
+  font-size: 0.8rem;
+  font-weight: 500;
   color: var(--text-muted);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 
-.model-add-btn:hover {
-  background: var(--border-light);
-  color: var(--text);
-  border-color: var(--border);
-}
-
+/* Model picker – single-line card (design style) */
 .model-select-card {
-  width: 140px;
+  width: 100%;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg-muted);
   overflow: hidden;
-}
-
-.model-select-header {
-  padding: 0.35rem 0.5rem 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.model-change-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-  border: none;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 0.75rem;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: left;
+  padding: 0;
+  font: inherit;
+  color: inherit;
 }
 
-.model-change-btn:hover {
+.model-select-card:hover {
   background: var(--border-light);
-  color: var(--text);
+  border-color: var(--border);
 }
 
-.model-select-preview {
-  padding: 0.5rem 0.75rem 0.75rem;
+.model-select-card-inline {
+  display: block;
+}
+
+.model-select-card-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.model-preview-placeholder {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 8px;
-  background: var(--bg);
-  border: 1px dashed var(--border);
+.model-select-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg);
 }
 
-.model-select-label {
-  font-size: 0.8rem;
+.model-select-icon-primary {
+  background: var(--accent) !important;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.model-select-icon-primary img {
+  display: none;
+}
+
+.model-select-arrow {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--accent);
+}
+
+.image-page .model-select-wrapper:has(.model-picker-dropdown) .model-select-card {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.model-picker-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.model-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.model-picker-option:hover {
+  background: var(--border-light);
+}
+
+.model-picker-option.selected {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+.model-picker-option-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: block;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-muted);
+}
+
+/* Same primary-color mask for dropdown option icons */
+.model-picker-option-icon.model-select-icon-primary {
+  width: 28px;
+  height: 28px;
+  background: var(--accent) !important;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+
+.model-picker-option-name {
+  flex: 1;
+}
+
+.model-select-card .model-select-label {
+  flex: 1;
+  font-size: 0.9rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--text);
 }
 
-/* Generate button – lime green accent */
+/* Use app primary (--accent) for generate button and model selection */
 .image-page {
-  --image-generate-accent: #a3e635;
-  --image-generate-accent-hover: #bef264;
+  --image-generate-accent: var(--accent);
+  --image-generate-accent-hover: color-mix(in srgb, var(--accent) 90%, white);
 }
 
 .generate-btn {
   width: 100%;
-  max-width: 160px;
   padding: 0.85rem 1.25rem;
   border: none;
   border-radius: 12px;
   background: var(--image-generate-accent);
-  color: #0a0a0a;
+  color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -288,29 +389,199 @@
   transform: scale(0.98);
 }
 
-@media (max-width: 640px) {
-  .image-create-panel {
+/* ========== How to generate – tutorial section (right of panel) ========== */
+.image-tutorial {
+  flex: 1;
+  min-width: 0;
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+}
+
+.image-tutorial-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.35rem;
+  text-align: left;
+}
+
+.image-tutorial-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-align: left;
+  margin: 0 0 1.5rem;
+}
+
+.image-tutorial-steps {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.image-tutorial-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  min-height: 280px;
+  align-items: stretch;
+}
+
+.image-tutorial-step .image-tutorial-reference-preview {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.image-tutorial-step-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.image-tutorial-step-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.image-tutorial-step-visual {
+  margin-top: 0.5rem;
+  border-radius: 12px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.image-tutorial-step-upload {
+  background: var(--bg-muted);
+  border: 2px dashed var(--border);
+  padding: 1rem;
+  min-height: 140px;
+}
+
+.image-tutorial-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  z-index: 1;
+}
+
+.image-tutorial-upload-placeholder .iconify {
+  color: var(--accent);
+}
+
+.image-tutorial-upload-hint {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.image-tutorial-reference-preview {
+  width: 100%;
+  min-height: 220px;
+  max-height: 320px;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.image-tutorial-step-prompt {
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.image-tutorial-step-prompt .iconify {
+  color: var(--accent);
+}
+
+.image-tutorial-prompt-sample {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.image-tutorial-step-result {
+  background: var(--bg-muted);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.image-tutorial-step-result .iconify {
+  color: var(--accent);
+}
+
+@media (max-width: 1024px) {
+  .image-page-row {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
-  .image-create-right {
-    flex-direction: row;
-    justify-content: center;
-    flex-wrap: wrap;
+  .image-create-panel {
+    max-width: 30%;
   }
 
-  .model-add-btn {
-    width: 64px;
-    height: 64px;
-    font-size: 0.65rem;
+  .image-tutorial {
+    width: 100%;
+    max-width: 960px;
   }
 
-  .model-select-card {
-    width: 120px;
+  .image-tutorial-title,
+  .image-tutorial-subtitle {
+    text-align: center;
+  }
+
+  .image-tutorial-subtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .image-tutorial-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .image-page-row {
+    gap: 1.5rem;
+  }
+
+  .image-create-panel {
+    padding: 1rem;
   }
 
   .generate-btn {
-    max-width: none;
+    padding: 0.75rem 1rem;
+  }
+
+  .image-tutorial-title {
+    font-size: 1.25rem;
   }
 }
