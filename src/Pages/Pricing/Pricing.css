@@ -1,51 +1,222 @@
-/*
- * Pagina Pricing – componenta: Pricing.tsx
- * Stiluri pentru prețuri: wrapper, titlu, descriere, carduri planuri (Free, Pro).
- */
+/* PRICING — stable version (works with your existing login/index.css setup) */
 
-/* Container principal pagină */
-.page-wrapper {
-  color: var(--text);
+.pricing-wrap{
+  width: 100%;
+  max-width: 1200px;
+  margin: -40px auto 0 auto;
 }
 
-.page-title {
-  color: var(--text);
+
+.pricing-header{
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
 }
 
-/* Descrierea secțiunii Pricing */
-.pricing-description {
-  color: var(--text-muted);
-  margin-bottom: 24px;
+
+/* Grid */
+.pricing-grid{
+  margin: 40px auto 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 320px);
+  gap: 28px;
+  justify-content: center;
 }
 
-/* Container planuri (flex) */
-.pricing-plans {
+
+/* Card */
+.pricing-card{
+  border-radius: 22px;
+  padding: 28px;
+  border: 1px solid var(--pricing-border);
+  background: var(--pricing-card-bg);
+  box-shadow: var(--pricing-shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: grid;
+  gap: 12px;
+}
+
+.pricing-head{ display: grid; gap: 6px; }
+
+.pricing-top{
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-/* Card un plan (Free / Pro) */
-.pricing-plan {
-  flex: 1;
-  min-width: 220px;
-  background: var(--bg-panel);
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid var(--border);
+/* Text: we use the login vars that already exist in your index.css */
+.pricing-name{
+  font-size: 18px;
+  font-weight: 900;
+  margin: 0;
+  color: var(--login-text);
 }
 
-.plan-description {
-  color: var(--text-muted);
+.pricing-desc{
+  margin: 0;
+  font-size: 13px;
+  color: var(--login-muted);
 }
 
-@media (max-width: 600px) {
-  .pricing-plans {
-    flex-direction: column;
-    gap: 16px;
+/* Price */
+.pricing-price{
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.pricing-amount{
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--login-text);
+}
+
+.pricing-period{
+  font-size: 13px;
+  color: var(--login-muted);
+}
+
+/* Features */
+.pricing-features{
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0 0;
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--login-muted);
+}
+
+/* Badge */
+.pricing-badge{
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--pricing-badge-border);
+  background: var(--pricing-badge-bg);
+  color: var(--pricing-badge-text);
+  font-weight: 900;
+}
+
+/* Buttons — override the global button{} from index.css ONLY for pricing buttons */
+.pricing-cta{
+  appearance: none;
+  -webkit-appearance: none;
+
+  height: 46px;
+  border-radius: 14px;
+
+  border: 1px solid var(--pricing-btn-border) !important;
+  background: var(--pricing-btn-bg) !important;
+  color: var(--pricing-btn-text) !important;
+
+  font-weight: 900 !important;
+  cursor: pointer;
+
+  padding: 0 14px !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+.pricing-cta:hover{
+  transform: translateY(-1px);
+  opacity: 0.96;
+}
+
+.pricing-cta--featured{
+  border-color: transparent !important;
+  background: var(--pricing-featured-btn-bg) !important;
+  color: var(--pricing-featured-btn-text) !important;
+}
+
+/* Featured plan */
+.pricing-card--featured{
+  border-color: var(--pricing-featured-border);
+  box-shadow: var(--pricing-featured-shadow);
+  transform: translateY(-8px);
+}
+
+/* Responsive */
+@media (max-width: 1024px){
+  .pricing-grid{
+    grid-template-columns: 1fr;
   }
-
-  .pricing-plan {
-    min-width: unset;
+  .pricing-card--featured{
+    transform: none;
   }
+}
+
+/* Theme vars (local to Pricing page) */
+html[data-theme="light"]{
+  --pricing-card-bg: rgba(255,255,255,0.78);
+  --pricing-border: rgba(15, 23, 42, 0.18);
+  --pricing-shadow: 0 18px 55px rgba(15, 23, 42, 0.12);
+
+  --pricing-btn-bg: rgba(255,255,255,0.92);
+  --pricing-btn-border: rgba(15, 23, 42, 0.26);
+  --pricing-btn-text: #0f172a;
+
+  --pricing-badge-bg: rgba(255,255,255,0.85);
+  --pricing-badge-border: rgba(15, 23, 42, 0.26);
+  --pricing-badge-text: #0f172a;
+
+  --pricing-featured-border: rgba(34, 211, 238, 0.46);
+  --pricing-featured-shadow: 0 26px 90px rgba(34, 211, 238, 0.18);
+
+  --pricing-featured-btn-bg: rgba(15, 23, 42, 0.92);
+  --pricing-featured-btn-text: #ffffff;
+}
+
+html[data-theme="dark"]{
+  --pricing-card-bg: rgba(0,0,0,0.48);
+  --pricing-border: rgba(148, 163, 184, 0.32);
+  --pricing-shadow: 0 18px 55px rgba(0,0,0,0.55);
+
+  --pricing-btn-bg: rgba(255,255,255,0.06);
+  --pricing-btn-border: rgba(148, 163, 184, 0.40);
+  --pricing-btn-text: #f8fafc;
+
+  --pricing-badge-bg: rgba(255,255,255,0.08);
+  --pricing-badge-border: rgba(148, 163, 184, 0.40);
+  --pricing-badge-text: #f8fafc;
+
+  --pricing-featured-border: rgba(168, 85, 247, 0.46);
+  --pricing-featured-shadow: 0 26px 90px rgba(168, 85, 247, 0.14);
+
+  --pricing-featured-btn-bg: rgba(255,255,255,0.92);
+  --pricing-featured-btn-text: #0b1220;
+}
+
+/* === PRICING: override login layout (only on pricing page) === */
+.login-page .login-container{
+  grid-template-columns: 1fr !important;
+  justify-items: center;
+  max-width: 1200px;
+}
+
+.pricing-wrap{
+  width: 100%;
+  display: grid;
+  justify-items: center;
+}
+
+.pricing-header{
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.login-subtitle{
+  margin: 0 auto;
+  max-width: 760px;
+  text-align: center;
 }
