@@ -187,7 +187,7 @@ export default function Image() {
                   onClick={() => fileInputRef.current?.click()}
                   aria-label="Upload image as prompt"
                 >
-                  <Icon icon="mdi:image-plus" width={24} />
+                  <img src="/upload.png" alt="" width={24} height={24} className="prompt-image-placeholder-icon" />
                   <span>Add image</span>
                 </button>
               )}

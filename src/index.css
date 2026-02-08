@@ -1,4 +1,3 @@
-/* ========== TEMA ÎNTUNECATĂ (implicit) ========== */
 :root,
 [data-theme='dark'] {
   --bg: #050505;
@@ -24,7 +23,6 @@
   --scrollbar-thumb-hover: #6b7280;
 }
 
-/* ========== TEMA DESCHISĂ ========== */
 [data-theme='light'] {
   --bg: #f8f9fa;
   --bg-panel: #ffffff;
@@ -49,7 +47,6 @@
   --scrollbar-thumb-hover: #9ca3af;
 }
 
-/* ========== SCROLLBAR GLOBAL ========== */
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -134,9 +131,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
 }
+
 button:hover {
   border-color: var(--link);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;

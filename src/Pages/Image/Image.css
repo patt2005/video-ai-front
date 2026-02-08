@@ -109,6 +109,17 @@
   color: var(--text);
 }
 
+/* Icon follows app theme: light in dark theme, dark in light theme */
+.prompt-image-placeholder-icon {
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .prompt-image-placeholder-icon {
+  filter: brightness(0);
+}
+
 .prompt-image-preview-wrap {
   position: relative;
   width: 100%;
@@ -169,7 +180,6 @@
   border-color: var(--accent);
 }
 
-/* Generation options row */
 .generation-options {
   display: flex;
   flex-wrap: wrap;
@@ -215,7 +225,6 @@
   color: var(--text-muted);
 }
 
-/* Model picker – single-line card (design style) */
 .model-select-card {
   width: 100%;
   border-radius: 12px;
@@ -335,7 +344,6 @@
   background: var(--bg-muted);
 }
 
-/* Same primary-color mask for dropdown option icons */
 .model-picker-option-icon.model-select-icon-primary {
   width: 28px;
   height: 28px;
@@ -360,7 +368,6 @@
   color: var(--text);
 }
 
-/* Use app primary (--accent) for generate button and model selection */
 .image-page {
   --image-generate-accent: var(--accent);
   --image-generate-accent-hover: color-mix(in srgb, var(--accent) 90%, white);
@@ -625,6 +632,7 @@
   gap: 0.75rem;
   animation: image-tutorial-showcase-scroll 65s linear infinite;
 }
+
 .image-tutorial-showcase-track .image-tutorial-showcase-img {
   flex-shrink: 0;
   width: 12rem;
@@ -632,6 +640,7 @@
   object-fit: cover;
   border-radius: 1rem;
 }
+
 .image-tutorial-showcase-scroll:hover .image-tutorial-showcase-track,
 .image-tutorial-showcase-scroll:focus-within .image-tutorial-showcase-track {
   animation-play-state: paused;

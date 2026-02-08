@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 
 const DEFAULT_LOCATION = 'us-central1';
 const DEFAULT_PROJECT_ID = 'striking-optics-480108-r7';
-const DEFAULT_API_KEY = 'AQ.Ab8RN6JY34y394e_t1SrKOXBOdmdLl2Vhhmb6a2g_GwhH1pt5A';
+const DEFAULT_API_KEY = 'AQ.Ab8RN6J4pu66fdo4QBgp698SE4zH60nerZ9sBla0VDwJQt23ag';
 
 function createGenAIInstance(): GoogleGenAI {
   const project =
