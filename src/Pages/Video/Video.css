@@ -1,107 +1,412 @@
 /*
- * Pagina Video – componenta: Video.tsx
- * Stiluri pentru pagina Video: layout pe coloane, carduri features/models, badge-uri TOP/NEW.
+ * Video page: full-viewport background video, black opacity overlay,
+ * create panel at middle bottom center.
+ * Uses .page-content--video (no padding) from App layout.
  */
-
-/* Container principal pagină Video */
 .video-page {
-  padding: 14px 0 0;
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
 }
 
-/* Grid două coloane (Features | Models) */
-.video-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+.video-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
-/* Titlul coloanei (Features / Models) */
-.col-title {
-  font-size: 18px;
-  color: var(--text-muted);
-  margin: 10px 0 12px;
-  letter-spacing: 0.02em;
+.video-page-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-/* Stack vertical pentru listă carduri */
-.stack {
+.video-page-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.video-page-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 560px;
+  margin-bottom: 2.5rem;
+  padding: 0 1rem;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-}
-
-/* Card un rând (feature sau model) */
-.row-card {
-  position: relative;
-  display: flex;
-  gap: 14px;
   align-items: center;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--bg-muted);
-  border: 1px solid var(--border-light);
-  backdrop-filter: blur(10px);
+  gap: 1.25rem;
 }
 
-/* Iconița din stânga cardului */
-.row-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: var(--bg-muted);
-  border: 1px solid var(--border-light);
+.video-page-header {
+  text-align: center;
+  max-width: 420px;
 }
 
-.row-body {
+/* Always light text on the dark video overlay so it reads well in both light and dark app themes */
+.video-page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f9fafb;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.video-page-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.video-page-panel-inner {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.video-page-panel-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
   min-width: 0;
 }
 
-/* Titlul rândului (cu badge TOP/NEW) */
-.row-title {
+.video-page-panel-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.video-page-panel-add-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 700;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  padding: 0;
+}
+
+.video-page-panel-add-btn:focus {
+  outline: none;
+}
+
+.video-page-panel-add-btn:hover {
+  background: var(--border-light);
+  border-color: var(--border);
   color: var(--text);
 }
 
-/* Descrierea rândului */
-.row-desc {
-  margin-top: 4px;
-  font-size: 14px;
+.video-page-panel-add-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.video-page-panel-add-btn-icon .iconify,
+.video-page-panel-add-btn-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100%;
+  min-height: 100%;
+  display: block;
+  color: inherit;
+  fill: currentColor;
+}
+
+.video-page-panel-ref-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.video-page-panel-ref-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 1px solid var(--border);
+}
+
+.video-page-panel-ref-clear {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.video-page-panel-ref-clear:hover {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.video-page-panel-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 1rem;
+  padding: 0.75rem 0.5rem 0.75rem 0;
+  outline: none;
+  font-family: inherit;
+  padding-left: 0.5rem;
+}
+
+.video-page-panel-input::placeholder {
   color: var(--text-muted);
 }
 
-/* Badge generic (pill) */
-.pill {
+.video-page-panel-arrow {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.video-page-panel-arrow:hover {
+  background: color-mix(in srgb, var(--accent) 88%, white);
+}
+
+.video-page-panel-arrow:active {
+  transform: scale(0.96);
+}
+
+/* Force icon size so changing width/height on <Icon> is respected */
+.video-page-panel-arrow-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 22px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  width: var(--arrow-icon-size, 44px);
+  height: var(--arrow-icon-size, 44px);
+  flex-shrink: 0;
 }
 
-/* Badge TOP (roz) */
-.pill--top {
-  background: rgba(236, 72, 153, 0.18);
-  color: #fb7185;
-  border: 1px solid rgba(236, 72, 153, 0.35);
+.video-page-panel-arrow-icon .iconify,
+.video-page-panel-arrow-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100%;
+  min-height: 100%;
 }
 
-/* Badge NEW (verde) */
-.pill--new {
-  background: rgba(163, 230, 53, 0.16);
-  color: #a3e635;
-  border: 1px solid rgba(163, 230, 53, 0.35);
+/* Video result modal (Radix Dialog) */
+.video-result-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  animation: video-result-modal-overlay-in 0.2s ease-out;
 }
 
-@media (max-width: 900px) {
-  .video-cols {
-    grid-template-columns: 1fr;
+@keyframes video-result-modal-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.video-result-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 2rem);
+  max-width: 560px;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  z-index: 101;
+  animation: video-result-modal-content-in 0.25s ease-out;
+}
+
+@keyframes video-result-modal-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.video-result-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.video-result-modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.video-result-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.video-result-modal-close:hover {
+  background: var(--bg-muted);
+  color: var(--text);
+}
+
+.video-result-modal-body {
+  padding: 1.25rem;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted);
+}
+
+.video-result-modal-video {
+  max-width: 100%;
+  max-height: min(60vh, 400px);
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  display: block;
+  background: #000;
+}
+
+.video-result-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.video-result-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  border: 1px solid transparent;
+}
+
+.video-result-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.video-result-modal-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.video-result-modal-btn-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 90%, white);
+  border-color: color-mix(in srgb, var(--accent) 90%, white);
+}
+
+.video-result-modal-btn-secondary {
+  background: var(--bg-muted);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.video-result-modal-btn-secondary:hover:not(:disabled) {
+  background: var(--border-light);
+  border-color: var(--border);
+}
+
+.video-result-modal-btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.video-result-modal-btn-ghost:hover {
+  background: var(--bg-muted);
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .video-page {
+    min-height: calc(100vh - 60px);
+  }
+
+  .video-page-panel {
+    margin-bottom: 1.5rem;
+    padding: 0 0.75rem;
   }
 }
