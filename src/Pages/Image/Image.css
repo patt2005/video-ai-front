@@ -1,6 +1,4 @@
-/*
- * Image page – create section: prompt area, options row, model selection, generate button
- */
+@import "tailwindcss";
 
 .image-page {
   min-height: 100%;
@@ -43,7 +41,7 @@
 .image-create-panel {
   flex-shrink: 0;
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
   min-height: 560px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
@@ -389,7 +387,265 @@
   transform: scale(0.98);
 }
 
-/* ========== How to generate – tutorial section (right of panel) ========== */
+.generate-btn:disabled {
+  opacity: 0.85;
+  cursor: not-allowed;
+}
+
+.image-generate-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.image-generate-spinner {
+  animation: image-generate-spin 0.8s linear infinite;
+}
+
+@keyframes image-generate-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.image-generate-error {
+  margin: 0.75rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, red 12%, transparent);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.image-generated-wrap {
+  margin-top: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.image-generated-wrap:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.image-generated-preview {
+  width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+/* Image result modal (Radix Dialog) */
+.image-result-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  animation: image-result-modal-overlay-in 0.2s ease-out;
+}
+
+@keyframes image-result-modal-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.image-result-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 2rem);
+  max-width: 520px;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  z-index: 101;
+  animation: image-result-modal-content-in 0.25s ease-out;
+}
+
+@keyframes image-result-modal-content-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.image-result-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.image-result-modal-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.image-result-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.image-result-modal-close:hover {
+  background: var(--bg-muted);
+  color: var(--text);
+}
+
+.image-result-modal-body {
+  padding: 1.25rem;
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-muted);
+}
+
+.image-result-modal-img {
+  max-width: 100%;
+  max-height: min(60vh, 400px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  display: block;
+}
+
+.image-result-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.image-result-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  border: 1px solid transparent;
+}
+
+.image-result-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.image-result-modal-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.image-result-modal-btn-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 90%, white);
+  border-color: color-mix(in srgb, var(--accent) 90%, white);
+}
+
+.image-result-modal-btn-secondary {
+  background: var(--bg-muted);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.image-result-modal-btn-secondary:hover:not(:disabled) {
+  background: var(--border-light);
+  border-color: var(--border);
+}
+
+.image-result-modal-btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.image-result-modal-btn-ghost:hover {
+  background: var(--bg-muted);
+  color: var(--text);
+}
+
+.image-tutorial-showcase-scroll {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.image-tutorial-showcase-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.image-tutorial-showcase-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+  gap: 0.75rem;
+  animation: image-tutorial-showcase-scroll 65s linear infinite;
+}
+.image-tutorial-showcase-track .image-tutorial-showcase-img {
+  flex-shrink: 0;
+  width: 12rem;
+  height: 12rem;
+  object-fit: cover;
+  border-radius: 1rem;
+}
+.image-tutorial-showcase-scroll:hover .image-tutorial-showcase-track,
+.image-tutorial-showcase-scroll:focus-within .image-tutorial-showcase-track {
+  animation-play-state: paused;
+}
+
+@keyframes image-tutorial-showcase-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 .image-tutorial {
   flex: 1;
   min-width: 0;
@@ -407,6 +663,7 @@
   font-weight: 700;
   color: var(--text);
   margin: 0 0 0.35rem;
+  margin-top: 2rem;
   text-align: left;
 }
 
@@ -421,7 +678,7 @@
   flex: 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1.75rem;
   align-items: stretch;
   min-height: 0;
 }
@@ -430,18 +687,47 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  background: var(--bg-panel);
+  background: var(--bg-muted);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
-  min-height: 280px;
+  min-height: 200px;
   align-items: stretch;
+  justify-content: center;
+  position: relative;
 }
 
-.image-tutorial-step .image-tutorial-reference-preview {
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
+.image-tutorial-step-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 90%, white);
+  color: var(--bg-panel);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.image-tutorial-step-icon-wrap {
+  width: 64px;
+  height: 64px;
+  margin: 0.5rem 0 0;
+  border-radius: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-tutorial-step-icon {
+  color: var(--accent);
 }
 
 .image-tutorial-step-title {
@@ -496,18 +782,6 @@
 .image-tutorial-upload-hint {
   font-size: 0.75rem;
   opacity: 0.85;
-}
-
-.image-tutorial-reference-preview {
-  width: 100%;
-  min-height: 220px;
-  max-height: 320px;
-  height: auto;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 0;
-  display: block;
-  margin-top: 0.5rem;
 }
 
 .image-tutorial-step-prompt {

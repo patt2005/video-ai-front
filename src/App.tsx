@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Header from './Components/Header';
 import Home from './Pages/Home/Home';
 import Image from './Pages/Image/Image';
@@ -15,6 +16,7 @@ import './App.css';
 function App() {
     return (
         <Router>
+            <Toaster position="top-center" richColors closeButton />
             <div className="app-shell">
                 <Header />
                 <main className="page-content">
