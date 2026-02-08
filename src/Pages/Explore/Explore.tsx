@@ -1,4 +1,5 @@
 import './Explore.css';
+import { Link } from 'react-router-dom';
 import longCardIcon from '../../assets/longcardicon.png';
 import video1 from '../../assets/video1.mp4';
 import video2 from '../../assets/video2.mp4';
@@ -79,6 +80,9 @@ export default function Explore() {
                     <h2 className="explore-full-title">CLICK NOW FOR EXCLUSIVE USE THE DISCOUNT</h2>
                     <p className="explore-full-text">Be the first to join our journey</p>
                 </div>
+                <Link to="/pricing" className="explore-full-button">
+                    View Pricing
+                </Link>
             </div>
 
             <h2 className="explore-section-title">Mixed Media</h2>

@@ -153,10 +153,34 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+.explore-full-button {
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  align-self: center;
+  margin-right: 40px;
+}
+
+.explore-full-button:hover {
+  background: #2a2a2a;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
 
 .explore-section-title {
   margin-top: 32px;
   margin-bottom: 20px;
+  margin-left: 30px;
   font-size: 28px;
   font-weight: 700;
   color: #a3e635;
@@ -189,6 +213,49 @@
 }
 
 @media (max-width: 768px) {
+  /* Card lat - stack vertical pe mobil */
+  .explore-full-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .explore-full-icon {
+    width: 100px;
+    height: 100px;
+    align-self: center;
+  }
+
+  .explore-full-thumb {
+    width: 100%;
+  }
+
+  .explore-full-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .explore-full-text {
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .explore-full-button {
+    width: 100%;
+    margin-right: 0;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+  }
+
+  /* Titlu Mixed Media */
+  .explore-section-title {
+    margin-left: 0;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  /* Grid - o singură coloană pe mobil */
   .explore-grid {
     grid-template-columns: 1fr;
   }
