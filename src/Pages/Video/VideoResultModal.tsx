@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import './Video.css';
+import '../../styles/Video.css';
 
 type VideoResultModalProps = {
   open: boolean;

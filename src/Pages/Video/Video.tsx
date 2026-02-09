@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import './Video.css';
+import '../../styles/Video.css';
 import { pollTaskUntilComplete, text2video, image2video, ViduError } from '../../lib/vidu';
 import { VideoResultModal } from './VideoResultModal';
 

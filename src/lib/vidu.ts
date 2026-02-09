@@ -50,9 +50,18 @@ export interface ViduTaskStatus {
 }
 
 export class ViduError extends Error {
+  code?:
+    | 'invalid_image'
+    | 'invalid_response'
+    | 'server_error'
+    | 'task_failed'
+    | 'task_not_found'
+    | 'timeout'
+    | 'missing_api_key';
+
   constructor(
     message: string,
-    public code?:
+    code?:
       | 'invalid_image'
       | 'invalid_response'
       | 'server_error'
@@ -63,6 +72,7 @@ export class ViduError extends Error {
   ) {
     super(message);
     this.name = 'ViduError';
+    this.code = code;
   }
 }
 

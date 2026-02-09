@@ -11,27 +11,15 @@ export default function Login() {
             <div className="login-container">
                 {/* LEFT */}
                 <div className="login-left">
-          <span className="login-pill">
-            <span className="login-dot" />
-            AI Studio · MovyAI
-          </span>
+                    <span className="login-pill">
+                        <span className="login-dot" />
+                        MovyAI
+                    </span>
 
                     <h1 className="login-title">
                         Create, edit, and explore{" "}
                         <span className="login-title-muted">with MovyAI</span>
                     </h1>
-
-
-                    <p className="login-subtitle">
-                        A dark, glassy workspace designed for creators. Sign in to access your
-                        projects, presets, and cloud renders.
-                    </p>
-
-                    <div className="login-features">
-                        <FeatureCard title="Fast" desc="Generate in minutes" />
-                        <FeatureCard title="Precise" desc="Frame-level edits" />
-                        <FeatureCard title="Cloud" desc="Projects anywhere" />
-                    </div>
                 </div>
 
                 {/* RIGHT */}
@@ -39,10 +27,10 @@ export default function Login() {
                     <div className="login-card">
                         <div className="login-card-head">
                             <h2 className="login-card-title">Sign in</h2>
-                            <span className="login-badge">v0.1</span>
+
                         </div>
 
-                        <p className="login-card-sub">Welcome back — let’s continue.</p>
+                        <p className="login-card-sub">Welcome back — let's continue.</p>
 
                         <form className="login-form">
                             <div className="login-field">
@@ -75,6 +63,11 @@ export default function Login() {
                             </div>
 
                             <button type="button" className="login-secondary">
+                                <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png" 
+                                    alt="Google" 
+                                    className="login-google-icon" 
+                                />
                                 Continue with Google
                             </button>
                         </form>
@@ -82,14 +75,5 @@ export default function Login() {
                 </div>
             </div>
         </main>
-    );
-}
-
-function FeatureCard({ title, desc }: { title: string; desc: string }) {
-    return (
-        <div className="login-feature">
-            <div className="login-feature-title">{title}</div>
-            <div className="login-feature-desc">{desc}</div>
-        </div>
     );
 }

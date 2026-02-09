@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './Admin.css';
+import '../../styles/Admin.css';
 
 export default function Admin() {
     // Utilizarea hook-ului useState pentru mock data (Nota 7 & 8)

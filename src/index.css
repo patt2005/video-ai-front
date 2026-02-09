@@ -9,7 +9,7 @@
   --border-light: rgba(255, 255, 255, 0.08);
   --accent: #8b5cf6;
   --link: #646cff;
-  --link-hover: #535bf2;
+  --link-hover: #4450f1;
   --header-bg: #6e6969;
   --header-border: #333;
   --header-text: #f9fafb;
@@ -413,7 +413,16 @@ html[data-theme='light'] {
   flex: 1;
 }
 
+.login-google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
 .login-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 10px;
   padding: 10px 12px;
   border: 1px solid rgba(0,0,0,0.10);

@@ -1,4 +1,4 @@
-import './Edit.css';
+import '../../styles/Edit.css';
 
 export default function Edit() {
   return (

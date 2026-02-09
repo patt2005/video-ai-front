@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import './Profile.css';
+import '../../styles/Profile.css';
 
 // Aceasta este Interfața pentru utilizator (Cerința Nota 6)
 interface UserProfile {

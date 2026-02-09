@@ -1,17 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import './Image.css';
+import '../../styles/Image.css';
 import { Modality } from '@google/genai';
 import { getGenAI } from '../../lib/genai-vertex';
 import { ImageResultModal } from './ImageResultModal';
 
 const GOOGLE_ICON = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png';
-const GPT_IMAGE_ICON = 'https://cdn-icons-png.flaticon.com/512/11865/11865326.png';
 
 const MODELS = [
   { id: 'nano-banana', name: 'Nano Banana', iconUrl: GOOGLE_ICON },
-//   { id: 'gpt-image', name: 'GPT Image', iconUrl: GPT_IMAGE_ICON },
 ] as const;
 
 const IMAGE_GEN_MODEL = 'gemini-2.5-flash-image';

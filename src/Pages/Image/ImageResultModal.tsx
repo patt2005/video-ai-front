@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Icon } from '@iconify/react';
-import './Image.css';
+import '../../styles/Image.css';
 
 type ImageResultModalProps = {
   open: boolean;

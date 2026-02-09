@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './Header.css';
+import '../styles/Header.css';
 import MovyIcon from '../assets/result-icon.png';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from './ThemeContext.tsx';

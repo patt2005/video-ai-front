@@ -1,15 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 
-const DEFAULT_LOCATION = 'us-central1';
-const DEFAULT_PROJECT_ID = 'striking-optics-480108-r7';
 const DEFAULT_API_KEY = 'AQ.Ab8RN6J4pu66fdo4QBgp698SE4zH60nerZ9sBla0VDwJQt23ag';
 
 function createGenAIInstance(): GoogleGenAI {
-  const project =
-    (typeof process !== 'undefined' && process.env.PROJECT_ID) || DEFAULT_PROJECT_ID;
-  const location =
-    (typeof process !== 'undefined' && process.env.GOOGLE_CLOUD_LOCATION) || DEFAULT_LOCATION;
-
   return new GoogleGenAI({
     vertexai: true,
     apiKey: DEFAULT_API_KEY
