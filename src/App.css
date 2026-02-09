@@ -1,15 +1,8 @@
-/*
- * App.css – componenta: App.tsx
- * Doar stiluri comune: root, shell aplicație, zonă conținut, butoane comune.
- * Stilurile specifice sunt în: Components/Header.css, Pages/.../...css
- */
-
 #root {
   margin: 0;
   padding: 0;
 }
 
-/* Shell principal aplicație */
 .app-shell {
   display: flex;
   flex-direction: column;
@@ -23,12 +16,15 @@
   flex: 1;
 }
 
-/* Zona de conținut a paginilor – conținutul la început, sub header */
 .page-content {
   padding: 24px 40px 40px;
   flex: 0 0 auto;
   align-self: flex-start;
   width: 100%;
+}
+
+.page-content--video {
+  padding: 0;
 }
 
 @media (max-width: 768px) {
@@ -43,7 +39,6 @@
   }
 }
 
-/* Butoane comune (folosite în mai multe pagini) */
 .icon-button {
   width: 38px;
   height: 38px;

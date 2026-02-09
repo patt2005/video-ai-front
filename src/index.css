@@ -1,6 +1,4 @@
-/* ========== TEMA ÎNTUNECATĂ (implicit) ========== */
 @import "tailwindcss";
-
 :root,
 [data-theme='dark'] {
   --bg: #050505;
@@ -8,12 +6,11 @@
   --bg-muted: #1a1a1a;
   --text: #f9fafb;
   --text-muted: #9ca3af;
-  --border: #333;
   --border-light: rgba(255, 255, 255, 0.08);
   --accent: #8b5cf6;
   --link: #646cff;
   --link-hover: #535bf2;
-  --header-bg: #1a1a1a;
+  --header-bg: #6e6969;
   --header-border: #333;
   --header-text: #f9fafb;
   --header-nav-bg: rgba(255, 255, 255, 0.08);
@@ -26,7 +23,6 @@
   --scrollbar-thumb-hover: #6b7280;
 }
 
-/* ========== TEMA DESCHISĂ ========== */
 [data-theme='light'] {
   --bg: #f8f9fa;
   --bg-panel: #ffffff;
@@ -51,7 +47,6 @@
   --scrollbar-thumb-hover: #9ca3af;
 }
 
-/* ========== SCROLLBAR GLOBAL ========== */
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -136,9 +131,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s, background-color 0.25s;
 }
+
 button:hover {
   border-color: var(--link);
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;

@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Header from './Components/Header';
-import Home from './Pages/Home/Home';
+
 import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
 import Video from './Pages/Video/Video';
@@ -12,16 +13,18 @@ import Profile from './Pages/Profile/Profile';
 import Pricing from './Pages/Pricing/Pricing';
 import './App.css';
 
-function App() {
+function AppLayout() {
+    const location = useLocation();
+    const isVideoPage = location.pathname === '/video';
+
     return (
-        <Router>
+        <>
+            <Toaster position="top-center" richColors closeButton />
             <div className="app-shell">
                 <Header />
-
-                <main className="page-content">
+                <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/explore" element={<Explore />} />
+                        <Route path="/" element={<Explore />} />
                         <Route path="/image" element={<Image />} />
                         <Route path="/video" element={<Video />} />
                         <Route path="/edit" element={<Edit />} />
@@ -33,6 +36,14 @@ function App() {
                     </Routes>
                 </main>
             </div>
+        </>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AppLayout />
         </Router>
     );
 }

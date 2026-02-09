@@ -97,3 +97,4 @@ knip.jsonc
 *.cache
 private_key.pem
 public_key.pem
+service-account.json

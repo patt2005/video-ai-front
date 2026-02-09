@@ -54,7 +54,7 @@
 .logo-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   padding: 6px 10px;
   border-radius: 999px;
   background: transparent;
@@ -63,9 +63,9 @@
 }
 
 .logo-image {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   object-fit: contain;
 }
 
@@ -325,8 +325,8 @@
   }
 
   .logo-image {
-    width: 20px;
-    height: 20px;
+    width: 28px;
+    height: 28px;
   }
 
   .logo-text {

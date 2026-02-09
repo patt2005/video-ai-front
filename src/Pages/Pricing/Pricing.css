@@ -1,5 +1,3 @@
-/* PRICING — stable version (works with your existing login/index.css setup) */
-
 .pricing-wrap{
   width: 100%;
   max-width: 1200px;
@@ -15,8 +13,6 @@
   text-align: center;
 }
 
-
-/* Grid */
 .pricing-grid{
   margin: 40px auto 0 auto;
   display: grid;
@@ -25,8 +21,6 @@
   justify-content: center;
 }
 
-
-/* Card */
 .pricing-card{
   border-radius: 22px;
   padding: 28px;
@@ -48,7 +42,6 @@
   gap: 10px;
 }
 
-/* Text: we use the login vars that already exist in your index.css */
 .pricing-name{
   font-size: 18px;
   font-weight: 900;
@@ -154,7 +147,6 @@
   }
 }
 
-/* Theme vars (local to Pricing page) */
 html[data-theme="light"]{
   --pricing-card-bg: rgba(255,255,255,0.78);
   --pricing-border: rgba(15, 23, 42, 0.18);
@@ -195,7 +187,6 @@ html[data-theme="dark"]{
   --pricing-featured-btn-text: #0b1220;
 }
 
-/* === PRICING: override login layout (only on pricing page) === */
 .login-page .login-container{
   grid-template-columns: 1fr !important;
   justify-items: center;

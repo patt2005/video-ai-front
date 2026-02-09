@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from './ThemeContext.tsx';
 
 const navItems = [
-  { label: 'Explore', to: '/explore' },
+  { label: 'Explore', to: '/' },
   { label: 'Image', to: '/image' },
   { label: 'Video', to: '/video' },
   { label: 'Edit', to: '/edit' },
@@ -29,7 +29,7 @@ export default function Header() {
     <header className="top-header">
       <div className="header-main">
         <div className="header-left">
-          <Link to="/" className="logo-badge" aria-label="MovyAI home">
+          <Link to="/" className="logo-badge" aria-label="MovyAI explore page">
             <img src={MovyIcon} alt="MovyAI icon" className="logo-image" />
             <span className="logo-text">MovyAI</span>
           </Link>
