@@ -1,21 +1,13 @@
-/*
- * Pagina Video – componenta: Video.tsx
- * Stiluri pentru pagina Video: layout pe coloane, carduri features/models, badge-uri TOP/NEW.
- */
-
-/* Container principal pagină Video */
 .video-page {
   padding: 14px 0 0;
 }
 
-/* Grid două coloane (Features | Models) */
 .video-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
 }
 
-/* Titlul coloanei (Features / Models) */
 .col-title {
   font-size: 18px;
   color: var(--text-muted);
@@ -23,14 +15,12 @@
   letter-spacing: 0.02em;
 }
 
-/* Stack vertical pentru listă carduri */
 .stack {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Card un rând (feature sau model) */
 .row-card {
   position: relative;
   display: flex;
@@ -43,7 +33,6 @@
   backdrop-filter: blur(10px);
 }
 
-/* Iconița din stânga cardului */
 .row-icon {
   width: 44px;
   height: 44px;
@@ -56,7 +45,6 @@
   min-width: 0;
 }
 
-/* Titlul rândului (cu badge TOP/NEW) */
 .row-title {
   display: flex;
   align-items: center;
@@ -66,14 +54,12 @@
   color: var(--text);
 }
 
-/* Descrierea rândului */
 .row-desc {
   margin-top: 4px;
   font-size: 14px;
   color: var(--text-muted);
 }
 
-/* Badge generic (pill) */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -86,14 +72,12 @@
   letter-spacing: 0.06em;
 }
 
-/* Badge TOP (roz) */
 .pill--top {
   background: rgba(236, 72, 153, 0.18);
   color: #fb7185;
   border: 1px solid rgba(236, 72, 153, 0.35);
 }
 
-/* Badge NEW (verde) */
 .pill--new {
   background: rgba(163, 230, 53, 0.16);
   color: #a3e635;
