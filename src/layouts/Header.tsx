@@ -1,29 +1,35 @@
 import { useState } from 'react';
 import '../styles/Header.css';
 import MovyIcon from '../assets/result-icon.png';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from './ThemeContext.tsx';
+import { useAuth } from './AuthContext.tsx';
+import { paths } from '../routes/paths.ts';
 
-const navItems = [
-  { label: 'Explore', to: '/' },
-  { label: 'Image', to: '/image' },
-  { label: 'Video', to: '/video' },
-  { label: 'Edit', to: '/edit' },
+const mainNavItems = [
+  { label: 'Explore', to: paths.root },
+  { label: 'Image', to: paths.image },
+  { label: 'Video', to: paths.video },
+  { label: 'Edit', to: paths.edit },
 ];
 
-const actionItems = [
-  { label: 'Pricing', to: '/pricing', ghost: true },
-  { label: 'Login', to: '/login', ghost: true },
-  { label: 'Sign up', to: '/signup', ghost: false },
-  { label: 'Profile', to: '/profile', ghost: true },
-];
+const publicNavItems = [{ label: 'Explore', to: paths.root }];
 
 export default function Header() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { isLoggedIn, logout } = useAuth();
 
+  const navItems = isLoggedIn ? mainNavItems : publicNavItems;
   const closeMenu = () => setMenuOpen(false);
+
+  const handleLogout = () => {
+    logout();
+    closeMenu();
+    navigate(paths.root);
+  };
 
   return (
     <header className="top-header">
@@ -75,15 +81,35 @@ export default function Header() {
               </svg>
             )}
           </button>
-          {actionItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`header-btn ${item.ghost ? 'header-btn--ghost' : 'header-btn--primary'}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {!isLoggedIn ? (
+            <>
+              <Link to={paths.pricing} className="header-btn header-btn--ghost">
+                Pricing
+              </Link>
+              <Link to={paths.login} className="header-btn header-btn--ghost">
+                Login
+              </Link>
+              <Link to={paths.signup} className="header-btn header-btn--primary">
+                Sign up
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to={paths.pricing} className="header-btn header-btn--ghost">
+                Pricing
+              </Link>
+              <Link to={paths.profile} className="header-btn header-btn--ghost">
+                Profile
+              </Link>
+              <button
+                type="button"
+                className="header-btn header-btn--ghost"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
+            </>
+          )}
         </div>
 
         <button
@@ -122,16 +148,35 @@ export default function Header() {
               </Link>
             );
           })}
-          {actionItems.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className={`mobile-link mobile-link--action ${item.ghost ? '' : 'mobile-link--primary'}`}
-              onClick={closeMenu}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {!isLoggedIn ? (
+            <>
+              <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                Pricing
+              </Link>
+              <Link to={paths.login} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                Login
+              </Link>
+              <Link to={paths.signup} className="mobile-link mobile-link--action mobile-link--primary" onClick={closeMenu}>
+                Sign up
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                Pricing
+              </Link>
+              <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                Profile
+              </Link>
+              <button
+                type="button"
+                className="mobile-link mobile-link--action"
+                onClick={handleLogout}
+              >
+                Log out
+              </button>
+            </>
+          )}
         </nav>
       </div>
     </header>

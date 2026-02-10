@@ -1,7 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Header from './layouts/Header.tsx';
-
+import { useAuth } from './layouts/AuthContext.tsx';
 import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
 import Video from './Pages/Video/Video';
@@ -13,6 +13,12 @@ import Profile from './Pages/Profile/Profile';
 import Pricing from './Pages/Pricing/Pricing';
 import './App.css';
 import { paths } from './routes/paths.ts';
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const { isLoggedIn } = useAuth();
+    if (!isLoggedIn) return <Navigate to={paths.login} replace />;
+    return <>{children}</>;
+}
 
 function AppLayout() {
     const location = useLocation();
@@ -26,14 +32,49 @@ function AppLayout() {
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
                     <Routes>
                         <Route path={paths.root} element={<Explore />} />
-                        <Route path={paths.image} element={<Image />} />
-                        <Route path={paths.video} element={<Video />} />
-                        <Route path={paths.edit} element={<Edit />} />
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<Signup />} />
-                        <Route path={paths.admin} element={<Admin />} />
-                        <Route path={paths.profile} element={<Profile />} />
                         <Route path={paths.pricing} element={<Pricing />} />
+                        <Route
+                            path={paths.image}
+                            element={
+                                <ProtectedRoute>
+                                    <Image />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path={paths.video}
+                            element={
+                                <ProtectedRoute>
+                                    <Video />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path={paths.edit}
+                            element={
+                                <ProtectedRoute>
+                                    <Edit />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path={paths.profile}
+                            element={
+                                <ProtectedRoute>
+                                    <Profile />
+                                </ProtectedRoute>
+                            }
+                        />
+                        <Route
+                            path={paths.admin}
+                            element={
+                                <ProtectedRoute>
+                                    <Admin />
+                                </ProtectedRoute>
+                            }
+                        />
                     </Routes>
                 </main>
             </div>
