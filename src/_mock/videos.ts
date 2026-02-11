@@ -1,4 +1,5 @@
 import type { ExploreVideo } from '../types/video/video.ts';
+import type { PreviewVideo } from '../types/video/previewVideo.ts';
 
 export const exploreVideos: ExploreVideo[] = [
   {
@@ -42,4 +43,10 @@ export const exploreVideos: ExploreVideo[] = [
     subtitle: 'Experiment with colors, shapes, and mesmerizing visual pattern.',
   },
 ];
+
+export const previewVideos: PreviewVideo[] = [
+  ...exploreVideos,
+  ...exploreVideos,
+  ...exploreVideos,
+].map((v) => ({ videoUrl: v.videoUrl }));
 

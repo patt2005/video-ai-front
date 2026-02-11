@@ -1,7 +1,8 @@
 import '../../styles/Explore.css';
 import { Link } from 'react-router-dom';
 import longCardIcon from '../../assets/longcardicon.png';
-import { exploreVideos } from '../../_mock/videos.ts';
+import { exploreVideos, previewVideos } from '../../_mock/videos.ts';
+import ExploreCard from './ExploreCard';
 
 export default function Explore() {
     return (
@@ -11,13 +12,7 @@ export default function Explore() {
             </p>
             <div className="explore-cards-row">
                 {exploreVideos.map((video) => (
-                    <div className="explore-card" key={video.title}>
-                        <video className="explore-card-thumb" autoPlay loop muted playsInline>
-                            <source src={video.videoUrl} type="video/mp4" />
-                        </video>
-                        <h2 className="explore-card-title">{video.title}</h2>
-                        <p className="explore-card-text">{video.subtitle}</p>
-                    </div>
+                    <ExploreCard key={video.title} video={video} />
                 ))}
             </div>
             <div className="explore-full-card">
@@ -34,13 +29,16 @@ export default function Explore() {
             <h2 className="explore-section-title">Mixed Media</h2>
 
             <div className="explore-grid">
-                <div className="explore-grid-item">01</div>
-                <div className="explore-grid-item">02</div>
-                <div className="explore-grid-item">03</div>
-                <div className="explore-grid-item explore-grid-item--wide">04</div>
-                <div className="explore-grid-item">05</div>
-                <div className="explore-grid-item">06</div>
-                <div className="explore-grid-item explore-grid-item--wide">07</div>
+                {previewVideos.slice(0, 7).map((video, index) => (
+                    <div
+                        key={`${video.videoUrl}-${index}`}
+                        className={`explore-grid-item${index === 3 || index === 6 ? ' explore-grid-item--wide' : ''}`}
+                    >
+                        <video className="explore-grid-item-thumb" autoPlay loop muted playsInline>
+                            <source src={video.videoUrl} type="video/mp4" />
+                        </video>
+                    </div>
+                ))}
             </div>
         </div>
     )
