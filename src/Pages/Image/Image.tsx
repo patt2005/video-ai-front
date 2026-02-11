@@ -5,6 +5,28 @@ import '../../styles/Image.css';
 import { Modality } from '@google/genai';
 import { getGenAI } from '../../lib/genai-vertex';
 import { ImageResultModal } from './ImageResultModal';
+import { ImageTutorialStepCard, type ImageTutorialStep } from './ImageTutorialStepCard';
+
+const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
+  {
+    step: 1,
+    icon: 'mdi:image-plus',
+    title: 'Add reference image',
+    description: 'Upload or paste an image to guide style or subject (optional).',
+  },
+  {
+    step: 2,
+    icon: 'mdi:lead-pencil',
+    title: 'Enter prompt',
+    description: 'Describe the scene you imagine, with details.',
+  },
+  {
+    step: 3,
+    icon: 'mdi:image-check',
+    title: 'Get your image',
+    description: 'Click Generate to create your final image.',
+  },
+];
 
 const GOOGLE_ICON = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png';
 
@@ -297,38 +319,9 @@ export default function Image() {
           Follow these three steps to create your image — add a reference (optional), describe your idea, then generate.
         </p>
         <div className="image-tutorial-steps">
-          <div className="image-tutorial-step">
-            <span className="image-tutorial-step-badge" aria-hidden>1</span>
-            <div className="image-tutorial-step-icon-wrap">
-              <Icon icon="mdi:image-plus" className="image-tutorial-step-icon" width={36} />
-            </div>
-            <h3 className="image-tutorial-step-title">Add reference image</h3>
-            <p className="image-tutorial-step-desc">
-              Upload or paste an image to guide style or subject (optional).
-            </p>
-          </div>
-
-          <div className="image-tutorial-step">
-            <span className="image-tutorial-step-badge" aria-hidden>2</span>
-            <div className="image-tutorial-step-icon-wrap">
-              <Icon icon="mdi:lead-pencil" className="image-tutorial-step-icon" width={36} />
-            </div>
-            <h3 className="image-tutorial-step-title">Enter prompt</h3>
-            <p className="image-tutorial-step-desc">
-              Describe the scene you imagine, with details.
-            </p>
-          </div>
-
-          <div className="image-tutorial-step">
-            <span className="image-tutorial-step-badge" aria-hidden>3</span>
-            <div className="image-tutorial-step-icon-wrap">
-              <Icon icon="mdi:image-check" className="image-tutorial-step-icon" width={36} />
-            </div>
-            <h3 className="image-tutorial-step-title">Get your image</h3>
-            <p className="image-tutorial-step-desc">
-              Click Generate to create your final image.
-            </p>
-          </div>
+          {IMAGE_TUTORIAL_STEPS.map((tutorial) => (
+            <ImageTutorialStepCard key={tutorial.step} {...tutorial} />
+          ))}
         </div>
         </section>
       </div>

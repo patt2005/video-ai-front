@@ -2,18 +2,9 @@ import { useState } from 'react';
 import '../styles/Header.css';
 import MovyIcon from '../assets/result-icon.png';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from './ThemeContext.tsx';
-import { useAuth } from './AuthContext.tsx';
+import { useTheme } from '../contexts/ThemeContext.tsx';
+import { useAuth } from '../contexts/AuthContext.tsx';
 import { paths } from '../routes/paths.ts';
-
-const mainNavItems = [
-  { label: 'Explore', to: paths.root },
-  { label: 'Image', to: paths.image },
-  { label: 'Video', to: paths.video },
-  { label: 'Edit', to: paths.edit },
-];
-
-const publicNavItems = [{ label: 'Explore', to: paths.root }];
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -22,7 +13,12 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const { isLoggedIn, logout } = useAuth();
 
-  const navItems = isLoggedIn ? mainNavItems : publicNavItems;
+  const navItems = [
+    { label: 'Explore', to: paths.root },
+    { label: 'Image', to: paths.image },
+    { label: 'Video', to: paths.video },
+    { label: 'Edit', to: paths.edit },
+  ];
   const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
@@ -40,21 +36,23 @@ export default function Header() {
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
-        <nav className="header-nav" aria-label="Primary navigation">
-          {navItems.map((item) => {
-            const isActive = pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`header-link ${isActive ? 'is-active' : ''}`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
+        {isLoggedIn ? (
+            <nav className="header-nav" aria-label="Primary navigation">
+                      {navItems.map((item) => {
+                        const isActive = pathname === item.to;
+                        return (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            className={`header-link ${isActive ? 'is-active' : ''}`}
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </nav>) :
+                    (<div></div>)
+        }
         <div className="header-actions">
           <button
             type="button"

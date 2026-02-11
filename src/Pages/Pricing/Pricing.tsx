@@ -3,7 +3,6 @@ import "../../styles/Pricing.css";
 export default function Pricing() {
     return (
         <main className="login-page">
-            {/* Background blobs (reutilizat) */}
             <div className="login-blobs" aria-hidden="true">
                 <div className="blob blob-purple" />
                 <div className="blob blob-cyan" />

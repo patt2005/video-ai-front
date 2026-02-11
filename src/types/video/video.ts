@@ -3,4 +3,3 @@ export interface ExploreVideo {
   title: string;
   subtitle: string;
 }
-

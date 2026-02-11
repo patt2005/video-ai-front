@@ -1,13 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Header from './layouts/Header.tsx';
-import { useAuth } from './layouts/AuthContext.tsx';
+import { useAuth } from './contexts/AuthContext.tsx';
 import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
 import Video from './Pages/Video/Video';
 import Edit from './Pages/Edit/Edit';
 import Login from './Pages/Login/Login';
-import Signup from './Pages/Signup/Signup';
 import Admin from './Pages/Admin/Admin';
 import Profile from './Pages/Profile/Profile';
 import Pricing from './Pages/Pricing/Pricing';
@@ -31,9 +30,16 @@ function AppLayout() {
                 <Header />
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
                     <Routes>
-                        <Route path={paths.root} element={<Explore />} />
+                        <Route
+                            path={paths.root}
+                            element={
+                                <ProtectedRoute>
+                                    <Explore />
+                                </ProtectedRoute>
+                            }
+                        />
                         <Route path={paths.login} element={<Login />} />
-                        <Route path={paths.signup} element={<Signup />} />
+                        <Route path={paths.signup} element={<Login />} />
                         <Route path={paths.pricing} element={<Pricing />} />
                         <Route
                             path={paths.image}
