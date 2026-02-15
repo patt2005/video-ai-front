@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { Toaster } from 'sonner';
 import Header from './Components/Header';
 
 import Image from './Pages/Image/Image';
@@ -19,7 +18,7 @@ function AppLayout() {
 
     return (
         <>
-            <Toaster position="top-center" richColors closeButton />
+
             <div className="app-shell">
                 <Header />
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
