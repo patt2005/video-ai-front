@@ -6,7 +6,7 @@ import ExploreCard from './ExploreCard';
 
 export default function Explore() {
     return (
-        <div className="page-wrapper explore-wrapper">
+        <div className="page-wrapper">
             <p className="explore-description">
               Follow your dream creating Videos wit MovyAI
             </p>

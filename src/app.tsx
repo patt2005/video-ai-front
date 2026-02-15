@@ -21,7 +21,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppLayout() {
     const location = useLocation();
-    const isVideoPage = location.pathname === paths.video;
+    const isVideoPage = location.pathname === paths.video || location.pathname === paths.root;
 
     return (
         <>

@@ -3,7 +3,7 @@ import type { PreviewVideo } from '../types/video/previewVideo.ts';
 
 export const exploreVideos: ExploreVideo[] = [
   {
-    videoUrl:"https://videos.openai.com/az/files/00000000-e530-7280-816c-d49fb88f7785%2Fraw?se=2026-02-12T00%3A00%3A00Z&sp=r&sv=2026-02-06&sr=b&skoid=5e5fc900-07cf-43e7-ab5b-314c0d877bb0&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-02-09T06%3A24%3A43Z&ske=2026-02-16T06%3A29%3A43Z&sks=b&skv=2026-02-06&sig=Hxc4nzVYkhkTnOA5cgw4OgsDbGcy3hCe2foVk/c3r54%3D&ac=oaisdsorprsouthcentralus",
+    videoUrl:"https://videos.openai.com/az/files/00000000-e530-7280-816c-d49fb88f7785%2Fraw?se=2026-05-12T00%3A00%3A00Z&sp=r&sv=2026-02-06&sr=b&skoid=5e5fc900-07cf-43e7-ab5b-314c0d877bb0&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-02-09T06%3A24%3A43Z&ske=2026-02-16T06%3A29%3A43Z&sks=b&skv=2026-02-06&sig=Hxc4nzVYkhkTnOA5cgw4OgsDbGcy3hCe2foVk/c3r54%3D&ac=oaisdsorprsouthcentralus",
     title: 'Feel the Time',
     subtitle: 'Explore impressive features fast and secure.',
   },
