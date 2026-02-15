@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import '../../styles/Image.css';
 import { Modality } from '@google/genai';
 import { getGenAI } from '../../lib/genaiVertex';
-import { ImageResultModal } from './ImageResultModal';
+import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { ImageTutorialStepCard, type ImageTutorialStep } from './ImageTutorialStepCard';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
