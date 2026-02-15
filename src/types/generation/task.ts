@@ -1,9 +1,10 @@
 export type ContentType = 'image' | 'video';
+export type TaskStatus = 'pending' | 'success' | 'failed';
 
-export interface GenerationTask {
+export interface Task {
     id: number;
     userId: number;
     creationDate: string;
     contentId: number | null;
-    contentType: ContentType;
+    status: TaskStatus;
 }
