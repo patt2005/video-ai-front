@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import Header from './layouts/Header.tsx';
+import Header from './layouts/header.tsx';
 import { useAuth } from './contexts/AuthContext.tsx';
 import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
@@ -19,6 +19,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
+function RootRoute() {
+    const { user } = useAuth();
+    return user?.role === 'admin' ? <Admin /> : <Explore />;
+}
+
 function AppLayout() {
     const location = useLocation();
     const isVideoPage = location.pathname === paths.video || location.pathname === paths.root;
@@ -34,7 +39,7 @@ function AppLayout() {
                             path={paths.root}
                             element={
                                 <ProtectedRoute>
-                                    <Explore />
+                                    <RootRoute />
                                 </ProtectedRoute>
                             }
                         />

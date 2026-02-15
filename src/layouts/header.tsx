@@ -11,7 +11,7 @@ export default function Header() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
 
   const navItems = [
     { label: 'Explore', to: paths.root },
@@ -36,23 +36,24 @@ export default function Header() {
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
-        {isLoggedIn ? (
+        {isLoggedIn && user?.role !== 'admin' ? (
             <nav className="header-nav" aria-label="Primary navigation">
-                      {navItems.map((item) => {
-                        const isActive = pathname === item.to;
-                        return (
-                          <Link
-                            key={item.to}
-                            to={item.to}
-                            className={`header-link ${isActive ? 'is-active' : ''}`}
-                          >
-                            {item.label}
-                          </Link>
-                        );
-                      })}
-                    </nav>) :
-                    (<div></div>)
-        }
+              {navItems.map((item) => {
+                const isActive = pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`header-link ${isActive ? 'is-active' : ''}`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : (
+            <div />
+          )}
         <div className="header-actions">
           <button
             type="button"
@@ -93,11 +94,20 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link to={paths.pricing} className="header-btn header-btn--ghost">
-                Pricing
-              </Link>
+              {user?.role !== 'admin' && (
+                <>
+                  <Link to={paths.pricing} className="header-btn header-btn--ghost">
+                    Pricing
+                  </Link>
+                </>
+              )}
+              {user?.role === 'admin' && (
+                <Link to={paths.admin} className="header-btn header-btn--ghost">
+                  Admin
+                </Link>
+              )}
               <Link to={paths.profile} className="header-btn header-btn--ghost">
-                Profile
+                              Profile
               </Link>
               <button
                 type="button"
@@ -133,7 +143,7 @@ export default function Header() {
           >
             {theme === 'dark' ? '☀️ Temă deschisă' : '🌙 Temă întunecată'}
           </button>
-          {navItems.map((item) => {
+          {isLoggedIn && user?.role !== 'admin' && navItems.map((item) => {
             const isActive = pathname === item.to;
             return (
               <Link
@@ -160,12 +170,21 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Pricing
-              </Link>
-              <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Profile
-              </Link>
+              {user?.role !== 'admin' && (
+                <>
+                  <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                    Pricing
+                  </Link>
+                  <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                    Profile
+                  </Link>
+                </>
+              )}
+              {user?.role === 'admin' && (
+                <Link to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                  Admin
+                </Link>
+              )}
               <button
                 type="button"
                 className="mobile-link mobile-link--action"

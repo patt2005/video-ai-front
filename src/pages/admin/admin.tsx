@@ -1,17 +1,22 @@
 import { useState } from 'react';
 import '../../styles/Admin.css';
+import { mockUsers } from '../../_mock/user';
+
+function formatRegisterDate(isoDate: string | undefined) {
+    if (!isoDate) return '—';
+    try {
+        const d = new Date(isoDate);
+        return d.toLocaleDateString('ro-RO', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch {
+        return isoDate;
+    }
+}
 
 export default function Admin() {
-    // Utilizarea hook-ului useState pentru mock data (Nota 7 & 8)
-    const [videos, setVideos] = useState([
-        { id: 1, title: 'Cyberpunk Astronaut', status: 'Terminat' },
-        { id: 2, title: 'Mars Colony', status: 'În procesare' },
-        { id: 3, title: 'Neon Cityscape', status: 'Terminat' }
-    ]);
+    const [users, setUsers] = useState(mockUsers);
 
-    // Funcție handling pentru procesarea datelor (Nota 8 & 16)
     const handleDelete = (id: number) => {
-        setVideos(videos.filter(v => v.id !== id));
+        setUsers(users.filter((u) => u.id !== id));
     };
 
     return (
@@ -20,29 +25,36 @@ export default function Admin() {
             <div className="admin-table-container">
                 <table className="admin-table">
                     <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Titlu Video</th>
-                        <th>Status</th>
-                        <th>Acțiuni</th>
-                    </tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Data înregistrării</th>
+                            <th>Rol</th>
+                            <th>Acțiuni</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {videos.map(v => (
-                        <tr key={v.id}>
-                            <td>{v.id}</td>
-                            <td>{v.title}</td>
-                            <td className={v.status === 'Terminat' ? 'status-completed' : 'status-processing'}>{v.status}</td>
-                            <td>
-                                <button
-                                    onClick={() => handleDelete(v.id)}
-                                    className="admin-delete-btn"
-                                >
-                                    Șterge
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                        {users.map((user) => (
+                            <tr key={user.id}>
+                                <td>{user.id}</td>
+                                <td>{user.username}</td>
+                                <td>{user.email ?? '—'}</td>
+                                <td>{formatRegisterDate(user.registerDate)}</td>
+                                <td className={user.role === 'admin' ? 'role-admin' : 'role-user'}>
+                                    {user.role}
+                                </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDelete(user.id)}
+                                        className="admin-delete-btn"
+                                    >
+                                        Șterge
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

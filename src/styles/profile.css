@@ -54,3 +54,9 @@
   border-radius: 20px;
   font-size: 12px;
 }
+
+.profile-register-date {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
