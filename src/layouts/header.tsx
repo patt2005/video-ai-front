@@ -31,7 +31,7 @@ export default function Header() {
     <header className="top-header">
       <div className="header-main">
         <div className="header-left">
-          <Link to="/" className="logo-badge" aria-label="MovyAI explore page">
+          <Link to={paths.root} className="logo-badge" aria-label="MovyAI explore page">
             <img src={MovyIcon} alt="MovyAI icon" className="logo-image" />
             <span className="logo-text">MovyAI</span>
           </Link>

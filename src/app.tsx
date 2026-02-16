@@ -6,7 +6,8 @@ import Image from './Pages/Image/Image';
 import Explore from './Pages/Explore/Explore';
 import Video from './Pages/Video/Video';
 import Edit from './Pages/Edit/Edit';
-import Login from './Pages/Login/Login';
+import Login from './Pages/Login/login';
+import SignUp from './Pages/Login/signup';
 import Admin from './Pages/Admin/Admin';
 import Profile from './Pages/Profile/Profile';
 import Pricing from './Pages/Pricing/Pricing';
@@ -44,7 +45,7 @@ function AppLayout() {
                             }
                         />
                         <Route path={paths.login} element={<Login />} />
-                        <Route path={paths.signup} element={<Login />} />
+                        <Route path={paths.signup} element={<SignUp />} />
                         <Route path={paths.pricing} element={<Pricing />} />
                         <Route
                             path={paths.image}

@@ -664,3 +664,107 @@ html[data-theme="dark"]{
     max-width: 100%;
   }
 }
+
+/* ================= SIGNUP PAGE (distinct from login) ================= */
+/* Signup uses same purple/cyan blobs as app (reuse blob-purple, blob-cyan) */
+
+/* Signup value prop + feature bullets */
+.signup-page .signup-value-prop {
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+.signup-page .signup-features {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 380px;
+}
+.signup-page .signup-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.78);
+  font-weight: 500;
+}
+.signup-page .signup-feature-icon {
+  flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
+}
+html[data-theme="dark"] .signup-page .signup-feature-item {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Signup layout: form on LEFT, copy on RIGHT (opposite of login) */
+@media (min-width: 1024px) {
+  .signup-page .signup-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .signup-page .signup-layout .signup-form-wrap {
+    order: -1;
+    justify-content: flex-start;
+  }
+  .signup-page .signup-layout .signup-copy {
+    margin-top: 10rem;
+    order: 1;
+  }
+}
+
+/* Signup card: subtle purple border and accent */
+.signup-page .signup-card {
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(168, 85, 247, 0.08);
+}
+html[data-theme="dark"] .signup-page .signup-card {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Signup primary button: app purple */
+.signup-page .signup-primary {
+  background: rgba(168, 85, 247, 0.95);
+  color: white;
+}
+.signup-page .signup-primary:hover {
+  background: rgba(126, 34, 206, 0.95);
+}
+html[data-theme="dark"] .signup-page .signup-primary {
+  background: rgba(168, 85, 247, 0.9);
+  color: white;
+}
+html[data-theme="dark"] .signup-page .signup-primary:hover {
+  background: rgba(192, 132, 252, 0.95);
+}
+
+/* Signup input focus: same purple as login */
+.signup-page .login-field input:focus {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.18);
+}
+.signup-page .login-field--error input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
+}
+
+/* Signup title accent */
+.signup-page .signup-title-accent {
+  color: #7c3aed;
+}
+html[data-theme="dark"] .signup-page .signup-title-accent {
+  color: #a78bfa;
+}
+
+.signup-page .signup-links {
+  justify-content: center;
+}
+.signup-page .login-link {
+  color: #7c3aed;
+}
+html[data-theme="dark"] .signup-page .login-link {
+  color: #a78bfa;
+}
