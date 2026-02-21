@@ -624,6 +624,12 @@ html[data-theme="dark"]{
     gap: 20px;
   }
 
+  /* Hide left column (title + copy / video) on mobile – show only form */
+  .login-left,
+  .signup-page .signup-copy {
+    display: none;
+  }
+
   .login-right{
     justify-self: stretch;
   }
@@ -672,33 +678,32 @@ html[data-theme="dark"]{
 .signup-page .signup-value-prop {
   font-size: clamp(28px, 5vw, 42px);
   line-height: 1.15;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
-.signup-page .signup-features {
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 380px;
+
+/* Video card on the right */
+.signup-page .signup-video-card-wrap {
+  margin-top: 12px;
+  max-width: 560px;
+  width: 100%;
 }
-.signup-page .signup-feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 16px;
-  line-height: 1.4;
-  color: rgba(0, 0, 0, 0.78);
-  font-weight: 500;
+.signup-page .signup-video-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
-.signup-page .signup-feature-icon {
-  flex-shrink: 0;
-  font-size: 20px;
-  line-height: 1;
+html[data-theme="dark"] .signup-page .signup-video-card {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
-html[data-theme="dark"] .signup-page .signup-feature-item {
-  color: rgba(255, 255, 255, 0.88);
+.signup-page .signup-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+  min-height: 320px;
+  object-fit: cover;
 }
 
 /* Signup layout: form on LEFT, copy on RIGHT (opposite of login) */
@@ -711,7 +716,7 @@ html[data-theme="dark"] .signup-page .signup-feature-item {
     justify-content: flex-start;
   }
   .signup-page .signup-layout .signup-copy {
-    margin-top: 10rem;
+    margin-top: 2rem;
     order: 1;
   }
 }

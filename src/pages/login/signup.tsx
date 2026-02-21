@@ -59,24 +59,21 @@ export default function SignUp() {
                     <h1 className="login-title signup-value-prop">
                         Create videos in minutes, not hours
                     </h1>
-                    <ul className="signup-features" aria-label="Features">
-                        <li className="signup-feature-item">
-                            <span className="signup-feature-icon" aria-hidden>🎬</span>
-                            AI video generation
-                        </li>
-                        <li className="signup-feature-item">
-                            <span className="signup-feature-icon" aria-hidden>✍️</span>
-                            Script → video in one click
-                        </li>
-                        <li className="signup-feature-item">
-                            <span className="signup-feature-icon" aria-hidden>🎨</span>
-                            Smart styles & templates
-                        </li>
-                        <li className="signup-feature-item">
-                            <span className="signup-feature-icon" aria-hidden>🚀</span>
-                            Export ready for social
-                        </li>
-                    </ul>
+                    <div className="signup-video-card-wrap">
+                        <div className="signup-video-card">
+                            <video
+                                className="signup-video"
+                                src="https://static.higgsfield.ai/quiz-v2/kling-3-quiz.mp4"
+                                autoPlay
+                                controls
+                                loop
+                                muted
+                                playsInline
+                                preload="auto"
+                                aria-label="MovyAI video demo"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <div className="login-right signup-form-wrap">

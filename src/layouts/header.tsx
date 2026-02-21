@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import '../styles/Header.css';
-import MovyIcon from '../assets/result-icon.png';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useTheme} from '../contexts/themeContext.tsx';
 import {useAuth} from '../contexts/authContext.tsx';
@@ -33,7 +32,7 @@ export default function Header() {
       <div className="header-main">
         <div className="header-left">
           <Link to={paths.root} className="logo-badge" aria-label="MovyAI explore page">
-            <img src={MovyIcon} alt="MovyAI icon" className="logo-image" />
+            <img src="/icon-512.png" alt="MovyAI" className="logo-image" />
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
