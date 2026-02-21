@@ -2,7 +2,7 @@ import '../../styles/Explore.css';
 import { Link } from 'react-router-dom';
 import longCardIcon from '../../assets/longcardicon.png';
 import { exploreVideos, previewVideos } from '../../_mock/videos.ts';
-import ExploreCard from './ExploreCard';
+import ExploreCard from './exploreCard';
 
 export default function Explore() {
     return (

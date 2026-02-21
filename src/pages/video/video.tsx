@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import '../../styles/Video.css';
-import { VideoResultModal } from '../../components/modals/VideoResultModal';
+// import { VideoResultModal } from '../../components/modals/videoResultModal';
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;
@@ -11,8 +11,7 @@ export default function Video() {
   const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string } | null>(null);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
-  const [resultModalOpen, setResultModalOpen] = useState(false);
+  // const [resultModalOpen, setResultModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleGenerateClick = async () => {
@@ -22,8 +21,7 @@ export default function Video() {
       });
       return;
     }
-
-    const trimmedPrompt = prompt.trim();
+    
     setIsGenerating(true);
     setPrompt('');
     const toastId = toast.loading('Generating video…', {
@@ -37,10 +35,9 @@ export default function Video() {
          toast.dismiss(toastId);
        }, 3000);
     } catch (err) {
-      const message = err instanceof ViduError ? err.message : err instanceof Error ? err.message : 'Something went wrong.';
       toast.error('Generation failed', {
         id: toastId,
-        description: message,
+        description: 'Something went wrong.',
       });
     } finally {
       setIsGenerating(false);
@@ -141,12 +138,13 @@ export default function Video() {
           </div>
         </div>
       </div>
-
+      {/*
       <VideoResultModal
         open={resultModalOpen}
         onOpenChange={setResultModalOpen}
         videoUrl={resultVideoUrl}
       />
+      */}
     </div>
   );
 }

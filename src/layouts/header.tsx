@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import '../styles/Header.css';
 import MovyIcon from '../assets/result-icon.png';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext.tsx';
-import { useAuth } from '../contexts/AuthContext.tsx';
-import { paths } from '../routes/paths.ts';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {useTheme} from '../contexts/themeContext.tsx';
+import {useAuth} from '../contexts/authContext.tsx';
+import {paths} from '../routes/paths.ts';
+import {UserRole} from "../types/user/user.ts";
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -36,7 +37,7 @@ export default function Header() {
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
-        {isLoggedIn && user?.role !== 'admin' ? (
+        {isLoggedIn && user?.role !== UserRole.Admin ? (
             <nav className="header-nav" aria-label="Primary navigation">
               {navItems.map((item) => {
                 const isActive = pathname === item.to;
@@ -94,14 +95,14 @@ export default function Header() {
             </>
           ) : (
             <>
-              {user?.role !== 'admin' && (
+              {user?.role !== UserRole.Admin && (
                 <>
                   <Link to={paths.pricing} className="header-btn header-btn--ghost">
                     Pricing
                   </Link>
                 </>
               )}
-              {user?.role === 'admin' && (
+              {user?.role === UserRole.Admin && (
                 <Link to={paths.admin} className="header-btn header-btn--ghost">
                   Admin
                 </Link>
@@ -143,7 +144,7 @@ export default function Header() {
           >
             {theme === 'dark' ? '☀️ Temă deschisă' : '🌙 Temă întunecată'}
           </button>
-          {isLoggedIn && user?.role !== 'admin' && navItems.map((item) => {
+          {isLoggedIn && user?.role !== UserRole.Admin && navItems.map((item) => {
             const isActive = pathname === item.to;
             return (
               <Link
@@ -170,7 +171,7 @@ export default function Header() {
             </>
           ) : (
             <>
-              {user?.role !== 'admin' && (
+              {user?.role !== UserRole.Admin && (
                 <>
                   <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
                     Pricing
@@ -180,7 +181,7 @@ export default function Header() {
                   </Link>
                 </>
               )}
-              {user?.role === 'admin' && (
+              {user?.role === UserRole.Admin && (
                 <Link to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu}>
                   Admin
                 </Link>

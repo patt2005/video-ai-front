@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/authContext';
 import { taskService } from '../../services/taskService';
 import type { Task } from '../../types/generation/task';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
-import { VideoResultModal } from '../../components/modals/VideoResultModal';
+import { VideoResultModal } from '../../components/modals/videoResultModal';
 import '../../styles/Profile.css';
 
 function formatRole(role: string) {

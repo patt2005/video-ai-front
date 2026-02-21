@@ -1,0 +1,124 @@
+/*
+ * Footer.css – component: footer.tsx
+ * Stiluri pentru subsol: brand, linkuri, copyright.
+ */
+
+.app-footer {
+  margin-top: auto;
+  background: var(--header-bg);
+  border-top: 1px solid var(--header-border);
+  color: var(--header-text);
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--header-text);
+}
+
+.footer-logo:hover {
+  opacity: 0.9;
+}
+
+.footer-logo-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.footer-logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 20px;
+}
+
+.footer-link {
+  padding: 6px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--header-text);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.footer-link:hover {
+  background: var(--header-btn-ghost-hover);
+}
+
+.footer-bottom {
+  padding-top: 8px;
+  border-top: 1px solid var(--header-border);
+  width: 100%;
+  max-width: 400px;
+}
+
+.footer-copy {
+  margin: 0;
+  font-size: 12px;
+  color: var(--header-text);
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    padding: 20px 20px 18px;
+    gap: 16px;
+  }
+
+  .footer-nav {
+    gap: 6px 14px;
+  }
+
+  .footer-link {
+    font-size: 12px;
+  }
+
+  .footer-logo-text {
+    font-size: 14px;
+  }
+
+  .footer-logo-img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-inner {
+    padding: 16px 16px 14px;
+  }
+
+  .footer-copy {
+    font-size: 11px;
+  }
+}

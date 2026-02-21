@@ -1,18 +1,20 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import {BrowserRouter as Router, Navigate, Route, Routes, useLocation} from 'react-router-dom';
+import {Toaster} from 'sonner';
 import Header from './layouts/header.tsx';
-import { useAuth } from './contexts/AuthContext.tsx';
-import Image from './Pages/Image/Image';
-import Explore from './Pages/Explore/Explore';
-import Video from './Pages/Video/Video';
-import Edit from './Pages/Edit/Edit';
-import Login from './Pages/Login/login';
-import SignUp from './Pages/Login/signup';
-import Admin from './Pages/Admin/Admin';
-import Profile from './Pages/Profile/Profile';
-import Pricing from './Pages/Pricing/Pricing';
+import Footer from './layouts/footer.tsx';
+import {useAuth} from './contexts/authContext.tsx';
+import Image from './pages/image/image';
+import Explore from './pages/explore/explore';
+import Video from './pages/video/video';
+import Edit from './pages/edit/edit';
+import Login from './pages/login/login';
+import SignUp from './pages/login/signup';
+import Admin from './pages/admin/admin';
+import Profile from './pages/profile/profile';
+import Pricing from './pages/pricing/pricing';
 import './App.css';
-import { paths } from './routes/paths.ts';
+import {paths} from './routes/paths.ts';
+import {UserRole} from "./types/user/user.ts";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { isLoggedIn } = useAuth();
@@ -22,7 +24,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function RootRoute() {
     const { user } = useAuth();
-    return user?.role === 'admin' ? <Admin /> : <Explore />;
+    return user?.role === UserRole.Admin ? <Admin /> : <Explore />;
 }
 
 function AppLayout() {
@@ -34,6 +36,7 @@ function AppLayout() {
             <Toaster position="top-center" richColors closeButton />
             <div className="app-shell">
                 <Header />
+                <div className="main-area">
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
                     <Routes>
                         <Route
@@ -89,6 +92,8 @@ function AppLayout() {
                         />
                     </Routes>
                 </main>
+                </div>
+                <Footer />
             </div>
         </>
     );

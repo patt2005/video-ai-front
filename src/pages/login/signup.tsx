@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { object, string, ref, ValidationError } from 'yup';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/authContext';
 import { paths } from '../../routes/paths';
 
 const signupSchema = object({

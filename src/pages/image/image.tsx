@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import '../../styles/Image.css';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
-import { ImageTutorialStepCard, type ImageTutorialStep } from './ImageTutorialStepCard';
+import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [

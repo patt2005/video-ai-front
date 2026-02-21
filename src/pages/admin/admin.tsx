@@ -1,9 +1,10 @@
-import { useState, useMemo, Fragment } from 'react';
-import { Icon } from '@iconify/react';
+import {Fragment, useMemo, useState} from 'react';
+import {Icon} from '@iconify/react';
 import '../../styles/Admin.css';
-import { userService } from '../../services/userService';
-import { taskService } from '../../services/taskService';
-import type { Task } from '../../types/generation/task';
+import {userService} from '../../services/userService';
+import {taskService} from '../../services/taskService';
+import type {Task} from '../../types/generation/task';
+import {UserRole} from "../../types/user/user.ts";
 
 function formatRegisterDate(isoDate: string | undefined) {
     if (!isoDate) return '—';
@@ -114,7 +115,7 @@ export default function Admin() {
                                         <td>{user.username}</td>
                                         <td>{user.email ?? '—'}</td>
                                         <td>{formatRegisterDate(user.registerDate)}</td>
-                                        <td className={user.role === 'admin' ? 'role-admin' : 'role-user'}>
+                                        <td className={user.role === UserRole.Admin ? 'role-admin' : 'role-user'}>
                                             {user.role}
                                         </td>
                                         <td>
