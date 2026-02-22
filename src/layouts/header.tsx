@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import '../styles/header.css';
-import MovyIcon from '../assets/result-icon.png';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from '../contexts/themeContext';
-import { useAuth } from '../contexts/authContext';
-import { paths } from '../routes/paths';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {useTheme} from '../contexts/themeContext.tsx';
+import {useAuth} from '../contexts/authContext.tsx';
+import {paths} from '../routes/paths.ts';
+import {UserRole} from "../types/user/user.ts";
 
 export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
 
   const navItems = [
     { label: 'Explore', to: paths.root },
@@ -27,29 +27,33 @@ export default function Header() {
     navigate(paths.root);
   };
 
-  const content = (
-    <div className="top-header" role="banner">
+  return (
+    <header className="top-header">
       <div className="header-main">
         <div className="header-left">
-          <Link to="/" className="logo-badge" aria-label="MovyAI explore page">
-            <img src={MovyIcon} alt="MovyAI icon" className="logo-image" />
+          <Link to={paths.root} className="logo-badge" aria-label="MovyAI explore page">
+            <img src="/icon-512.png" alt="MovyAI" className="logo-image" />
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
-        <nav className="header-nav" aria-label="Primary navigation">
-          {navItems.map((item) => {
-            const isActive = pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`header-link ${isActive ? 'is-active' : ''}`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+        {isLoggedIn && user?.role !== UserRole.Admin ? (
+            <nav className="header-nav" aria-label="Primary navigation">
+              {navItems.map((item) => {
+                const isActive = pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`header-link ${isActive ? 'is-active' : ''}`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : (
+            <div />
+          )}
         <div className="header-actions">
           <button
             type="button"
@@ -90,11 +94,20 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link to={paths.pricing} className="header-btn header-btn--ghost">
-                Pricing
-              </Link>
+              {user?.role !== UserRole.Admin && (
+                <>
+                  <Link to={paths.pricing} className="header-btn header-btn--ghost">
+                    Pricing
+                  </Link>
+                </>
+              )}
+              {user?.role === UserRole.Admin && (
+                <Link to={paths.admin} className="header-btn header-btn--ghost">
+                  Admin
+                </Link>
+              )}
               <Link to={paths.profile} className="header-btn header-btn--ghost">
-                Profile
+                              Profile
               </Link>
               <button
                 type="button"
@@ -130,7 +143,7 @@ export default function Header() {
           >
             {theme === 'dark' ? '☀️ Temă deschisă' : '🌙 Temă întunecată'}
           </button>
-          {navItems.map((item) => {
+          {isLoggedIn && user?.role !== UserRole.Admin && navItems.map((item) => {
             const isActive = pathname === item.to;
             return (
               <Link
@@ -157,16 +170,25 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Pricing
-              </Link>
-              <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Profile
-              </Link>
+              {user?.role !== UserRole.Admin && (
+                <>
+                  <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                    Pricing
+                  </Link>
+                  <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                    Profile
+                  </Link>
+                </>
+              )}
+              {user?.role === UserRole.Admin && (
+                <Link to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu}>
+                  Admin
+                </Link>
+              )}
               <button
                 type="button"
                 className="mobile-link mobile-link--action"
-                onClick={() => { handleLogout(); closeMenu(); }}
+                onClick={handleLogout}
               >
                 Log out
               </button>
@@ -174,8 +196,6 @@ export default function Header() {
           )}
         </nav>
       </div>
-    </div>
+    </header>
   );
-
-  return content;
 }
