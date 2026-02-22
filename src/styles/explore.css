@@ -18,7 +18,7 @@
   font-size: 28px;
   font-weight: 600;
   text-align: center;
-  margin: 0 auto 24px;
+  margin: 0 auto 12px;
   max-width: 800px;
   color: var(--text);
   line-height: 1.3;
@@ -27,9 +27,10 @@
 /* Rând cu carduri video scrollabile sub header */
 .explore-cards-row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   overflow-x: auto;
   scrollbar-width: none;
+  margin-top: 0;
 }
 
 .explore-cards-row::-webkit-scrollbar {
@@ -41,26 +42,26 @@
 }
 
 .explore-card {
-  flex: 0 0 380px;
+  flex: 0 0 520px;
   background: var(--bg-panel);
-  border-radius: 12px;
+  border-radius: 14px;
   border: 1px solid var(--border);
-  padding: 10px;
+  padding: 14px;
 }
 
 .explore-card-thumb {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 8px;
+  border-radius: 10px;
   background-color: #111827;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   object-fit: cover;
   display: block;
 }
 
 .explore-card-title {
   font-family: 'Poppins', sans-serif;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   margin-bottom: 6px;
   color: var(--text);
@@ -68,14 +69,14 @@
 
 .explore-card-text {
   font-family: 'Poppins', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: var(--text-muted);
 }
 
 @media (min-width: 768px) {
   .explore-card {
-    flex-basis: 530px;
+    flex-basis: 720px;
   }
 }
 
@@ -205,7 +206,7 @@
 .explore-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 20px;
   padding-left: 40px;
   padding-right: 40px;
 }
@@ -213,9 +214,9 @@
 .explore-grid-item {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 0;
-  min-height: 120px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -224,7 +225,7 @@
 .explore-grid-item-thumb {
   width: 100%;
   height: 100%;
-  min-height: 120px;
+  min-height: 240px;
   object-fit: cover;
   background-color: #111827;
 }

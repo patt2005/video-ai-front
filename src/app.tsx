@@ -1,23 +1,18 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import Header from './layouts/Header.tsx';
-import { useAuth } from './contexts/AuthContext.tsx';
-import Image from './Pages/Image/Image';
-import Explore from './Pages/Explore/Explore';
-import Video from './Pages/Video/Video';
-import Edit from './Pages/Edit/Edit';
-import Login from './Pages/Login/Login';
-import Admin from './Pages/Admin/Admin';
-import Profile from './Pages/Profile/Profile';
-import Pricing from './Pages/Pricing/Pricing';
-import './App.css';
-import { paths } from './routes/paths.ts';
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    const { isLoggedIn } = useAuth();
-    if (!isLoggedIn) return <Navigate to={paths.login} replace />;
-    return <>{children}</>;
-}
+import Header from './layouts/header';
+import Footer from './layouts/footer';
+import Image from './pages/image/image';
+import Explore from './pages/explore/explore';
+import Video from './pages/video/video';
+import Edit from './pages/edit/edit';
+import Login from './pages/login/login';
+import Admin from './pages/admin/admin';
+import Profile from './pages/profile/profile';
+import Pricing from './pages/pricing/pricing';
+import './app.css';
+import './styles/header.css';
+import { paths } from './routes/paths';
 
 function AppLayout() {
     const location = useLocation();
@@ -30,59 +25,18 @@ function AppLayout() {
                 <Header />
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
                     <Routes>
-                        <Route
-                            path={paths.root}
-                            element={
-                                <ProtectedRoute>
-                                    <Explore />
-                                </ProtectedRoute>
-                            }
-                        />
+                        <Route path={paths.root} element={<Explore />} />
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<Login />} />
                         <Route path={paths.pricing} element={<Pricing />} />
-                        <Route
-                            path={paths.image}
-                            element={
-                                <ProtectedRoute>
-                                    <Image />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path={paths.video}
-                            element={
-                                <ProtectedRoute>
-                                    <Video />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path={paths.edit}
-                            element={
-                                <ProtectedRoute>
-                                    <Edit />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path={paths.profile}
-                            element={
-                                <ProtectedRoute>
-                                    <Profile />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path={paths.admin}
-                            element={
-                                <ProtectedRoute>
-                                    <Admin />
-                                </ProtectedRoute>
-                            }
-                        />
+                        <Route path={paths.image} element={<Image />} />
+                        <Route path={paths.video} element={<Video />} />
+                        <Route path={paths.edit} element={<Edit />} />
+                        <Route path={paths.profile} element={<Profile />} />
+                        <Route path={paths.admin} element={<Admin />} />
                     </Routes>
                 </main>
+                <Footer />
             </div>
         </>
     );

@@ -1,8 +1,8 @@
-import '../../styles/Explore.css';
+import '../../styles/explore.css';
 import { Link } from 'react-router-dom';
 import longCardIcon from '../../assets/longcardicon.png';
-import { exploreVideos, previewVideos } from '../../_mock/videos.ts';
-import ExploreCard from './ExploreCard';
+import { exploreVideos, previewVideos } from '../../_mock/videos';
+import ExploreCard from './exploreCard';
 
 export default function Explore() {
     return (

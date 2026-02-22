@@ -3,8 +3,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1.5rem 0.5rem;
+  padding: 1rem;
   color: var(--text);
+  box-sizing: border-box;
 }
 
 .image-page-header {
@@ -33,6 +34,8 @@
   gap: 1rem;
   align-items: stretch;
   justify-content: center;
+  padding: 0 0.25rem;
+  box-sizing: border-box;
 }
 
 .image-create-panel {
@@ -820,10 +823,13 @@
   .image-page-row {
     flex-direction: column;
     align-items: center;
+    padding: 0;
   }
 
   .image-create-panel {
-    max-width: 30%;
+    max-width: 100%;
+    width: 100%;
+    min-height: auto;
   }
 
   .image-tutorial {
@@ -843,25 +849,75 @@
 }
 
 @media (max-width: 768px) {
-  .image-tutorial-steps {
-    grid-template-columns: 1fr;
+  .image-page {
+    padding: 0.75rem 1rem;
   }
-}
 
-@media (max-width: 640px) {
-  .image-page-row {
-    gap: 1.5rem;
+  .image-page-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .image-page-title {
+    font-size: 1.4rem;
+  }
+
+  .image-page-subtitle {
+    font-size: 0.875rem;
   }
 
   .image-create-panel {
     padding: 1rem;
+    max-width: 100%;
   }
 
-  .generate-btn {
-    padding: 0.75rem 1rem;
+  .image-tutorial-steps {
+    grid-template-columns: 1fr;
   }
 
   .image-tutorial-title {
     font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .image-page {
+    padding: 0.5rem 0.75rem 1.5rem;
+  }
+
+  .image-page-row {
+    gap: 1.25rem;
+  }
+
+  .image-create-panel {
+    padding: 0.875rem 0.75rem;
+    max-width: 100%;
+  }
+
+  .prompt-image-picker,
+  .prompt-image-placeholder,
+  .prompt-image-preview-wrap {
+    min-height: 120px;
+  }
+
+  .prompt-input {
+    min-height: 100px;
+    font-size: 16px; /* avoids zoom on focus on iOS */
+  }
+
+  .generate-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .image-tutorial-title {
+    font-size: 1.15rem;
+  }
+
+  .image-tutorial-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .model-select-card-row {
+    padding: 0.6rem 0.75rem;
   }
 }

@@ -1,0 +1,99 @@
+/*
+ * Footer – bara de jos a site-ului
+ */
+
+.site-footer {
+  flex-shrink: 0;
+  background: var(--header-bg, #1a1a1a);
+  border-top: 1px solid var(--header-border, #333);
+  color: var(--header-text, #f9fafb);
+  margin-top: auto;
+}
+
+.footer-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 40px 20px;
+  box-sizing: border-box;
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.08));
+}
+
+.footer-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--header-text);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.footer-logo:hover {
+  opacity: 0.9;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer-link {
+  font-size: 14px;
+  color: var(--header-text);
+  text-decoration: none;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.footer-link:hover {
+  opacity: 1;
+}
+
+.footer-bottom {
+  padding-top: 16px;
+}
+
+.footer-copy {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted, #9ca3af);
+}
+
+@media (max-width: 768px) {
+  .footer-inner {
+    padding: 20px 20px 16px;
+  }
+
+  .footer-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+
+  .footer-nav {
+    gap: 6px 20px;
+  }
+
+  .footer-link {
+    font-size: 13px;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-inner {
+    padding: 16px 16px 14px;
+  }
+}

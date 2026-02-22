@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import '../../styles/Image.css';
+import '../../styles/image.css';
 import { Modality } from '@google/genai';
 import { getGenAI } from '../../lib/genaiVertex';
-import { ImageResultModal } from './ImageResultModal';
-import { ImageTutorialStepCard, type ImageTutorialStep } from './ImageTutorialStepCard';
+import { ImageResultModal } from './imageResultModal';
+import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   {

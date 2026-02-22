@@ -6,6 +6,7 @@
   --bg-muted: #1a1a1a;
   --text: #f9fafb;
   --text-muted: #9ca3af;
+  --border: #374151;
   --border-light: rgba(255, 255, 255, 0.08);
   --accent: #8b5cf6;
   --link: #646cff;
@@ -163,31 +164,29 @@ html[data-theme='light'] {
   position: relative;
   z-index: 1;
   flex: 1;
-  max-width: 1280px;
-  margin: 48px auto 0;
   width: 100%;
-  padding: 0 24px 24px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 40px;
-  align-items: start;
+  min-height: 100%;
+  margin: 0;
+  padding: 1.5rem 24px 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
   box-sizing: border-box;
-}
-
-@media (min-width: 1024px) {
-  .login-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .login-left {
-    margin-top: 10rem;
-  }
 }
 
 .login-left {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  text-align: center;
+  order: 1;
+  max-width: 520px;
+}
+
+.login-right {
+  order: 2;
 }
 
 .login-blobs {
@@ -299,13 +298,8 @@ html[data-theme='light'] {
 .login-right {
   display: flex;
   justify-content: center;
-  align-self: start;
-}
-
-@media (min-width: 1024px) {
-  .login-right {
-    justify-content: flex-end;
-  }
+  align-items: center;
+  width: 100%;
 }
 
 .login-card {
@@ -616,51 +610,45 @@ html[data-theme="dark"]{
   letter-spacing: 0.01em;
 }
 /* === LOGIN RESPONSIVE (MOBILE) === */
-@media (max-width: 1024px){
-  .login-layout{
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 24px 24px 16px;
-    gap: 20px;
+@media (max-width: 1024px) {
+  .login-layout {
+    padding: 1.25rem 20px 1.5rem;
+    gap: 1.5rem;
   }
 
-  .login-right{
-    justify-self: stretch;
-  }
-
-  .login-card{
+  .login-card {
     width: 100%;
     padding: 20px;
   }
 }
 
-@media (max-width: 640px){
-  .login-layout{
+@media (max-width: 640px) {
+  .login-layout {
     max-width: 100%;
     padding: 18px 18px 16px;
     gap: 16px;
   }
 
-  .login-card{
+  .login-card {
     padding: 18px;
   }
 
-  .login-title{
+  .login-title {
     font-size: clamp(32px, 9vw, 44px);
     line-height: 1.05;
   }
 
-  .login-subtitle{
+  .login-subtitle {
     font-size: 15px;
   }
 
-  .login-features{
+  .login-features {
     display: grid;
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .login-pill{
+  .login-pill {
     max-width: 100%;
   }
 }

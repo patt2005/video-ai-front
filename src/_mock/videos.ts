@@ -1,5 +1,5 @@
-import type { ExploreVideo } from '../types/video/video.ts';
-import type { PreviewVideo } from '../types/video/previewVideo.ts';
+import type { ExploreVideo } from '../types/video/exploreVideo';
+import type { PreviewVideo } from '../types/video/previewVideo';
 
 export const exploreVideos: ExploreVideo[] = [
   {

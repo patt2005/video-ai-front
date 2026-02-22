@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import '../../styles/Video.css';
+import '../../styles/video.css';
 import { pollTaskUntilComplete, text2video, image2video, ViduError } from '../../lib/vidu';
-import { VideoResultModal } from './VideoResultModal';
+import { VideoResultModal } from './videoResultModal';
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;

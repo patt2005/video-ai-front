@@ -12,6 +12,14 @@
   transition: background-color 0.3s, color 0.3s;
 }
 
+.app-shell > .top-header {
+  flex-shrink: 0;
+}
+
+.app-shell > main {
+  flex: 1;
+}
+
 .main-area {
   flex: 1;
 }
