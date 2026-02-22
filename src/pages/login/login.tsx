@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { object, string, ref, ValidationError } from 'yup';
-import type { InferType } from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { object, string, ValidationError } from 'yup';
 import { useAuth } from '../../contexts/authContext';
 import { paths } from '../../routes/paths';
 
@@ -10,37 +9,22 @@ const loginSchema = object({
     password: string().required('Password is required').min(8, 'Password must be at least 8 characters'),
 });
 
-const signupSchema = loginSchema.shape({
-    repeatPassword: string()
-        .required('Please repeat your password')
-        .oneOf([ref('password')], 'Passwords must match'),
-});
-
-type LoginFormValues = InferType<typeof loginSchema>;
-
 export default function Login() {
-    const location = useLocation();
     const navigate = useNavigate();
     const { loginWithMockUser } = useAuth();
-    const isSignup = location.pathname === paths.signup;
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [repeatPassword, setRepeatPassword] = useState('');
-    const [errors, setErrors] = useState<Partial<Record<keyof LoginFormValues | 'repeatPassword', string>>>({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrors({});
 
-        const payload = { email, password, ...(isSignup ? { repeatPassword } : {}) };
+        const payload = { email, password };
 
         try {
-            if (isSignup) {
-                await signupSchema.validate(payload, { abortEarly: false });
-            } else {
-                await loginSchema.validate(payload, { abortEarly: false });
-            }
+            await loginSchema.validate(payload, { abortEarly: false });
             loginWithMockUser();
             navigate(paths.root, { replace: true });
         } catch (err) {
@@ -73,20 +57,18 @@ export default function Login() {
                         <span className="login-title-muted">with MovyAI</span>
                     </h1>
                     <p className="login-subtitle">
-                        {isSignup
-                            ? "Create an account to get started with AI-powered tools."
-                            : "Sign in to your account to create, edit, and explore with AI-powered tools."}
+                        "Sign in to your account to create, edit, and explore with AI-powered tools."
                     </p>
                 </div>
 
                 <div className="login-right">
                                 <div className="login-card">
                                     <div className="login-card-head">
-                                        <h2 className="login-card-title">{isSignup ? 'Sign up' : 'Sign in'}</h2>
+                                        <h2 className="login-card-title">Sign in</h2>
                                     </div>
 
                                     <p className="login-card-sub">
-                                        {isSignup ? "Create your account — let's get started." : "Welcome back — let's continue."}
+                                        Welcome back — let's continue.
                                     </p>
 
                                     <form className="login-form" onSubmit={handleSubmit}>
@@ -117,7 +99,7 @@ export default function Login() {
                                                 placeholder="••••••••"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                autoComplete={isSignup ? 'new-password' : 'current-password'}
+                                                autoComplete="current-password"
                                                 aria-invalid={!!errors.password}
                                                 aria-describedby={errors.password ? 'login-password-error' : undefined}
                                             />
@@ -128,47 +110,14 @@ export default function Login() {
                                             )}
                                         </div>
 
-                                        {isSignup && (
-                                            <div className={`login-field${errors.repeatPassword ? ' login-field--error' : ''}`}>
-                                                <label htmlFor="login-repeat-password">Repeat password</label>
-                                                <input
-                                                    id="login-repeat-password"
-                                                    type="password"
-                                                    placeholder="••••••••"
-                                                    value={repeatPassword}
-                                                    onChange={(e) => setRepeatPassword(e.target.value)}
-                                                    autoComplete="new-password"
-                                                    aria-invalid={!!errors.repeatPassword}
-                                                    aria-describedby={errors.repeatPassword ? 'login-repeat-password-error' : undefined}
-                                                />
-                                                {errors.repeatPassword && (
-                                                    <p id="login-repeat-password-error" className="login-field-error" role="alert">
-                                                        {errors.repeatPassword}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        )}
-
                                         <button className="login-primary" type="submit">
-                                            {isSignup ? 'Sign up' : 'Login'}
+                                            Login
                                         </button>
 
                                         <div className="login-links">
-                                            {!isSignup && (
-                                                <Link to={paths.signup} className="login-link">
-                                                    Create account
-                                                </Link>
-                                            )}
-                                            {!isSignup && (
-                                                <button type="button" className="login-ghost">
-                                                    Forgot password?
-                                                </button>
-                                            )}
-                                            {isSignup && (
-                                                <Link to={paths.login} className="login-link">
-                                                    Already have an account? Sign in
-                                                </Link>
-                                            )}
+                                            <button type="button" className="login-ghost">
+                                                Forgot password?
+                                            </button>
                                         </div>
 
                                         <div className="login-divider">

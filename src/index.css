@@ -616,7 +616,17 @@ html[data-theme="dark"]{
     gap: 1.5rem;
   }
 
-  .login-card {
+  /* Hide left column (title + copy / video) on mobile – show only form */
+  .login-left,
+  .signup-page .signup-copy {
+    display: none;
+  }
+
+  .login-right{
+    justify-self: stretch;
+  }
+
+  .login-card{
     width: 100%;
     padding: 20px;
   }
@@ -651,4 +661,107 @@ html[data-theme="dark"]{
   .login-pill {
     max-width: 100%;
   }
+}
+
+/* ================= SIGNUP PAGE (distinct from login) ================= */
+/* Signup uses same purple/cyan blobs as app (reuse blob-purple, blob-cyan) */
+
+/* Signup value prop + feature bullets */
+.signup-page .signup-value-prop {
+  font-size: clamp(28px, 5vw, 42px);
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+/* Video card on the right */
+.signup-page .signup-video-card-wrap {
+  margin-top: 12px;
+  max-width: 560px;
+  width: 100%;
+}
+.signup-page .signup-video-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  background: var(--bg-panel);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+html[data-theme="dark"] .signup-page .signup-video-card {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+.signup-page .signup-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+  min-height: 320px;
+  object-fit: cover;
+}
+
+/* Signup layout: form on LEFT, copy on RIGHT (opposite of login) */
+@media (min-width: 1024px) {
+  .signup-page .signup-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+  .signup-page .signup-layout .signup-form-wrap {
+    order: -1;
+    justify-content: flex-start;
+  }
+  .signup-page .signup-layout .signup-copy {
+    margin-top: 2rem;
+    order: 1;
+  }
+}
+
+/* Signup card: subtle purple border and accent */
+.signup-page .signup-card {
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(168, 85, 247, 0.08);
+}
+html[data-theme="dark"] .signup-page .signup-card {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Signup primary button: app purple */
+.signup-page .signup-primary {
+  background: rgba(168, 85, 247, 0.95);
+  color: white;
+}
+.signup-page .signup-primary:hover {
+  background: rgba(126, 34, 206, 0.95);
+}
+html[data-theme="dark"] .signup-page .signup-primary {
+  background: rgba(168, 85, 247, 0.9);
+  color: white;
+}
+html[data-theme="dark"] .signup-page .signup-primary:hover {
+  background: rgba(192, 132, 252, 0.95);
+}
+
+/* Signup input focus: same purple as login */
+.signup-page .login-field input:focus {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.18);
+}
+.signup-page .login-field--error input:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.2);
+}
+
+/* Signup title accent */
+.signup-page .signup-title-accent {
+  color: #7c3aed;
+}
+html[data-theme="dark"] .signup-page .signup-title-accent {
+  color: #a78bfa;
+}
+
+.signup-page .signup-links {
+  justify-content: center;
+}
+.signup-page .login-link {
+  color: #7c3aed;
+}
+html[data-theme="dark"] .signup-page .login-link {
+  color: #a78bfa;
 }

@@ -17,7 +17,7 @@
   padding: 40px;
 }
 
-/* Titlul „Profilul Meu” (accent violet) */
+/* Page title "My Profile" (accent) */
 .profile-title {
   color: var(--accent);
 }
@@ -53,4 +53,153 @@
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
+}
+
+.profile-register-date {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+/* Secțiunea de task-uri sub cardul de profil */
+.profile-tasks-section {
+  margin-top: 32px;
+}
+
+.profile-tasks-header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.profile-tasks-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.profile-tasks-search {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.profile-tasks-search::placeholder {
+  color: var(--text-muted);
+}
+
+.profile-tasks-search:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.profile-tasks-empty {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin: 0;
+  padding: 24px;
+  background: var(--bg-panel);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.profile-tasks-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.profile-task-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-task-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.profile-task-open-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.profile-task-no-content {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.profile-task-id {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.profile-task-date {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.profile-task-status {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.profile-task-status--pending {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ff9800;
+}
+
+.profile-task-status--success {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+}
+
+.profile-task-status--failed {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
+}
+
+.profile-task-type {
+  font-size: 12px;
+  text-transform: capitalize;
+  color: var(--text-muted);
 }

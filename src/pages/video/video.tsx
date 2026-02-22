@@ -1,28 +1,17 @@
 import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
-import '../../styles/video.css';
-import { pollTaskUntilComplete, text2video, image2video, ViduError } from '../../lib/vidu';
-import { VideoResultModal } from './videoResultModal';
+import '../../styles/Video.css';
+// import { VideoResultModal } from '../../components/modals/videoResultModal';
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
 
 export default function Video() {
   const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string } | null>(null);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
-  const [resultModalOpen, setResultModalOpen] = useState(false);
+  // const [resultModalOpen, setResultModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleGenerateClick = async () => {
@@ -32,8 +21,7 @@ export default function Video() {
       });
       return;
     }
-
-    const trimmedPrompt = prompt.trim();
+    
     setIsGenerating(true);
     setPrompt('');
     const toastId = toast.loading('Generating video…', {
@@ -41,42 +29,15 @@ export default function Video() {
     });
 
     try {
-      let taskId: string;
-      if (referenceImage) {
-        const dataUrl = await fileToDataUrl(referenceImage.file);
-        taskId = await image2video(dataUrl, trimmedPrompt);
-      } else {
-        taskId = await text2video(trimmedPrompt);
-      }
+      //TODO: call the backend
 
-      console.log('Task id returned:');
-      console.log(taskId);
-
-      const status = await pollTaskUntilComplete(taskId, {
-        progressHandler: (progress) => {
-          if (progress != null && progress >= 1) return;
-          toast.loading('Generating video…', {
-            id: toastId,
-            description: progress != null ? `Progress: ${Math.round(progress * 100)}%` : 'Processing…',
-          });
-        },
-      });
-
-      const videoUrl = status.creations?.[0]?.url ?? null;
-      if (videoUrl) {
-        setResultVideoUrl(videoUrl);
-        setResultModalOpen(true);
-      }
-
-      toast.success('Video generated', {
-        id: toastId,
-        description: 'Your video is ready.',
-      });
+       setTimeout(() => {
+         toast.dismiss(toastId);
+       }, 3000);
     } catch (err) {
-      const message = err instanceof ViduError ? err.message : err instanceof Error ? err.message : 'Something went wrong.';
       toast.error('Generation failed', {
         id: toastId,
-        description: message,
+        description: 'Something went wrong.',
       });
     } finally {
       setIsGenerating(false);
@@ -177,12 +138,13 @@ export default function Video() {
           </div>
         </div>
       </div>
-
+      {/*
       <VideoResultModal
         open={resultModalOpen}
         onOpenChange={setResultModalOpen}
         videoUrl={resultVideoUrl}
       />
+      */}
     </div>
   );
 }

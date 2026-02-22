@@ -1,41 +1,38 @@
 import { Link } from 'react-router-dom';
-import { paths } from '../routes/paths';
-import '../styles/footer.css';
+import '../styles/Footer.css';
+import MovyIcon from '../assets/result-icon.png';
+import { paths } from '../routes/paths.ts';
 
-const currentYear = new Date().getFullYear();
+const footerLinks = [
+  { label: 'Explore', to: paths.root },
+  { label: 'Image', to: paths.image },
+  { label: 'Video', to: paths.video },
+  { label: 'Edit', to: paths.edit },
+  { label: 'Pricing', to: paths.pricing },
+];
 
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="site-footer">
+    <footer className="app-footer">
       <div className="footer-inner">
-        <div className="footer-top">
-          <Link to={paths.root} className="footer-logo">
-            MovyAI
+        <div className="footer-brand">
+          <Link to={paths.root} className="footer-logo" aria-label="MovyAI home">
+            <img src={MovyIcon} alt="" className="footer-logo-img" />
+            <span className="footer-logo-text">MovyAI</span>
           </Link>
-          <nav className="footer-nav" aria-label="Footer navigation">
-            <Link to={paths.root} className="footer-link">
-              Explore
-            </Link>
-            <Link to={paths.image} className="footer-link">
-              Image
-            </Link>
-            <Link to={paths.video} className="footer-link">
-              Video
-            </Link>
-            <Link to={paths.edit} className="footer-link">
-              Edit
-            </Link>
-            <Link to={paths.pricing} className="footer-link">
-              Pricing
-            </Link>
-            <Link to={paths.login} className="footer-link">
-              Login
-            </Link>
-          </nav>
         </div>
+        <nav className="footer-nav" aria-label="Footer navigation">
+          {footerLinks.map((item) => (
+            <Link key={item.to} to={item.to} className="footer-link">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
         <div className="footer-bottom">
           <p className="footer-copy">
-            © {currentYear} MovyAI. All rights reserved.
+            © {year} MovyAI. All rights reserved.
           </p>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import '../styles/header.css';
+import '../styles/Header.css';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useTheme} from '../contexts/themeContext.tsx';
 import {useAuth} from '../contexts/authContext.tsx';

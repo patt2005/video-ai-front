@@ -1,4 +1,4 @@
-import type { ExploreVideo } from '../../types/video/exploreVideo';
+import type { ExploreVideo } from '../../types/video/exploreVideo.ts';
 
 interface ExploreCardProps {
     video: ExploreVideo;

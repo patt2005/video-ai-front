@@ -1,9 +1,9 @@
-import { UserRole, type User } from '../types/user/user';
+import { UserRole, type User } from '../types/user/user.ts';
 
 export const mockUser: User = {
     id: 1,
     username: 'mihai',
-    role: UserRole.User,
+    role: UserRole.Admin,
     email: 'mihai@movyai.app',
     registerDate: '2025-01-10',
 };
