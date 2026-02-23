@@ -30,6 +30,7 @@ function RootRoute() {
 function AppLayout() {
     const location = useLocation();
     const isVideoPage = location.pathname === paths.video || location.pathname === paths.root;
+    const isPricingPage = location.pathname === paths.pricing;
 
     return (
         <>
@@ -37,7 +38,7 @@ function AppLayout() {
             <div className="app-shell">
                 <Header />
                 <div className="main-area">
-                <main className={`page-content ${isVideoPage ? 'page-content--video' : ''}`}>
+                <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''}`}>
                     <Routes>
                         <Route
                             path={paths.root}

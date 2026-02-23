@@ -3,9 +3,13 @@
  * Stiluri pentru pagina Explore (wrapper, titlu, descriere + carduri video scrollabile).
  */
 
-/* Container principal pagină */
+/* Container principal pagină – spațiu sub homebar, folosește toată lățimea */
 .page-wrapper {
   color: var(--text);
+  padding-top: 24px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .page-title {
@@ -138,7 +142,6 @@
 }
 
 .explore-full-title {
-  font-family: 'Bebas Neue';
   font-size: 24px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -155,7 +158,6 @@
 }
 
 .explore-full-text {
-  font-family: 'Poppins';
   font-size: 14px;
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
@@ -202,13 +204,16 @@
   text-shadow: 0 2px 8px rgba(163, 230, 53, 0.4);
 }
 
-/* Grid 3 coloane sub cardul lat */
+/* Grid 3 coloane sub cardul lat – ocupă toată lățimea, fără spațiu gol */
 .explore-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding-left: 40px;
   padding-right: 40px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .explore-grid-item {
@@ -217,6 +222,7 @@
   border-radius: 14px;
   padding: 0;
   min-height: 240px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -234,7 +240,96 @@
   grid-column: span 2;
 }
 
+.explore-grid--single {
+  grid-template-columns: 1fr;
+  margin-top: 0;
+}
+
+.explore-grid-item-thumb--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  min-height: 240px;
+}
+
+.explore-grid-item-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+/* Visual Effects – rând orizontal scrollabil */
+.explore-vfx-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-left: 40px;
+  padding-right: 40px;
+  margin-top: 0;
+}
+
+.explore-vfx-row::-webkit-scrollbar {
+  display: none;
+}
+
+.explore-vfx-card {
+  flex: 0 0 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  flex-shrink: 0;
+}
+
+.explore-vfx-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  background: linear-gradient(145deg, #312e81 0%, #1e1b4b 50%, #0f172a 100%);
+}
+
+.explore-vfx-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 0.04em;
+}
+
 @media (max-width: 768px) {
+  .explore-description {
+    font-size: 18px;
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-bottom: 10px;
+  }
+
+  .explore-cards-row .explore-card:first-child {
+    margin-left: 16px;
+  }
+
+  .explore-card {
+    flex: 0 0 280px;
+    padding: 10px;
+  }
+
+  .explore-card-thumb {
+    margin-bottom: 8px;
+  }
+
+  .explore-card-title {
+    font-size: 15px;
+  }
+
+  .explore-card-text {
+    font-size: 13px;
+  }
+
   .explore-full-card {
     margin-left: 16px;
     margin-right: 16px;
@@ -279,14 +374,49 @@
     font-size: 24px;
   }
 
-  /* Grid - o singură coloană pe mobil */
+  /* Mixed Media – două coloane pe telefon */
   .explore-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     padding-left: 16px;
     padding-right: 16px;
   }
-  
+
+  .explore-grid-item {
+    min-height: 0;
+    border-radius: 12px;
+  }
+
+  .explore-grid-item-thumb {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  /* Pe telefon toate casetele egale; ultima (singură pe rând) ocupă toată lățimea */
   .explore-grid-item--wide {
     grid-column: span 1;
+  }
+
+  .explore-grid-item:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .explore-vfx-row {
+    padding-left: 16px;
+    padding-right: 16px;
+    gap: 16px;
+  }
+
+  .explore-vfx-card {
+    flex: 0 0 260px;
+  }
+
+  .explore-vfx-thumb {
+    min-height: 140px;
+  }
+
+  .explore-vfx-label {
+    font-size: 16px;
   }
 }

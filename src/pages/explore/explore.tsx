@@ -8,7 +8,7 @@ export default function Explore() {
     return (
         <div className="page-wrapper">
             <p className="explore-description">
-              Follow your dream creating Videos wit MovyAI
+              Follow your dream creating Videos with MovyAI
             </p>
             <div className="explore-cards-row">
                 {exploreVideos.map((video) => (
@@ -37,6 +37,17 @@ export default function Explore() {
                         <video className="explore-grid-item-thumb" autoPlay loop muted playsInline>
                             <source src={video.videoUrl} type="video/mp4" />
                         </video>
+                    </div>
+                ))}
+            </div>
+
+            <h2 className="explore-section-title">Visual Effects</h2>
+            <div className="explore-vfx-row">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={`vf-${i}`} className="explore-vfx-card">
+                        <div className="explore-vfx-thumb">
+                            <span className="explore-vfx-label">Visual Effects</span>
+                        </div>
                     </div>
                 ))}
             </div>
