@@ -1,17 +1,51 @@
 import {useState} from 'react';
 import '../styles/Header.css';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {Icon} from '@iconify/react';
 import {useTheme} from '../contexts/themeContext.tsx';
 import {useAuth} from '../contexts/authContext.tsx';
 import {paths} from '../routes/paths.ts';
 import {UserRole} from "../types/user/user.ts";
+
+function ProtectedLink({
+  to,
+  className,
+  children,
+  onClick,
+  guestOnly,
+  authOnly,
+  roles,
+  excludeRoles,
+}: {
+  to: string;
+  className?: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  guestOnly?: boolean;
+  authOnly?: boolean;
+  roles?: UserRole[];
+  excludeRoles?: UserRole[];
+}) {
+  const { isLoggedIn, user } = useAuth();
+
+  if (guestOnly && isLoggedIn) return null;
+  if (authOnly && !isLoggedIn) return null;
+  if (roles && (!isLoggedIn || !user || !roles.includes(user.role))) return null;
+  if (excludeRoles && isLoggedIn && user && excludeRoles.includes(user.role)) return null;
+
+  return (
+    <Link to={to} className={className} onClick={onClick}>
+      {children}
+    </Link>
+  );
+}
 
 export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const { user, isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, logout } = useAuth();
 
   const navItems = [
     { label: 'Explore', to: paths.root },
@@ -36,87 +70,56 @@ export default function Header() {
             <span className="logo-text">MovyAI</span>
           </Link>
         </div>
-        {isLoggedIn && user?.role !== UserRole.Admin ? (
-            <nav className="header-nav" aria-label="Primary navigation">
-              {navItems.map((item) => {
-                const isActive = pathname === item.to;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`header-link ${isActive ? 'is-active' : ''}`}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          ) : (
-            <div />
-          )}
+        <nav className="header-nav" aria-label="Primary navigation">
+          {navItems.map((item) => (
+            <ProtectedLink
+              key={item.to}
+              to={item.to}
+              className={`header-link ${pathname === item.to ? 'is-active' : ''}`}
+              authOnly
+              excludeRoles={[UserRole.Admin]}
+            >
+              {item.label}
+            </ProtectedLink>
+          ))}
+        </nav>
         <div className="header-actions">
           <button
-            type="button"
-            className="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Comută la temă deschisă' : 'Comută la temă întunecată'}
-            title={theme === 'dark' ? 'Temă deschisă' : 'Temă întunecată'}
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Comută la temă deschisă' : 'Comută la temă întunecată'}
+              title={theme === 'dark' ? 'Temă deschisă' : 'Temă întunecată'}
           >
             {theme === 'dark' ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" />
-                <line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-              </svg>
+                <Icon icon="material-symbols:light-mode-outline" width="20" height="20" aria-hidden />
             ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
+                <Icon icon="material-symbols:dark-mode-outline" width="20" height="20" aria-hidden />
             )}
           </button>
-          {!isLoggedIn ? (
-            <>
-              <Link to={paths.pricing} className="header-btn header-btn--ghost">
-                Pricing
-              </Link>
-              <Link to={paths.login} className="header-btn header-btn--ghost">
-                Login
-              </Link>
-              <Link to={paths.signup} className="header-btn header-btn--primary">
-                Sign up
-              </Link>
-            </>
-          ) : (
-            <>
-              {user?.role !== UserRole.Admin && (
-                <>
-                  <Link to={paths.pricing} className="header-btn header-btn--ghost">
-                    Pricing
-                  </Link>
-                </>
-              )}
-              {user?.role === UserRole.Admin && (
-                <Link to={paths.admin} className="header-btn header-btn--ghost">
-                  Admin
-                </Link>
-              )}
-              <Link to={paths.profile} className="header-btn header-btn--ghost">
-                              Profile
-              </Link>
-              <button
-                type="button"
-                className="header-btn header-btn--ghost"
-                onClick={handleLogout}
-              >
-                Log out
-              </button>
-            </>
+          <ProtectedLink to={paths.pricing} className="header-btn header-btn--ghost" excludeRoles={[UserRole.Admin]}>
+            Pricing
+          </ProtectedLink>
+          <ProtectedLink to={paths.login} className="header-btn header-btn--ghost" guestOnly>
+            Login
+          </ProtectedLink>
+          <ProtectedLink to={paths.signup} className="header-btn header-btn--primary" guestOnly>
+            Sign up
+          </ProtectedLink>
+          <ProtectedLink to={paths.admin} className="header-btn header-btn--ghost" roles={[UserRole.Admin]}>
+            Admin
+          </ProtectedLink>
+          <ProtectedLink to={paths.profile} className="header-btn header-btn--ghost" authOnly>
+            Profile
+          </ProtectedLink>
+          {isLoggedIn && (
+            <button
+              type="button"
+              className="header-btn header-btn--ghost"
+              onClick={handleLogout}
+            >
+              Log out
+            </button>
           )}
         </div>
 
@@ -143,56 +146,41 @@ export default function Header() {
           >
             {theme === 'dark' ? '☀️ Temă deschisă' : '🌙 Temă întunecată'}
           </button>
-          {isLoggedIn && user?.role !== UserRole.Admin && navItems.map((item) => {
-            const isActive = pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`mobile-link ${isActive ? 'is-active' : ''}`}
-                onClick={closeMenu}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-          {!isLoggedIn ? (
-            <>
-              <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Pricing
-              </Link>
-              <Link to={paths.login} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                Login
-              </Link>
-              <Link to={paths.signup} className="mobile-link mobile-link--action mobile-link--primary" onClick={closeMenu}>
-                Sign up
-              </Link>
-            </>
-          ) : (
-            <>
-              {user?.role !== UserRole.Admin && (
-                <>
-                  <Link to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                    Pricing
-                  </Link>
-                  <Link to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                    Profile
-                  </Link>
-                </>
-              )}
-              {user?.role === UserRole.Admin && (
-                <Link to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu}>
-                  Admin
-                </Link>
-              )}
-              <button
-                type="button"
-                className="mobile-link mobile-link--action"
-                onClick={handleLogout}
-              >
-                Log out
-              </button>
-            </>
+          {navItems.map((item) => (
+            <ProtectedLink
+              key={item.to}
+              to={item.to}
+              className={`mobile-link ${pathname === item.to ? 'is-active' : ''}`}
+              onClick={closeMenu}
+              authOnly
+              excludeRoles={[UserRole.Admin]}
+            >
+              {item.label}
+            </ProtectedLink>
+          ))}
+          <ProtectedLink to={paths.pricing} className="mobile-link mobile-link--action" onClick={closeMenu} excludeRoles={[UserRole.Admin]}>
+            Pricing
+          </ProtectedLink>
+          <ProtectedLink to={paths.login} className="mobile-link mobile-link--action" onClick={closeMenu} guestOnly>
+            Login
+          </ProtectedLink>
+          <ProtectedLink to={paths.signup} className="mobile-link mobile-link--action mobile-link--primary" onClick={closeMenu} guestOnly>
+            Sign up
+          </ProtectedLink>
+          <ProtectedLink to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu} roles={[UserRole.Admin]}>
+            Admin
+          </ProtectedLink>
+          <ProtectedLink to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu} authOnly>
+            Profile
+          </ProtectedLink>
+          {isLoggedIn && (
+            <button
+              type="button"
+              className="mobile-link mobile-link--action"
+              onClick={handleLogout}
+            >
+              Log out
+            </button>
           )}
         </nav>
       </div>

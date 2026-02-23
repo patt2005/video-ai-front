@@ -8,7 +8,7 @@ export default function Explore() {
     return (
         <div className="page-wrapper">
             <p className="explore-description">
-              Follow your dream creating Videos with MovyAI
+              Follow your dreams
             </p>
             <div className="explore-cards-row">
                 {exploreVideos.map((video) => (

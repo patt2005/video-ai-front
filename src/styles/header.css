@@ -1,8 +1,3 @@
-/*
- * Header.css – componenta: Header.tsx
- * Stiluri pentru bara de navigare: header, logo, linkuri, butoane.
- */
-
 .top-header {
   position: sticky;
   top: 0;
@@ -96,6 +91,10 @@
   box-shadow: inset 0 0 0 1px var(--border-light);
   overflow-x: auto;
   scrollbar-width: none;
+}
+
+.header-nav:empty {
+  display: none;
 }
 
 .header-link {
@@ -290,6 +289,7 @@
 @media (max-width: 768px) {
   .header-nav,
   .header-actions .header-btn,
+  .theme-toggle,
   .header-actions a.header-btn {
     display: none;
   }

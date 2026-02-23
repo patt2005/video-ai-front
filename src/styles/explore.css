@@ -16,19 +16,19 @@
   color: var(--text);
 }
 
-/* Text descriere Explore */
 .explore-description {
   font-family: 'Poppins', sans-serif;
   font-size: 28px;
   font-weight: 600;
-  text-align: center;
-  margin: 0 auto 12px;
-  max-width: 800px;
+  text-align: left;
+  margin-left: 40px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  max-width: 100%;
   color: var(--text);
   line-height: 1.3;
 }
 
-/* Rând cu carduri video scrollabile sub header */
 .explore-cards-row {
   display: flex;
   gap: 20px;

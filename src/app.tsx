@@ -1,4 +1,4 @@
-import {BrowserRouter as Router, Navigate, Route, Routes, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Navigate, Outlet, Route, Routes, useLocation} from 'react-router-dom';
 import {Toaster} from 'sonner';
 import Header from './layouts/header.tsx';
 import Footer from './layouts/footer.tsx';
@@ -16,10 +16,16 @@ import './App.css';
 import {paths} from './routes/paths.ts';
 import {UserRole} from "./types/user/user.ts";
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-    const { isLoggedIn } = useAuth();
+function ProtectedRoute({ roles }: { roles?: UserRole[] }) {
+    const { isLoggedIn, user } = useAuth();
+
     if (!isLoggedIn) return <Navigate to={paths.login} replace />;
-    return <>{children}</>;
+
+    if (roles && (!user || !roles.includes(user.role))) {
+        return <Navigate to={paths.root} replace />;
+    }
+
+    return <Outlet />;
 }
 
 function RootRoute() {
@@ -40,22 +46,21 @@ function AppLayout() {
                 <div className="main-area">
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''}`}>
                     <Routes>
-                        <Route
-                            path={paths.root}
-                            element={
-                                <ProtectedRoute>
-                                    <RootRoute />
-                                </ProtectedRoute>
-                            }
-                        />
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />
                         <Route path={paths.pricing} element={<Pricing />} />
-                        <Route path={paths.image} element={<Image />} />
-                        <Route path={paths.video} element={<Video />} />
-                        <Route path={paths.edit} element={<Edit />} />
-                        <Route path={paths.profile} element={<Profile />} />
-                        <Route path={paths.admin} element={<Admin />} />
+
+                        <Route element={<ProtectedRoute />}>
+                            <Route path={paths.root} element={<RootRoute />} />
+                            <Route path={paths.image} element={<Image />} />
+                            <Route path={paths.video} element={<Video />} />
+                            <Route path={paths.edit} element={<Edit />} />
+                            <Route path={paths.profile} element={<Profile />} />
+                        </Route>
+
+                        <Route element={<ProtectedRoute roles={[UserRole.Admin]} />}>
+                            <Route path={paths.admin} element={<Admin />} />
+                        </Route>
                     </Routes>
                 </main>
                 </div>
