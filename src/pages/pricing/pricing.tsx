@@ -8,7 +8,6 @@ export default function Pricing() {
                 <div className="blob blob-cyan" />
                 <div className="blob-wash" />
             </div>
-
             <div className="login-container">
                 <div className="pricing-wrap">
                     <header className="pricing-header">
@@ -19,7 +18,6 @@ export default function Pricing() {
                             Choose a plan that fits your workflow. Upgrade or cancel anytime.
                         </p>
                     </header>
-
                     <section className="pricing-grid">
                         <div className="pricing-card">
                             <div className="pricing-head">

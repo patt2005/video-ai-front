@@ -1,5 +1,10 @@
-export type ContentType = 'image' | 'video';
-export type TaskStatus = 'pending' | 'success' | 'failed';
+export const TaskStatus = {
+    Pending: "Pending",
+    Success: "Success",
+    Failed: "Failed"
+} as const;
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
 export interface Task {
     id: number;

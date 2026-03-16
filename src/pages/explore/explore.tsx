@@ -1,22 +1,39 @@
-import '../../styles/explore.css';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import longCardIcon from '../../assets/longcardicon.png';
-import { exploreVideos, previewVideos } from '../../_mock/videos.ts';
+import { Icon } from '@iconify/react';
+import { exploreVideos } from '../../_mock/videos';
+import '../../styles/explore.css';
+import type { ExploreVideo } from '../../types/video/exploreVideo';
 import ExploreCard from './exploreCard';
+import { ExploreVideoModal } from '../../components/modals/exploreVideoModal';
 
 export default function Explore() {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedVideo, setSelectedVideo] = useState<ExploreVideo | null>(null);
+
+    const handleCardClick = (video: ExploreVideo) => {
+        setSelectedVideo(video);
+        setModalOpen(true);
+    };
+
     return (
         <div className="page-wrapper">
             <p className="explore-description">
-              Follow your dream creating Videos with MovyAI
+              Follow your dreams
             </p>
             <div className="explore-cards-row">
                 {exploreVideos.map((video) => (
-                    <ExploreCard key={video.title} video={video} />
+                    <ExploreCard
+                        key={video.title}
+                        video={video}
+                        onClick={() => handleCardClick(video)}
+                    />
                 ))}
             </div>
             <div className="explore-full-card">
-                <img src={longCardIcon} alt="icon" className="explore-full-icon" />
+                <span className="explore-full-icon" aria-hidden="true">
+                    <Icon icon="mdi:tag-percent" width={80} height={80} />
+                </span>
                 <div className="explore-full-thumb">
                     <h2 className="explore-full-title">CLICK NOW FOR EXCLUSIVE USE THE DISCOUNT</h2>
                     <p className="explore-full-text">Be the first to join our journey</p>
@@ -29,10 +46,20 @@ export default function Explore() {
             <h2 className="explore-section-title">Mixed Media</h2>
 
             <div className="explore-grid">
-                {previewVideos.slice(0, 7).map((video, index) => (
+                {[...exploreVideos, ...exploreVideos].slice(0, 7).map((video, index) => (
                     <div
-                        key={`${video.videoUrl}-${index}`}
+                        key={`${video.title}-${index}`}
+                        role="button"
+                        tabIndex={0}
                         className={`explore-grid-item${index === 3 || index === 6 ? ' explore-grid-item--wide' : ''}`}
+                        onClick={() => handleCardClick(video)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleCardClick(video);
+                            }
+                        }}
+                        aria-label={`Open ${video.title}`}
                     >
                         <video className="explore-grid-item-thumb" autoPlay loop muted playsInline>
                             <source src={video.videoUrl} type="video/mp4" />
@@ -41,16 +68,11 @@ export default function Explore() {
                 ))}
             </div>
 
-            <h2 className="explore-section-title">Visual Effects</h2>
-            <div className="explore-vfx-row">
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={`vf-${i}`} className="explore-vfx-card">
-                        <div className="explore-vfx-thumb">
-                            <span className="explore-vfx-label">Visual Effects</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+            <ExploreVideoModal
+                open={modalOpen}
+                onOpenChange={setModalOpen}
+                video={selectedVideo}
+            />
         </div>
     )
 }

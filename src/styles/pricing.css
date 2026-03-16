@@ -1,4 +1,3 @@
-/* Pagina Pricing: doar înălțimea conținutului, fără spațiu gol jos (fără scroll inutil) */
 .page-content--pricing .login-page {
   min-height: 0;
 }
@@ -6,6 +5,7 @@
 .page-content--pricing {
   padding-top: 16px;
   padding-bottom: 24px;
+  align-self: center;
 }
 
 @media (max-width: 768px) {
@@ -215,9 +215,12 @@ html[data-theme="dark"]{
 }
 
 .login-page .login-container{
+  display: grid;
   grid-template-columns: 1fr !important;
   justify-items: center;
+  width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 .pricing-wrap{

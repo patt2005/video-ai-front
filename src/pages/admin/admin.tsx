@@ -39,10 +39,41 @@ export default function Admin() {
     const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
     const [expandedUserId, setExpandedUserId] = useState<number | null>(null);
 
+    const [filterId, setFilterId] = useState('');
+    const [filterUsername, setFilterUsername] = useState('');
+    const [filterEmail, setFilterEmail] = useState('');
+    const [filterRegisterDate, setFilterRegisterDate] = useState('');
+    const [filterRole, setFilterRole] = useState<string>('');
+    const [roleUpdateKey, setRoleUpdateKey] = useState(0);
+
     const users = useMemo(() => {
-        const list = userService.getUsers(userSearch || null);
-        return list.filter((u) => !deletedIds.has(u.id));
-    }, [userSearch, deletedIds]);
+        let list = userService.getUsers(userSearch || null);
+        list = list.filter((u) => !deletedIds.has(u.id));
+
+        const idTerm = filterId.trim().toLowerCase();
+        if (idTerm) {
+            list = list.filter((u) => String(u.id).toLowerCase().includes(idTerm));
+        }
+        const usernameTerm = filterUsername.trim().toLowerCase();
+        if (usernameTerm) {
+            list = list.filter((u) => u.username.toLowerCase().includes(usernameTerm));
+        }
+        const emailTerm = filterEmail.trim().toLowerCase();
+        if (emailTerm) {
+            list = list.filter((u) => (u.email ?? '').toLowerCase().includes(emailTerm));
+        }
+        const dateTerm = filterRegisterDate.trim().toLowerCase();
+        if (dateTerm) {
+            list = list.filter((u) => {
+                const formatted = formatRegisterDate(u.registerDate).toLowerCase();
+                return formatted.includes(dateTerm) || (u.registerDate ?? '').toLowerCase().includes(dateTerm);
+            });
+        }
+        if (filterRole) {
+            list = list.filter((u) => u.role === filterRole);
+        }
+        return list;
+    }, [userSearch, deletedIds, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole, roleUpdateKey]);
 
     const tasksByUserId = useMemo(() => {
         const map: Record<number, Task[]> = {};
@@ -54,6 +85,11 @@ export default function Admin() {
 
     const handleDelete = (id: number) => {
         setDeletedIds((prev) => new Set(prev).add(id));
+    };
+
+    const handleRoleChange = (userId: number, newRole: UserRole) => {
+        userService.updateUserRole(userId, newRole);
+        setRoleUpdateKey((k) => k + 1);
     };
 
     const toggleExpand = (userId: number) => {
@@ -85,6 +121,62 @@ export default function Admin() {
                             <th>Role</th>
                             <th>Actions</th>
                         </tr>
+                        <tr className="admin-table-filter-row">
+                            <th className="admin-table-col-expand" />
+                            <th>
+                                <input
+                                    type="text"
+                                    className="admin-table-filter-input"
+                                    placeholder="Filter..."
+                                    value={filterId}
+                                    onChange={(e) => setFilterId(e.target.value)}
+                                    aria-label="Filter by ID"
+                                />
+                            </th>
+                            <th>
+                                <input
+                                    type="text"
+                                    className="admin-table-filter-input"
+                                    placeholder="Filter..."
+                                    value={filterUsername}
+                                    onChange={(e) => setFilterUsername(e.target.value)}
+                                    aria-label="Filter by username"
+                                />
+                            </th>
+                            <th>
+                                <input
+                                    type="text"
+                                    className="admin-table-filter-input"
+                                    placeholder="Filter..."
+                                    value={filterEmail}
+                                    onChange={(e) => setFilterEmail(e.target.value)}
+                                    aria-label="Filter by email"
+                                />
+                            </th>
+                            <th>
+                                <input
+                                    type="text"
+                                    className="admin-table-filter-input"
+                                    placeholder="Filter..."
+                                    value={filterRegisterDate}
+                                    onChange={(e) => setFilterRegisterDate(e.target.value)}
+                                    aria-label="Filter by register date"
+                                />
+                            </th>
+                            <th>
+                                <select
+                                    className="admin-table-filter-select"
+                                    value={filterRole}
+                                    onChange={(e) => setFilterRole(e.target.value)}
+                                    aria-label="Filter by role"
+                                >
+                                    <option value="">All</option>
+                                    <option value={UserRole.Admin}>Admin</option>
+                                    <option value={UserRole.User}>User</option>
+                                </select>
+                            </th>
+                            <th />
+                        </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => {
@@ -115,8 +207,16 @@ export default function Admin() {
                                         <td>{user.username}</td>
                                         <td>{user.email ?? '—'}</td>
                                         <td>{formatRegisterDate(user.registerDate)}</td>
-                                        <td className={user.role === UserRole.Admin ? 'role-admin' : 'role-user'}>
-                                            {user.role}
+                                        <td>
+                                            <select
+                                                className={`admin-role-select ${user.role === UserRole.Admin ? 'role-admin' : 'role-user'}`}
+                                                value={user.role}
+                                                onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                                                aria-label={`Change role for ${user.username}`}
+                                            >
+                                                <option value={UserRole.Admin}>Admin</option>
+                                                <option value={UserRole.User}>User</option>
+                                            </select>
                                         </td>
                                         <td>
                                             <button

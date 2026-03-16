@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
+import { useAuth } from '../../contexts/authContext';
 import '../../styles/Image.css';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
+import { type CreateImageParams, imageService } from '../../services/imageService';
+import { fileService } from '../../services/fileService';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   {
@@ -34,6 +37,7 @@ const MODELS = [
 ] as const;
 
 export default function Image() {
+  const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
   const [selectedModel, setSelectedModel] = useState<(typeof MODELS)[number]['id']>('nano-banana');
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
@@ -82,10 +86,26 @@ export default function Image() {
     });
 
     try {
-        //TODO: Call the backend to generate image
-        setTimeout(() => {
-          toast.dismiss(toastId);
-        }, 3000);
+        let imageUrl: string | null = null;
+        const file = fileInputRef.current?.files?.[0];
+        if (file) {
+          const result = await fileService.uploadFile(file);
+          if (result) imageUrl = result.url;
+        }
+
+        const params: CreateImageParams = {
+          imageUrl,
+          prompt,
+        };
+
+        const resultUrl = await imageService.generateImage(params, {
+          userId: user?.id,
+        });
+        setGeneratedImage(resultUrl);
+        setIsGenerating(false);
+        setResultModalOpen(true);
+
+        toast.dismiss(toastId);
     } catch (err) {
       toast.error('Generation failed', {
         id: toastId,

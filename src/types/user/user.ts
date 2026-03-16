@@ -6,9 +6,9 @@ export const UserRole = {
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface User {
-    id?: number;
-    username: string;
+    id: string;
+    username?: string;
     role: UserRole;
     email: string;
-    registerDate?: string;
+    registerDate: string;
 }
