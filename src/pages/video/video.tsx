@@ -1,17 +1,22 @@
 import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
+import { useAuth } from '../../contexts/authContext';
 import '../../styles/Video.css';
-// import { VideoResultModal } from '../../components/modals/videoResultModal';
+import { VideoResultModal } from '../../components/modals/videoResultModal';
+import { videoService, type CreateVideoTaskParams } from '../../services/videoService';
+import { fileService } from '../../services/fileService';
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;
 
 export default function Video() {
+  const { user } = useAuth();
   const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string } | null>(null);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  // const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [resultModalOpen, setResultModalOpen] = useState(false);
+  const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleGenerateClick = async () => {
@@ -21,19 +26,39 @@ export default function Video() {
       });
       return;
     }
-    
+
+    const promptText = prompt;
     setIsGenerating(true);
     setPrompt('');
     const toastId = toast.loading('Generating video…', {
       description: 'This may take a few seconds.',
     });
 
-    try {
-      //TODO: call the backend
+    let imageUrl: string | null = null;
 
-       setTimeout(() => {
-         toast.dismiss(toastId);
-       }, 3000);
+    try {
+      if (fileInputRef.current !== null) {
+        const file = fileInputRef.current.files?.[0];
+        if (file) {
+          const result = await fileService.uploadFile(file);
+          if (result) imageUrl = result.url;
+        }
+      }
+
+      const params: CreateVideoTaskParams = {
+        imageUrl,
+        prompt: promptText,
+      };
+
+      const { url } = await videoService.createTask(params, {
+        userId: user?.id,
+      });
+      setResultVideoUrl(url);
+      setResultModalOpen(true);
+
+      setTimeout(() => {
+        toast.dismiss(toastId);
+      }, 3000);
     } catch (err) {
       toast.error('Generation failed', {
         id: toastId,
@@ -138,13 +163,11 @@ export default function Video() {
           </div>
         </div>
       </div>
-      {/*
       <VideoResultModal
         open={resultModalOpen}
         onOpenChange={setResultModalOpen}
         videoUrl={resultVideoUrl}
       />
-      */}
     </div>
   );
 }

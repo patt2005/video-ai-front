@@ -1,5 +1,4 @@
 import type { ExploreVideo } from '../types/video/exploreVideo';
-import type { PreviewVideo } from '../types/video/previewVideo';
 
 export const exploreVideos: ExploreVideo[] = [
   {
@@ -23,10 +22,4 @@ export const exploreVideos: ExploreVideo[] = [
     subtitle: 'Unleash your creativity with artistic effects and unique compositions.',
   },
 ];
-
-export const previewVideos: PreviewVideo[] = [
-  ...exploreVideos,
-  ...exploreVideos,
-  ...exploreVideos,
-].map((v) => ({ videoUrl: v.videoUrl }));
 

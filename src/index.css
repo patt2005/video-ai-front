@@ -151,13 +151,12 @@ html[data-theme='light'] {
 
 
 .login-page {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  background: var(--bg);
-  color: var(--text);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  background: var(--bg);
+  color: var(--text);
+  padding-top: 2rem;
 }
 
 .login-layout {
@@ -165,12 +164,10 @@ html[data-theme='light'] {
   z-index: 1;
   flex: 1;
   width: 100%;
-  min-height: 100%;
   margin: 0;
   padding: 1.5rem 24px 2rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 2rem;
   box-sizing: border-box;
@@ -303,6 +300,10 @@ html[data-theme='light'] {
 }
 
 .login-card {
+  margin-top: 3rem;
+}
+
+.login-card {
   width: 100%;
   max-width: 460px;
   border-radius: 18px;
@@ -346,6 +347,7 @@ html[data-theme='light'] {
   flex-direction: column;
   gap: 12px;
   flex-shrink: 0;
+  padding-top: 2rem;
 }
 
 .login-field label {
@@ -384,10 +386,27 @@ html[data-theme='light'] {
   color: #dc2626;
 }
 
+.login-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.login-forgot {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: rgba(0,0,0,0.65);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .login-primary {
-  margin-top: 4px;
   border-radius: 10px;
-  padding: 10px 12px;
+  margin-top: 2rem;
   border: none;
   font-weight: 700;
   cursor: pointer;
@@ -533,6 +552,10 @@ html[data-theme="dark"] .login-ghost {
   color: rgba(255,255,255,0.70);
 }
 
+html[data-theme="dark"] .login-forgot {
+  color: rgba(255,255,255,0.65);
+}
+
 html[data-theme="dark"] .login-divider span {
   background: rgba(255,255,255,0.12);
 }
@@ -541,12 +564,6 @@ html[data-theme="dark"] .login-secondary {
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.88);
-}
-/* === LOGIN PAGE BACKGROUND LAYER === */
-
-.login-page{
-  position: relative;
-  overflow: hidden;
 }
 
 .login-blobs{
@@ -625,11 +642,6 @@ html[data-theme="dark"]{
   .login-right{
     justify-self: stretch;
   }
-
-  .login-card{
-    width: 100%;
-    padding: 20px;
-  }
 }
 
 @media (max-width: 640px) {
@@ -670,12 +682,17 @@ html[data-theme="dark"]{
 .signup-page .signup-value-prop {
   font-size: clamp(28px, 5vw, 42px);
   line-height: 1.15;
-  margin-bottom: 4px;
+}
+
+/* Signup layout: above blobs, full width */
+.signup-page .signup-layout {
+  position: relative;
+  z-index: 1;
+  width: 100%;
 }
 
 /* Video card on the right */
 .signup-page .signup-video-card-wrap {
-  margin-top: 12px;
   max-width: 560px;
   width: 100%;
 }
@@ -685,6 +702,8 @@ html[data-theme="dark"]{
   border: 1px solid var(--border-light);
   background: var(--bg-panel);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  aspect-ratio: 16 / 9;
+  min-height: 280px;
 }
 html[data-theme="dark"] .signup-page .signup-video-card {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
@@ -692,23 +711,27 @@ html[data-theme="dark"] .signup-page .signup-video-card {
 .signup-page .signup-video {
   display: block;
   width: 100%;
-  height: auto;
-  vertical-align: middle;
-  min-height: 320px;
+  height: 100%;
+  min-height: 280px;
   object-fit: cover;
+  background: #000;
 }
 
 /* Signup layout: form on LEFT, copy on RIGHT (opposite of login) */
 @media (min-width: 1024px) {
   .signup-page .signup-layout {
+    display: grid;
     grid-template-columns: 1fr 1fr;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
   }
   .signup-page .signup-layout .signup-form-wrap {
     order: -1;
     justify-content: flex-start;
   }
   .signup-page .signup-layout .signup-copy {
-    margin-top: 2rem;
+    margin-top: 0;
     order: 1;
   }
 }

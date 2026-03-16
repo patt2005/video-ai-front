@@ -14,7 +14,7 @@ const signupSchema = object({
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const { loginWithMockUser } = useAuth();
+    const { login } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,8 +29,14 @@ export default function SignUp() {
 
         try {
             await signupSchema.validate(payload, { abortEarly: false });
-            loginWithMockUser();
-            navigate(paths.root, { replace: true });
+            const success = login(email, password);
+            if (success) {
+                navigate(paths.root, { replace: true });
+            } else {
+                setErrors({
+                    form: 'This demo only accepts existing test accounts. Sign in with e.g. mihai@movyai.app / password123',
+                });
+            }
         } catch (err) {
             if (err instanceof ValidationError) {
                 const next: Record<string, string> = {};
@@ -47,18 +53,15 @@ export default function SignUp() {
     };
 
     return (
-        <main className="signup-page login-page">
+        <main className="signup-page">
             <div className="login-blobs signup-blobs" aria-hidden="true">
                 <div className="blob blob-purple" />
                 <div className="blob blob-cyan" />
                 <div className="blob-wash" />
             </div>
 
-            <div className="login-layout signup-layout">
-                <div className="login-left signup-copy">
-                    <h1 className="login-title signup-value-prop">
-                        Create videos in minutes, not hours
-                    </h1>
+            <div className="signup-layout">
+                <div className="login-left">
                     <div className="signup-video-card-wrap">
                         <div className="signup-video-card">
                             <video
@@ -75,18 +78,18 @@ export default function SignUp() {
                         </div>
                     </div>
                 </div>
-
-                <div className="login-right signup-form-wrap">
+                
                     <div className="login-card signup-card">
                         <div className="login-card-head">
                             <h2 className="login-card-title">Create account</h2>
                         </div>
 
-                        <p className="login-card-sub">
-                            Get started — we'll have you creating in no time.
-                        </p>
-
                         <form className="login-form" onSubmit={handleSubmit}>
+                            {errors.form && (
+                                <p className="login-field-error login-field-error--form" role="alert">
+                                    {errors.form}
+                                </p>
+                            )}
                             <div className={`login-field${errors.email ? ' login-field--error' : ''}`}>
                                 <label htmlFor="signup-email">Email</label>
                                 <input
@@ -153,25 +156,9 @@ export default function SignUp() {
                                     Already have an account? Sign in
                                 </Link>
                             </div>
-
-                            <div className="login-divider">
-                                <span />
-                                <p>or</p>
-                                <span />
-                            </div>
-
-                            <button type="button" className="login-secondary">
-                                <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png"
-                                    alt="Google"
-                                    className="login-google-icon"
-                                />
-                                Continue with Google
-                            </button>
                         </form>
                     </div>
                 </div>
-            </div>
         </main>
     );
 }

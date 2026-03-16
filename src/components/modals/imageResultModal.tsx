@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { Icon } from '@iconify/react';
+import { toast } from 'sonner';
 import '../../styles/Image.css';
 
 type ImageResultModalProps = {
@@ -13,6 +14,61 @@ function downloadImage(dataUrl: string) {
   link.href = dataUrl;
   link.download = `generated-image-${Date.now()}.png`;
   link.click();
+}
+
+async function shareImage(src: string) {
+  const isDataUrl = src.startsWith('data:');
+  if (typeof navigator !== 'undefined' && navigator.share) {
+    try {
+      if (isDataUrl) {
+        const res = await fetch(src);
+        const blob = await res.blob();
+        const file = new File([blob], `generated-image-${Date.now()}.png`, { type: blob.type });
+        await navigator.share({
+          files: [file],
+          title: 'Generated image',
+          text: 'Check out this AI-generated image.',
+        });
+      } else {
+        await navigator.share({
+          url: src,
+          title: 'Generated image',
+          text: 'Check out this AI-generated image.',
+        });
+      }
+      toast.success('Shared');
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') {
+        copyToClipboard(src);
+      }
+    }
+  } else {
+    copyToClipboard(src);
+  }
+}
+
+function copyToClipboard(src: string) {
+  const isDataUrl = src.startsWith('data:');
+  if (isDataUrl && navigator.clipboard?.write) {
+    fetch(src)
+      .then((res) => res.blob())
+      .then((blob) =>
+        navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
+      )
+      .then(
+        () => toast.success('Image copied to clipboard'),
+        () => copyTextFallback(src)
+      );
+  } else {
+    copyTextFallback(src);
+  }
+}
+
+function copyTextFallback(text: string) {
+  navigator.clipboard.writeText(text).then(
+    () => toast.success('Link copied to clipboard'),
+    () => toast.error('Could not copy')
+  );
 }
 
 export function ImageResultModal({ open, onOpenChange, imageSrc }: ImageResultModalProps) {
@@ -56,8 +112,8 @@ export function ImageResultModal({ open, onOpenChange, imageSrc }: ImageResultMo
             <button
               type="button"
               className="image-result-modal-btn image-result-modal-btn-secondary"
-              disabled
-              title="Coming soon"
+              onClick={() => imageSrc && shareImage(imageSrc)}
+              disabled={!imageSrc}
             >
               <Icon icon="mdi:share-variant" width={20} />
               Share

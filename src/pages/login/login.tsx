@@ -11,7 +11,7 @@ const loginSchema = object({
 
 export default function Login() {
     const navigate = useNavigate();
-    const { loginWithMockUser } = useAuth();
+    const { login } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -25,8 +25,12 @@ export default function Login() {
 
         try {
             await loginSchema.validate(payload, { abortEarly: false });
-            loginWithMockUser();
-            navigate(paths.root, { replace: true });
+            const success = login(email, password);
+            if (success) {
+                navigate(paths.root, { replace: true });
+            } else {
+                setErrors({ form: 'Invalid email or password.' });
+            }
         } catch (err) {
             if (err instanceof ValidationError) {
                 const next: Record<string, string> = {};
@@ -50,93 +54,64 @@ export default function Login() {
                 <div className="blob-wash" />
             </div>
 
-            <div className="login-layout">
-                <div className="login-left">
-                    <h1 className="login-title">
-                        Create, edit, and explore{" "}
-                        <span className="login-title-muted">with MovyAI</span>
-                    </h1>
-                    <p className="login-subtitle">
-                        "Sign in to your account to create, edit, and explore with AI-powered tools."
-                    </p>
+            <div className="login-card">
+                <div className="login-card-head">
+                    <h2 className="login-card-title">Sign in</h2>
                 </div>
 
-                <div className="login-right">
-                                <div className="login-card">
-                                    <div className="login-card-head">
-                                        <h2 className="login-card-title">Sign in</h2>
-                                    </div>
+                <form className="login-form" onSubmit={handleSubmit}>
+                    {errors.form && (
+                        <p className="login-field-error login-field-error--form" role="alert">
+                            {errors.form}
+                        </p>
+                    )}
+                    <div className={`login-field${errors.email ? ' login-field--error' : ''}`}>
+                        <label htmlFor="login-email">Email</label>
+                        <input
+                            id="login-email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            autoComplete="email"
+                            aria-invalid={!!errors.email}
+                            aria-describedby={errors.email ? 'login-email-error' : undefined}
+                        />
+                        {errors.email && (
+                            <p id="login-email-error" className="login-field-error" role="alert">
+                                {errors.email}
+                            </p>
+                        )}
+                    </div>
 
-                                    <p className="login-card-sub">
-                                        Welcome back — let's continue.
-                                    </p>
+                    <div className={`login-field${errors.password ? ' login-field--error' : ''}`}>
+                        <label htmlFor="login-password">Password</label>
+                        <input
+                            id="login-password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            autoComplete="current-password"
+                            aria-invalid={!!errors.password}
+                            aria-describedby={errors.password ? 'login-password-error' : undefined}
+                        />
+                        {errors.password && (
+                            <p id="login-password-error" className="login-field-error" role="alert">
+                                {errors.password}
+                            </p>
+                        )}
+                    </div>
 
-                                    <form className="login-form" onSubmit={handleSubmit}>
-                                        <div className={`login-field${errors.email ? ' login-field--error' : ''}`}>
-                                            <label htmlFor="login-email">Email</label>
-                                            <input
-                                                id="login-email"
-                                                type="email"
-                                                placeholder="you@example.com"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                autoComplete="email"
-                                                aria-invalid={!!errors.email}
-                                                aria-describedby={errors.email ? 'login-email-error' : undefined}
-                                            />
-                                            {errors.email && (
-                                                <p id="login-email-error" className="login-field-error" role="alert">
-                                                    {errors.email}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className={`login-field${errors.password ? ' login-field--error' : ''}`}>
-                                            <label htmlFor="login-password">Password</label>
-                                            <input
-                                                id="login-password"
-                                                type="password"
-                                                placeholder="••••••••"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                autoComplete="current-password"
-                                                aria-invalid={!!errors.password}
-                                                aria-describedby={errors.password ? 'login-password-error' : undefined}
-                                            />
-                                            {errors.password && (
-                                                <p id="login-password-error" className="login-field-error" role="alert">
-                                                    {errors.password}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <button className="login-primary" type="submit">
-                                            Login
-                                        </button>
-
-                                        <div className="login-links">
-                                            <button type="button" className="login-ghost">
-                                                Forgot password?
-                                            </button>
-                                        </div>
-
-                                        <div className="login-divider">
-                                            <span />
-                                            <p>or</p>
-                                            <span />
-                                        </div>
-
-                                        <button type="button" className="login-secondary">
-                                            <img
-                                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png"
-                                                alt="Google"
-                                                className="login-google-icon"
-                                            />
-                                            Continue with Google
-                                        </button>
-                                    </form>
-                                </div>
-                </div>
+                    <div className="login-form-row">
+                        <button type="button" className="login-forgot">
+                            Forgot password?
+                        </button>
+                        <button className="login-primary" type="submit">
+                            Sign In
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
     );
