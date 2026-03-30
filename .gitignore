@@ -98,3 +98,39 @@ knip.jsonc
 private_key.pem
 public_key.pem
 service-account.json
+
+#################################
+# VideoBackend (ASP.NET Core / .NET)
+# Paths under ./VideoBackend only. Repo-wide rules above already cover
+# bin/, obj/, Debug/, Release/, x64/, x86/, bld/, etc. everywhere.
+# Based on https://github.com/github/gitignore/blob/main/Dotnet.gitignore
+#################################
+VideoBackend/**/[Dd]ebugPublic/
+VideoBackend/**/[Rr]eleases/
+VideoBackend/**/[Ww][Ii][Nn]32/
+VideoBackend/**/[Aa][Rr][Mm]/
+VideoBackend/**/[Aa][Rr][Mm]64/
+VideoBackend/**/[Ll]og/
+VideoBackend/**/[Ll]ogs/
+
+VideoBackend/**/project.lock.json
+VideoBackend/**/project.fragment.lock.json
+VideoBackend/**/artifacts/
+
+VideoBackend/**/ScaffoldingReadMe.txt
+
+VideoBackend/**/*.nupkg
+VideoBackend/**/*.snupkg
+
+VideoBackend/**/~$*
+VideoBackend/**/*~
+VideoBackend/**/CodeCoverage/
+
+VideoBackend/**/*.binlog
+
+VideoBackend/**/[Tt]est[Rr]esult*/
+VideoBackend/**/[Bb]uild[Ll]og.*
+
+VideoBackend/**/*.VisualState.xml
+VideoBackend/**/TestResult.xml
+VideoBackend/**/nunit-*.xml

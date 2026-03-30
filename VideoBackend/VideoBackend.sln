@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoBackend.Api", "VideoBackend.Api\VideoBackend.Api.csproj", "{1CF5D097-65F0-47C3-AAEE-06179B3319DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoBackend.Domain", "VideoBackend.Domain\VideoBackend.Domain.csproj", "{6C21C4C3-19B9-41A5-AF43-3ECEAA896BB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoBackend.BusinessLayer", "VideoBackend.BusinessLayer\VideoBackend.BusinessLayer.csproj", "{F4BE5DF3-B998-4BC4-AE8F-59AB1D6EB9BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoBackend.DataAccessLayer", "VideoBackend.DataAccessLayer\VideoBackend.DataAccessLayer.csproj", "{17E28B5B-1D96-49A5-B676-D3F6EC815862}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1CF5D097-65F0-47C3-AAEE-06179B3319DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CF5D097-65F0-47C3-AAEE-06179B3319DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CF5D097-65F0-47C3-AAEE-06179B3319DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CF5D097-65F0-47C3-AAEE-06179B3319DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C21C4C3-19B9-41A5-AF43-3ECEAA896BB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C21C4C3-19B9-41A5-AF43-3ECEAA896BB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C21C4C3-19B9-41A5-AF43-3ECEAA896BB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C21C4C3-19B9-41A5-AF43-3ECEAA896BB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4BE5DF3-B998-4BC4-AE8F-59AB1D6EB9BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4BE5DF3-B998-4BC4-AE8F-59AB1D6EB9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4BE5DF3-B998-4BC4-AE8F-59AB1D6EB9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4BE5DF3-B998-4BC4-AE8F-59AB1D6EB9BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17E28B5B-1D96-49A5-B676-D3F6EC815862}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17E28B5B-1D96-49A5-B676-D3F6EC815862}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17E28B5B-1D96-49A5-B676-D3F6EC815862}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17E28B5B-1D96-49A5-B676-D3F6EC815862}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

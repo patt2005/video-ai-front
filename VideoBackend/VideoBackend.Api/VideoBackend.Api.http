@@ -1,0 +1,6 @@
+@VideoBackend.Api_HostAddress = http://localhost:5014
+
+GET {{VideoBackend.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
