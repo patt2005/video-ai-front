@@ -15,6 +15,7 @@ import Pricing from './pages/pricing/pricing';
 import './App.css';
 import {paths} from './routes/paths.ts';
 import {UserRole} from "./types/user/user.ts";
+import HealthCheck from './components/HealthCheck.tsx';
 
 function ProtectedRoute({ roles }: { roles?: UserRole[] }) {
     const { isLoggedIn, user } = useAuth();
@@ -45,6 +46,7 @@ function AppLayout() {
                 <Header />
                 <div className="main-area">
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''}`}>
+                    <HealthCheck />
                     <Routes>
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />

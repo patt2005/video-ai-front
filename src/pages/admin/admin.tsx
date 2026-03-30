@@ -3,7 +3,7 @@ import {Icon} from '@iconify/react';
 import '../../styles/Admin.css';
 import {userService} from '../../services/userService';
 import {taskService} from '../../services/taskService';
-import type {Task} from '../../types/generation/task';
+import {type Task, TaskStatus} from '../../types/generation/task';
 import {UserRole} from "../../types/user/user.ts";
 
 function formatRegisterDate(isoDate: string | undefined) {
@@ -25,13 +25,18 @@ function formatTaskDate(isoDate: string) {
     }
 }
 
-function formatTaskStatus(status: Task['status']) {
-    const labels: Record<Task['status'], string> = {
-        pending: 'Pending',
-        success: 'Completed',
-        failed: 'Failed',
-    };
-    return labels[status];
+function formatTaskStatus(status: TaskStatus) : string {
+    switch (status) {
+        case TaskStatus.Pending: {
+            return "Pending";
+        }
+        case TaskStatus.Success: {
+            return "Success";
+        }
+        case TaskStatus.Failed: {
+            return "Failed";
+        }
+    }
 }
 
 export default function Admin() {
@@ -56,7 +61,7 @@ export default function Admin() {
         }
         const usernameTerm = filterUsername.trim().toLowerCase();
         if (usernameTerm) {
-            list = list.filter((u) => u.username.toLowerCase().includes(usernameTerm));
+            list = list.filter((u) => u.username?.toLowerCase().includes(usernameTerm));
         }
         const emailTerm = filterEmail.trim().toLowerCase();
         if (emailTerm) {
