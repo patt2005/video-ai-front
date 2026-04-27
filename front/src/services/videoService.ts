@@ -1,7 +1,7 @@
+import axios from 'axios';
 import { TaskStatus } from '../types/generation/task';
-import { ContentType } from '../types/generation/content';
-import { taskService } from './taskService';
-import { exploreVideos } from '../_mock/videos';
+
+const BASE_URL = 'http://localhost:5014';
 
 export interface VideoTaskPollResult {
   status: TaskStatus;
@@ -14,47 +14,25 @@ export interface CreateVideoTaskParams {
   imageUrl: string | null;
 }
 
-export interface CreateVideoTaskOptions {
-  userId?: number | string;
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function generateTaskId(): string {
-  return `vid_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-}
-
 export interface CreateVideoTaskResult {
   taskId: string;
-  url: string;
 }
 
 export async function createTask(
   params: CreateVideoTaskParams,
-  options?: CreateVideoTaskOptions
 ): Promise<CreateVideoTaskResult> {
-  const taskId = generateTaskId();
-  await delay(4000);
-  const url = exploreVideos[0].videoUrl;
-  if (options?.userId != null) {
-    taskService.addTask(options.userId, ContentType.Video, url);
-  }
-  return { taskId, url };
+  const { data } = await axios.post<{ taskId: string }>(`${BASE_URL}/api/video/generate`, {
+    prompt: params.prompt,
+    imageUrl: params.imageUrl,
+  });
+  return { taskId: data.taskId };
 }
 
 async function pollTask(taskId: string): Promise<VideoTaskPollResult> {
-  // TODO: Call the backend
-
+  // TODO: wire up to GET /api/task/{taskId} when the endpoint is ready
   await new Promise(resolve => setTimeout(resolve, 5000));
-  
   console.log(taskId);
-
-  return Promise.resolve({
-    status: TaskStatus.Success,
-    url: exploreVideos[0].videoUrl,
-  });
+  return { status: TaskStatus.Pending };
 }
 
 export async function pollTaskUntilComplete(

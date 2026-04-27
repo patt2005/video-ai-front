@@ -1,3 +1,25 @@
+/* Loading screen shown while videos are being fetched */
+.explore-loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 60vh;
+}
+
+.explore-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: explore-spin 0.75s linear infinite;
+}
+
+@keyframes explore-spin {
+  to { transform: rotate(360deg); }
+}
+
 /*
  * Pagina Explore – componenta: Explore.tsx
  * Stiluri pentru pagina Explore (wrapper, titlu, descriere + carduri video scrollabile).

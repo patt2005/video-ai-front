@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using VideoBackend.DataAccessLayer.Context;
+using VideoBackend.BusinessLayer;
+using VideoBackend.BusinessLayer.Interfaces;
 using EntityTask = VideoBackend.Domain.Entities.Task.Task;
 
 namespace VideoBackend.Api.Controllers;
@@ -9,83 +9,54 @@ namespace VideoBackend.Api.Controllers;
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    private readonly TaskContext _context;
+    internal ITaskAction _taskAction;
 
-    public TaskController(TaskContext context)
+    public TaskController()
     {
-        _context = context;
+        var bl = new BusinessLogic();
+        _taskAction = bl.TaskAction();
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<EntityTask>>> GetAll()
+    public IActionResult GetAll()
     {
-        var tasks = await _context.Tasks
-            .Include(x => x.User)
-            .Include(x => x.Content)
-            .ToListAsync();
+        var tasks = _taskAction.GetAllTasks();
         return Ok(tasks);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<EntityTask>> GetById(Guid id)
+    public IActionResult GetById(Guid id)
     {
-        var task = await _context.Tasks
-            .Include(x => x.User)
-            .Include(x => x.Content)
-            .FirstOrDefaultAsync(x => x.Id == id);
-
+        var task = _taskAction.GetTaskById(id);
         if (task is null)
-        {
             return NotFound();
-        }
 
         return Ok(task);
     }
 
     [HttpPost]
-    public async Task<ActionResult<EntityTask>> Create([FromBody] EntityTask task)
+    public IActionResult Create([FromBody] EntityTask task)
     {
-        if (task.Id == Guid.Empty)
-        {
-            task.Id = Guid.NewGuid();
-        }
-
-        _context.Tasks.Add(task);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetById), new { id = task.Id }, task);
+        var created = _taskAction.CreateTask(task);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<EntityTask>> Update(Guid id, [FromBody] EntityTask request)
+    public IActionResult Update(Guid id, [FromBody] EntityTask request)
     {
-        var existingTask = await _context.Tasks.FindAsync(id);
-        if (existingTask is null)
-        {
+        var updated = _taskAction.UpdateTask(id, request);
+        if (updated is null)
             return NotFound();
-        }
 
-        existingTask.Prompt = request.Prompt;
-        existingTask.CreationDate = request.CreationDate;
-        existingTask.UserId = request.UserId;
-        existingTask.ContentId = request.ContentId;
-        existingTask.Status = request.Status;
-
-        await _context.SaveChangesAsync();
-        return Ok(existingTask);
+        return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public IActionResult Delete(Guid id)
     {
-        var existingTask = await _context.Tasks.FindAsync(id);
-        if (existingTask is null)
-        {
+        var deleted = _taskAction.DeleteTask(id);
+        if (!deleted)
             return NotFound();
-        }
-
-        _context.Tasks.Remove(existingTask);
-        await _context.SaveChangesAsync();
 
         return NoContent();
     }

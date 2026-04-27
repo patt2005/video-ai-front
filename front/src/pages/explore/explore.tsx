@@ -11,15 +11,35 @@ export default function Explore() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState<ExploreVideo | null>(null);
     const [videos, setVideos] = useState<ExploreVideo[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        exploreService.getAll().then(setVideos).catch(console.error);
+        const fetchVideos = async () => {
+            try {
+                const videos = await exploreService.getAll();
+                setVideos(videos);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchVideos();
     }, []);
 
     const handleCardClick = (video: ExploreVideo) => {
         setSelectedVideo(video);
         setModalOpen(true);
     };
+
+    if (loading) {
+        return (
+            <div className="explore-loading-screen">
+                <div className="explore-spinner" />
+            </div>
+        );
+    }
 
     return (
         <div className="page-wrapper">

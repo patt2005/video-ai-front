@@ -1,3 +1,5 @@
+using VideoBackend.Domain.Enums;
+
 namespace VideoBackend.Domain.Entities.Task;
 
 public class Task
@@ -9,5 +11,5 @@ public class Task
     public User.User? User { get; set; }
     public Guid ContentId { get; set; }
     public Content? Content { get; set; }
-    public TaskStatus Status { get; set; }
+    public GenerationStatus Status { get; set; }
 }

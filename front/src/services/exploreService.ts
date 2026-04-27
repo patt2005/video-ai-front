@@ -14,7 +14,7 @@ function mapDto(dto: ExploreVideoDto): ExploreVideo {
   return {
     videoUrl: dto.videoUrl,
     title: dto.title,
-    subtitle: dto.description,
+    description: dto.description,
     prompt: dto.description,
   };
 }

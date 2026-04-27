@@ -1,6 +1,6 @@
 namespace VideoBackend.Domain.Enums;
 
-public enum TaskStatus
+public enum GenerationStatus
 {
     Success,
     Failed,

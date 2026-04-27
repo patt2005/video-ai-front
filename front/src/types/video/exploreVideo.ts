@@ -1,7 +1,7 @@
 export interface ExploreVideo {
   videoUrl: string;
   title: string;
-  subtitle: string;
+  description: string;
   prompt?: string;
   model?: string;
   aspectRatio?: string;

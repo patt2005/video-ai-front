@@ -1,14 +1,15 @@
-using VideoBackend.BusinessLayer.Core;
 using VideoBackend.BusinessLayer.Interfaces;
+using VideoBackend.BusinessLayer.Structure;
 
 namespace VideoBackend.BusinessLayer;
 
 public class BusinessLogic
 {
-    public BusinessLogic() { }
+    public IUserAction UserAction() => new UserActionExecution();
 
-    public IExploreVideoActions GetExploreVideoLogic()
-    {
-        return new ExploreVideoActions();
-    }
+    public ITaskAction TaskAction() => new TaskActionExecution();
+
+    public IExploreVideoAction ExploreVideoAction() => new ExploreVideoActionExecution();
+
+    public IVideoAction VideoAction() => new VideoActionExecution();
 }

@@ -52,15 +52,25 @@ export default function Video() {
         prompt: promptText,
       };
 
-      const { url } = await videoService.createTask(params, {
-        userId: user?.id,
-      });
-      setResultVideoUrl(url);
-      setResultModalOpen(true);
+      const { taskId } = await videoService.createTask(params);
 
-      setTimeout(() => {
+      toast.loading('Generating video…', {
+        id: toastId,
+        description: 'Polling for result…',
+      });
+
+      const result = await videoService.pollTaskUntilComplete(taskId);
+
+      if (result.status === 'Success' && result.url) {
+        setResultVideoUrl(result.url);
+        setResultModalOpen(true);
         toast.dismiss(toastId);
-      }, 3000);
+      } else {
+        toast.error('Generation failed', {
+          id: toastId,
+          description: result.error ?? 'Something went wrong.',
+        });
+      }
     } catch (err) {
       toast.error('Generation failed', {
         id: toastId,

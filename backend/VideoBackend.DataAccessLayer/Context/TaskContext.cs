@@ -1,22 +1,22 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using VideoBackend.Domain.Entities.Task;
+using VideoBackend.Domain.Entities.User;
 using Task = VideoBackend.Domain.Entities.Task.Task;
 
 namespace VideoBackend.DataAccessLayer.Context;
 
 public class TaskContext : DbContext
 {
-    private readonly IConfiguration _configuration;
-    
-    public TaskContext(IConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
+    public DbSet<Task> Tasks { get; set; }
+    public DbSet<Content> Contents { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
+        optionsBuilder.UseNpgsql(DbSession.ConnectionString);
     }
 
-    public DbSet<Task> Tasks { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>().ToTable("Users");
+    }
 }

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet add *)",
+      "Bash(dotnet ef migrations *)",
+      "Bash(dotnet ef database *)"
     ]
   }
 }

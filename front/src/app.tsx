@@ -15,7 +15,6 @@ import Pricing from './pages/pricing/pricing';
 import './App.css';
 import {paths} from './routes/paths.ts';
 import {UserRole} from "./types/user/user.ts";
-import HealthCheck from './components/HealthCheck.tsx';
 
 function ProtectedRoute({ roles }: { roles?: UserRole[] }) {
     const { isLoggedIn, user } = useAuth();

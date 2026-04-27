@@ -19,7 +19,7 @@ export default function ExploreCard({ video, onClick }: ExploreCardProps) {
                 <source src={video.videoUrl} type="video/mp4" />
             </video>
             <h2 className="explore-card-title">{video.title}</h2>
-            <p className="explore-card-text">{video.subtitle}</p>
+            <p className="explore-card-text">{video.description}</p>
         </div>
     );
 }
