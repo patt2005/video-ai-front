@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { useAuth } from '../../contexts/authContext';
@@ -12,8 +13,9 @@ const ARROW_ICON_SIZE = 20;
 
 export default function Video() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string } | null>(null);
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);

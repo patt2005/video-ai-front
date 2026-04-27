@@ -64,7 +64,7 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
 
   const handleRecreate = () => {
     onOpenChange(false);
-    navigate('/video');
+    navigate(`/video?prompt=${encodeURIComponent(promptText)}`);
   };
 
   return (

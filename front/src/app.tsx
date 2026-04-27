@@ -46,7 +46,7 @@ function AppLayout() {
                 <Header />
                 <div className="main-area">
                 <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''}`}>
-                    <HealthCheck />
+                    {/*<HealthCheck />*/}
                     <Routes>
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />

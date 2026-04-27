@@ -1,15 +1,20 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Icon } from '@iconify/react';
-import { exploreVideos } from '../../_mock/videos';
 import '../../styles/explore.css';
 import type { ExploreVideo } from '../../types/video/exploreVideo';
 import ExploreCard from './exploreCard';
 import { ExploreVideoModal } from '../../components/modals/exploreVideoModal';
+import longCardIcon from '../../assets/longcardicon.png';
+import { exploreService } from '../../services/exploreService';
 
 export default function Explore() {
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedVideo, setSelectedVideo] = useState<ExploreVideo | null>(null);
+    const [videos, setVideos] = useState<ExploreVideo[]>([]);
+
+    useEffect(() => {
+        exploreService.getAll().then(setVideos).catch(console.error);
+    }, []);
 
     const handleCardClick = (video: ExploreVideo) => {
         setSelectedVideo(video);
@@ -22,7 +27,7 @@ export default function Explore() {
               Follow your dreams
             </p>
             <div className="explore-cards-row">
-                {exploreVideos.map((video) => (
+                {videos.map((video) => (
                     <ExploreCard
                         key={video.title}
                         video={video}
@@ -32,7 +37,7 @@ export default function Explore() {
             </div>
             <div className="explore-full-card">
                 <span className="explore-full-icon" aria-hidden="true">
-                    <Icon icon="mdi:tag-percent" width={80} height={80} />
+                    <img src={longCardIcon} alt="icon" className="explore-full-icon" />
                 </span>
                 <div className="explore-full-thumb">
                     <h2 className="explore-full-title">CLICK NOW FOR EXCLUSIVE USE THE DISCOUNT</h2>
@@ -46,7 +51,7 @@ export default function Explore() {
             <h2 className="explore-section-title">Mixed Media</h2>
 
             <div className="explore-grid">
-                {[...exploreVideos, ...exploreVideos].slice(0, 7).map((video, index) => (
+                {[...videos, ...videos].slice(0, 7).map((video, index) => (
                     <div
                         key={`${video.title}-${index}`}
                         role="button"
