@@ -3,7 +3,7 @@ using VideoBackend.DataAccessLayer.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 var frontendCorsPolicy = "FrontendCors";
 
 builder.Services.AddControllers()
@@ -11,7 +11,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
@@ -36,7 +36,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors(frontendCorsPolicy);
 
 app.UseAuthorization();
