@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/authContext';
 import { paths } from '../../routes/paths';
 
 const signupSchema = object({
+    username: string().required('Username is required').min(3, 'Username must be at least 3 characters'),
     email: string().required('Email is required').email('Enter a valid email address'),
     password: string().required('Password is required').min(8, 'Password must be at least 8 characters'),
     confirmPassword: string()
@@ -14,8 +15,9 @@ const signupSchema = object({
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { register } = useAuth();
 
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,17 +27,15 @@ export default function SignUp() {
         e.preventDefault();
         setErrors({});
 
-        const payload = { email, password, confirmPassword };
+        const payload = { username, email, password, confirmPassword };
 
         try {
             await signupSchema.validate(payload, { abortEarly: false });
-            const success = login(email, password);
+            const success = await register(username, email, password);
             if (success) {
                 navigate(paths.root, { replace: true });
             } else {
-                setErrors({
-                    form: 'This demo only accepts existing test accounts. Sign in with e.g. mihai@movyai.app / password123',
-                });
+                setErrors({ form: 'Could not create account. Email may already be in use.' });
             }
         } catch (err) {
             if (err instanceof ValidationError) {
@@ -90,6 +90,25 @@ export default function SignUp() {
                                     {errors.form}
                                 </p>
                             )}
+                            <div className={`login-field${errors.username ? ' login-field--error' : ''}`}>
+                                <label htmlFor="signup-username">Username</label>
+                                <input
+                                    id="signup-username"
+                                    type="text"
+                                    placeholder="your username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    autoComplete="username"
+                                    aria-invalid={!!errors.username}
+                                    aria-describedby={errors.username ? 'signup-username-error' : undefined}
+                                />
+                                {errors.username && (
+                                    <p id="signup-username-error" className="login-field-error" role="alert">
+                                        {errors.username}
+                                    </p>
+                                )}
+                            </div>
+
                             <div className={`login-field${errors.email ? ' login-field--error' : ''}`}>
                                 <label htmlFor="signup-email">Email</label>
                                 <input

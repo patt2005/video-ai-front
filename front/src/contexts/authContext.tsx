@@ -30,9 +30,11 @@ function saveUserToStorage(user: User | null) {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoggedIn: boolean;
 }
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -61,6 +63,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
   }, [api]);
+   const register = useCallback(async (username: string, email: string, password: string): Promise<boolean> => {
+    try {
+      await authService.register(api, { username, email, password });
+      return await login(email, password);
+    } catch (error) {
+      console.error('Register failed:', error);
+      return false;
+    }
+  }, [api, login]);  
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
@@ -71,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isLoggedIn = user !== null;
 
   return (
-      <AuthContext.Provider value={{ user, login, logout, isLoggedIn }}>
+      <AuthContext.Provider value={{ user, login,register, logout, isLoggedIn }}>
         {children}
       </AuthContext.Provider>
   );
