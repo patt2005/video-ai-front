@@ -1,11 +1,13 @@
-import {Fragment, useMemo, useState,useEffect,useContext} from 'react';
-import{ApiContext} from "../../contexts/apiContext.tsx";
+import {Fragment, useMemo, useState, useEffect, useContext} from 'react';
+import {ApiContext} from "../../contexts/apiContext.tsx";
 import {Icon} from '@iconify/react';
+import {toast} from 'sonner';
+import * as Dialog from '@radix-ui/react-dialog';
 import '../../styles/Admin.css';
 import {userService} from '../../services/userService';
 import {taskService} from '../../services/taskService';
 import {type Task, TaskStatus} from '../../types/generation/task';
-import {UserRole,type User} from "../../types/user/user.ts";
+import {UserRole, type User} from "../../types/user/user.ts";
 
 function formatRegisterDate(isoDate: string | undefined) {
     if (!isoDate) return '—';
@@ -41,31 +43,28 @@ function formatTaskStatus(status: TaskStatus) : string {
 }
 
 export default function Admin() {
-    const { api }=useContext(ApiContext)!;
+    const { api } = useContext(ApiContext)!;
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [userSearch, setUserSearch] = useState('');
-    const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
     const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
     const [filterId, setFilterId] = useState('');
     const [filterUsername, setFilterUsername] = useState('');
     const [filterEmail, setFilterEmail] = useState('');
     const [filterRegisterDate, setFilterRegisterDate] = useState('');
     const [filterRole, setFilterRole] = useState<string>('');
-    const [roleUpdateKey, setRoleUpdateKey] = useState(0);
-    useEffect(()=>{
-       const fetchUsers=async()=>{
+
+    useEffect(() => {
+        const fetchUsers = async () => {
             const data = await userService.getUsers(api);
             setAllUsers(data);
         };
         fetchUsers();
-    },
-    [api]
-    );
+    }, [api]);
 
     const users = useMemo(() => {
-     let list: User[] = allUsers;
-        list = list.filter((u) => !deletedIds.has(u.id));
+        let list: User[] = allUsers;
         if (userSearch.trim() !== '') {
             const searchTerm = userSearch.trim().toLowerCase();
             list = list.filter((u) =>
@@ -98,7 +97,7 @@ export default function Admin() {
             list = list.filter((u) => u.role === filterRole);
         }
         return list;
-    }, [allUsers,userSearch, deletedIds, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole, roleUpdateKey]);
+    }, [allUsers, userSearch, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole]);
 
     const tasksByUserId = useMemo(() => {
         const map: Record<string, Task[]> = {};
@@ -108,13 +107,27 @@ export default function Admin() {
         return map;
     }, [users]);
 
-    const handleDelete = (id: string) => {
-        setDeletedIds((prev) => new Set(prev).add(id));
+    const handleRoleChange = async (userId: string, newRole: UserRole) => {
+        try {
+            const updated = await userService.updateUserRole(api, userId, newRole);
+            setAllUsers((prev) => prev.map((u) => (u.id === userId ? updated : u)));
+            toast.success(`Role updated to ${newRole}`);
+        } catch {
+            toast.error('Failed to update role');
+        }
     };
 
-    const handleRoleChange = (userId: string, newRole: UserRole) => {
-        userService.updateUserRole(userId, newRole);
-        setRoleUpdateKey((k) => k + 1);
+    const confirmDelete = async () => {
+        if (!userToDelete) return;
+        try {
+            await userService.deleteUser(api, userToDelete.id);
+            setAllUsers((prev) => prev.filter((u) => u.id !== userToDelete.id));
+            toast.success(`Deleted ${userToDelete.username}`);
+        } catch {
+            toast.error('Failed to delete user');
+        } finally {
+            setUserToDelete(null);
+        }
     };
 
     const toggleExpand = (userId: string) => {
@@ -246,7 +259,7 @@ export default function Admin() {
                                         <td>
                                             <button
                                                 type="button"
-                                                onClick={() => handleDelete(user.id)}
+                                                onClick={() => setUserToDelete(user)}
                                                 className="admin-delete-btn"
                                             >
                                                 Delete
@@ -296,6 +309,26 @@ export default function Admin() {
                     </tbody>
                 </table>
             </div>
+
+            <Dialog.Root open={userToDelete !== null} onOpenChange={(open) => !open && setUserToDelete(null)}>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="admin-modal-overlay" />
+                    <Dialog.Content className="admin-modal-content">
+                        <Dialog.Title className="admin-modal-title">Delete user?</Dialog.Title>
+                        <Dialog.Description className="admin-modal-desc">
+                            This will permanently delete <strong>{userToDelete?.username}</strong>. This action cannot be undone.
+                        </Dialog.Description>
+                        <div className="admin-modal-actions">
+                            <button onClick={() => setUserToDelete(null)} className="admin-modal-cancel">
+                                Cancel
+                            </button>
+                            <button onClick={confirmDelete} className="admin-modal-delete">
+                                Delete
+                            </button>
+                        </div>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
         </div>
     );
 }

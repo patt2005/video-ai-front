@@ -274,3 +274,75 @@
 .admin-task-status--failed {
   color: #f44336;
 }
+
+/* Confirmation modal */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+}
+
+.admin-modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-panel);
+  color: var(--text);
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  min-width: 400px;
+  max-width: 90vw;
+  z-index: 101;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.admin-modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.admin-modal-desc {
+  color: var(--text-muted);
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.admin-modal-cancel,
+.admin-modal-delete {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-modal-cancel {
+  background: transparent;
+  color: var(--text);
+}
+
+.admin-modal-cancel:hover {
+  background: var(--bg-muted);
+}
+
+.admin-modal-delete {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.admin-modal-delete:hover {
+  background: #b91c1c;
+}
