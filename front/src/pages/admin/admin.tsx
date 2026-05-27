@@ -1,10 +1,11 @@
-import {Fragment, useMemo, useState} from 'react';
+import {Fragment, useMemo, useState,useEffect,useContext} from 'react';
+import{ApiContext} from "../../contexts/apiContext.tsx";
 import {Icon} from '@iconify/react';
 import '../../styles/Admin.css';
 import {userService} from '../../services/userService';
 import {taskService} from '../../services/taskService';
 import {type Task, TaskStatus} from '../../types/generation/task';
-import {UserRole} from "../../types/user/user.ts";
+import {UserRole,type User} from "../../types/user/user.ts";
 
 function formatRegisterDate(isoDate: string | undefined) {
     if (!isoDate) return '—';
@@ -40,9 +41,11 @@ function formatTaskStatus(status: TaskStatus) : string {
 }
 
 export default function Admin() {
+    const { api }=useContext(ApiContext)!;
+    const [allUsers, setAllUsers] = useState<User[]>([]);
     const [userSearch, setUserSearch] = useState('');
-    const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
-    const [expandedUserId, setExpandedUserId] = useState<number | null>(null);
+    const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+    const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
 
     const [filterId, setFilterId] = useState('');
     const [filterUsername, setFilterUsername] = useState('');
@@ -50,14 +53,31 @@ export default function Admin() {
     const [filterRegisterDate, setFilterRegisterDate] = useState('');
     const [filterRole, setFilterRole] = useState<string>('');
     const [roleUpdateKey, setRoleUpdateKey] = useState(0);
+    useEffect(()=>{
+       const fetchUsers=async()=>{
+            const data = await userService.getUsers(api);
+            setAllUsers(data);
+        };
+        fetchUsers();
+    },
+    [api]
+    );
 
     const users = useMemo(() => {
-        let list = userService.getUsers(userSearch || null);
+     let list: User[] = allUsers;
         list = list.filter((u) => !deletedIds.has(u.id));
+        if (userSearch.trim() !== '') {
+            const searchTerm = userSearch.trim().toLowerCase();
+            list = list.filter((u) =>
+                u.id.toLowerCase().includes(searchTerm) ||
+                u.username?.toLowerCase().includes(searchTerm) ||
+                (u.email ?? '').toLowerCase().includes(searchTerm)
+            );
+        }
 
         const idTerm = filterId.trim().toLowerCase();
         if (idTerm) {
-            list = list.filter((u) => String(u.id).toLowerCase().includes(idTerm));
+            list = list.filter((u) => u.id.toLowerCase().includes(idTerm));
         }
         const usernameTerm = filterUsername.trim().toLowerCase();
         if (usernameTerm) {
@@ -78,26 +98,26 @@ export default function Admin() {
             list = list.filter((u) => u.role === filterRole);
         }
         return list;
-    }, [userSearch, deletedIds, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole, roleUpdateKey]);
+    }, [allUsers,userSearch, deletedIds, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole, roleUpdateKey]);
 
     const tasksByUserId = useMemo(() => {
-        const map: Record<number, Task[]> = {};
+        const map: Record<string, Task[]> = {};
         users.forEach((user) => {
             map[user.id] = taskService.getTasks(user.id, null);
         });
         return map;
     }, [users]);
 
-    const handleDelete = (id: number) => {
+    const handleDelete = (id: string) => {
         setDeletedIds((prev) => new Set(prev).add(id));
     };
 
-    const handleRoleChange = (userId: number, newRole: UserRole) => {
+    const handleRoleChange = (userId: string, newRole: UserRole) => {
         userService.updateUserRole(userId, newRole);
         setRoleUpdateKey((k) => k + 1);
     };
 
-    const toggleExpand = (userId: number) => {
+    const toggleExpand = (userId: string) => {
         setExpandedUserId((prev) => (prev === userId ? null : userId));
     };
 

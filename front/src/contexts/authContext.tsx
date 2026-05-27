@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: "a4da2b5b-85a0-4868-a2a5-3974ce4cc085",
       email: email,
       registerDate: Date.now().toString(),
-      role: UserRole.User,
+      role: UserRole.Admin,
     };
     
     console.log("User password", password);
