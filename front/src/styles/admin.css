@@ -346,3 +346,88 @@
 .admin-modal-delete:hover {
   background: #b91c1c;
 }
+
+/* Status badge inline next to username */
+.admin-username {
+  margin-right: 8px;
+}
+
+.admin-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-status-badge--blocked {
+  background: rgba(220, 38, 38, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+/* Actions cell — group block + delete */
+.admin-actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-block-btn {
+  background: none;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-block-btn:hover {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.admin-block-btn--unblock {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.admin-block-btn--unblock:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* Plan dropdown in admin table */
+.admin-plan-select {
+  padding: 4px 24px 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  min-width: 90px;
+}
+
+.admin-plan-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-plan-select--starter {
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.admin-plan-select--pro {
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.admin-plan-select--studio {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.5);
+}

@@ -1,6 +1,45 @@
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { ApiContext } from '../../contexts/apiContext';
+import { useAuth } from '../../contexts/authContext';
+import { subscriptionService } from '../../services/subscriptionService';
+import { SubscriptionPlan, type Subscription } from '../../types/subscription/subscription';
+import { paths } from '../../routes/paths';
 import '../../styles/pricing.css';
 
 export default function Pricing() {
+    const { api } = useContext(ApiContext)!;
+    const { isLoggedIn } = useAuth();
+    const navigate = useNavigate();
+    const [currentSub, setCurrentSub] = useState<Subscription | null>(null);
+    const [loading, setLoading] = useState<SubscriptionPlan | null>(null);
+
+    useEffect(() => {
+        if (!isLoggedIn) return;
+        subscriptionService.getMine(api).then(setCurrentSub).catch(() => setCurrentSub(null));
+    }, [api, isLoggedIn]);
+
+    const handleSubscribe = async (plan: SubscriptionPlan) => {
+        if (!isLoggedIn) {
+            navigate(paths.login);
+            return;
+        }
+        try {
+            setLoading(plan);
+            const sub = await subscriptionService.subscribe(api, plan);
+            setCurrentSub(sub);
+            toast.success(`Now on ${plan} plan`);
+        } catch {
+            toast.error('Failed to subscribe');
+        } finally {
+            setLoading(null);
+        }
+    };
+
+    const isCurrent = (plan: SubscriptionPlan) =>
+        currentSub?.status === 'Active' && currentSub?.plan === plan;
+
     return (
         <main className="login-page">
             <div className="login-blobs" aria-hidden="true">
@@ -30,8 +69,13 @@ export default function Pricing() {
                                 <span className="pricing-period">/ month</span>
                             </div>
 
-                            <button className="pricing-cta" type="button">
-                                Get started
+                            <button
+                                className="pricing-cta"
+                                type="button"
+                                onClick={() => handleSubscribe(SubscriptionPlan.Starter)}
+                                disabled={loading !== null || isCurrent(SubscriptionPlan.Starter)}
+                            >
+                                {isCurrent(SubscriptionPlan.Starter) ? 'Current plan' : loading === SubscriptionPlan.Starter ? 'Starting…' : 'Get started'}
                             </button>
 
                             <ul className="pricing-features">
@@ -55,8 +99,13 @@ export default function Pricing() {
                                 <span className="pricing-period">/ month</span>
                             </div>
 
-                            <button className="pricing-cta pricing-cta--featured" type="button">
-                                Start Pro
+                            <button
+                                className="pricing-cta pricing-cta--featured"
+                                type="button"
+                                onClick={() => handleSubscribe(SubscriptionPlan.Pro)}
+                                disabled={loading !== null || isCurrent(SubscriptionPlan.Pro)}
+                            >
+                                {isCurrent(SubscriptionPlan.Pro) ? 'Current plan' : loading === SubscriptionPlan.Pro ? 'Starting…' : 'Start Pro'}
                             </button>
 
                             <ul className="pricing-features">
@@ -78,8 +127,13 @@ export default function Pricing() {
                                 <span className="pricing-period">/ month</span>
                             </div>
 
-                            <button className="pricing-cta" type="button">
-                                Contact sales
+                            <button
+                                className="pricing-cta"
+                                type="button"
+                                onClick={() => handleSubscribe(SubscriptionPlan.Studio)}
+                                disabled={loading !== null || isCurrent(SubscriptionPlan.Studio)}
+                            >
+                                {isCurrent(SubscriptionPlan.Studio) ? 'Current plan' : loading === SubscriptionPlan.Studio ? 'Starting…' : 'Start Studio'}
                             </button>
 
                             <ul className="pricing-features">

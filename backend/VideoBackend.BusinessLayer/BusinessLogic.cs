@@ -11,17 +11,20 @@ public class BusinessLogic
     private readonly UserContext _userContext;
     private readonly TaskContext _taskContext;
     private readonly ExploreVideoContext _videoContext;
+    private readonly SubscriptionContext _subscriptionContext;
     private readonly IConfiguration _configuration;
 
     public BusinessLogic(
         UserContext userContext,
         TaskContext taskContext,
         ExploreVideoContext videoContext,
+        SubscriptionContext subscriptionContext,
         IConfiguration configuration)
     {
         _userContext = userContext;
         _taskContext = taskContext;
         _videoContext = videoContext;
+        _subscriptionContext = subscriptionContext;
         _configuration = configuration;
     }
 
@@ -37,4 +40,7 @@ public class BusinessLogic
     public IVideoAction VideoAction() => new VideoActionExecution();
 
     public IImageAction ImageAction() => new ImageActionExecution();
+
+    public ISubscriptionAction SubscriptionAction()
+        => new SubscriptionActionExecution(_subscriptionContext);
 }

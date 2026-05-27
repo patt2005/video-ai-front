@@ -11,4 +11,5 @@ export interface User {
     role: UserRole;
     email: string;
     registerDate: string;
+    isBlocked: boolean;
 }

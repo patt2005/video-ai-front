@@ -9,6 +9,8 @@ public interface IUserAction
     Task<UserDto?> GetUserByIdActionExecution(Guid id);
     Task<UserDto?> UpdateUserActionExecution(Guid id, UserDto dto, string? newPassword);
     Task<UserDto?> UpdateUserRoleActionExecution(Guid id, UserRole newRole);
+    Task<UserDto?> BlockUserActionExecution(Guid id);
+    Task<UserDto?> UnblockUserActionExecution(Guid id);
     Task<bool> DeleteUserActionExecution(Guid id);
     Task<LoginResponseDto?> LoginActionExecution(LoginDto dto);
     Task<UserDto?> RegisterActionExecution(RegisterDto dto);

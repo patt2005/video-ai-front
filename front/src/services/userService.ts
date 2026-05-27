@@ -12,6 +12,16 @@ export const userService = {
         return response.data;
     },
 
+    async blockUser(api: AxiosInstance, userId: string): Promise<User> {
+        const response = await api.patch<User>(`/api/User/${userId}/block`);
+        return response.data;
+    },
+
+    async unblockUser(api: AxiosInstance, userId: string): Promise<User> {
+        const response = await api.patch<User>(`/api/User/${userId}/unblock`);
+        return response.data;
+    },
+
     async deleteUser(api: AxiosInstance, userId: string): Promise<void> {
         await api.delete(`/api/User/${userId}`);
     },

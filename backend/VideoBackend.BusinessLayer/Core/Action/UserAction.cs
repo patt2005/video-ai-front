@@ -31,7 +31,8 @@ public class UserAction
                 Username = u.Username,
                 Email = u.Email,
                 Role = u.Role,
-                RegisterDate = u.RegisterDate
+                RegisterDate = u.RegisterDate,
+                IsBlocked = u.IsBlocked
             })
             .ToListAsync();
     }
@@ -46,7 +47,8 @@ public class UserAction
             Username = u.Username,
             Email = u.Email,
             Role = u.Role,
-            RegisterDate = u.RegisterDate
+            RegisterDate = u.RegisterDate,
+            IsBlocked = u.IsBlocked
         };
     }
 
@@ -70,7 +72,8 @@ public class UserAction
             Username = u.Username,
             Email = u.Email,
             Role = u.Role,
-            RegisterDate = u.RegisterDate
+            RegisterDate = u.RegisterDate,
+            IsBlocked = u.IsBlocked
         };
     }
 
@@ -88,7 +91,33 @@ public class UserAction
             Username = u.Username,
             Email = u.Email,
             Role = u.Role,
-            RegisterDate = u.RegisterDate
+            RegisterDate = u.RegisterDate,
+            IsBlocked = u.IsBlocked
+        };
+    }
+
+    protected async Task<UserDto?> BlockUserAction(Guid id)
+        => await SetUserBlockedStatusAsync(id, true);
+
+    protected async Task<UserDto?> UnblockUserAction(Guid id)
+        => await SetUserBlockedStatusAsync(id, false);
+
+    private async Task<UserDto?> SetUserBlockedStatusAsync(Guid id, bool isBlocked)
+    {
+        var u = await _context.Users.FindAsync(id);
+        if (u is null) return null;
+
+        u.IsBlocked = isBlocked;
+        await _context.SaveChangesAsync();
+
+        return new UserDto
+        {
+            Id = u.Id,
+            Username = u.Username,
+            Email = u.Email,
+            Role = u.Role,
+            RegisterDate = u.RegisterDate,
+            IsBlocked = u.IsBlocked
         };
     }
 
@@ -108,6 +137,8 @@ public class UserAction
         {
             return null;
         }
+
+        if (user.IsBlocked) return null;
 
         var jwtKey = _configuration["Jwt:Key"]!;
         var jwtIssuer = _configuration["Jwt:Issuer"]!;
@@ -161,7 +192,8 @@ public class UserAction
             Username = user.Username,
             Email = user.Email,
             Role = user.Role,
-            RegisterDate = user.RegisterDate
+            RegisterDate = user.RegisterDate,
+            IsBlocked = user.IsBlocked
         };
     }
 }

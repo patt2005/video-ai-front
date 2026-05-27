@@ -19,9 +19,10 @@ public class UserController : ControllerBase
         UserContext userContext,
         TaskContext taskContext,
         ExploreVideoContext videoContext,
+        SubscriptionContext subscriptionContext,
         IConfiguration configuration)
     {
-        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, subscriptionContext, configuration);
         _user = bl.UserAction();
     }
 
@@ -52,6 +53,22 @@ public class UserController : ControllerBase
     public async Task<IActionResult> UpdateRole(Guid id, [FromBody] UpdateRoleRequest request)
     {
         var updated = await _user.UpdateUserRoleActionExecution(id, request.Role);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
+    [HttpPatch("{id:guid}/block")]
+    public async Task<IActionResult> Block(Guid id)
+    {
+        var updated = await _user.BlockUserActionExecution(id);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
+    [HttpPatch("{id:guid}/unblock")]
+    public async Task<IActionResult> Unblock(Guid id)
+    {
+        var updated = await _user.UnblockUserActionExecution(id);
         if (updated is null) return NotFound();
         return Ok(updated);
     }
