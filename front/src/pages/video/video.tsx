@@ -57,7 +57,6 @@ export default function Video() {
 
       const url = await videoService.generateVideoAndPoll(
         {
-          userId: user.id,
           prompt: promptText,
           aspectRatio: selectedRatio,
           model: selectedModel,

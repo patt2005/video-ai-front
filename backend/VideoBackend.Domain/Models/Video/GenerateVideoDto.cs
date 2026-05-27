@@ -4,7 +4,6 @@ namespace VideoBackend.Domain.Models.Video;
 
 public class GenerateVideoDto
 {
-    public Guid UserId { get; set; }
     public string Prompt { get; set; } = string.Empty;
     public string AspectRatio { get; set; } = "16:9";
     public List<string>? ImageUrls { get; set; }

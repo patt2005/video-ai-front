@@ -23,7 +23,7 @@ public class VideoActions
         _ => "veo3.1-fast"
     };
 
-    protected GenerateVideoResponse GenerateVideoActionExecution(GenerateVideoDto dto)
+    protected GenerateVideoResponse GenerateVideoActionExecution(GenerateVideoDto dto, Guid userId)
     {
         // Build input object — image_urls only for fast/quality models
         var model = MapModel(dto.Model);
@@ -80,7 +80,7 @@ public class VideoActions
             Id = Guid.NewGuid(),
             Prompt = dto.Prompt,
             CreationDate = DateTime.UtcNow,
-            UserId = dto.UserId,
+            UserId = userId,
             ContentId = content.Id,
             Status = GenerationStatus.Pending,
             PoyoTaskId = poyoTaskId,
@@ -120,7 +120,7 @@ public class VideoActions
         var data = poyoResponse?["data"];
 
         var status = data?["status"]?.GetValue<string>() ?? "unknown";
-        var progress = data?["progress"]?.GetValue<int>() ?? 0;
+        var progress = (int)(data?["progress"]?.GetValue<double>() ?? 0);
         var errorMessage = data?["error_message"]?.GetValue<string>();
 
         var videoUrls = new List<string>();

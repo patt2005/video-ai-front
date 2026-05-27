@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { useAuth } from '../../contexts/authContext';
@@ -7,6 +7,7 @@ import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
 import { imageService } from '../../services/imageService';
+import { fileService } from '../../services/fileService';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   {
@@ -29,12 +30,6 @@ const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   },
 ];
 
-const GOOGLE_ICON = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/500px-Google_%22G%22_logo.svg.png';
-
-const MODELS = [
-  { id: 'nano-banana', name: 'Nano Banana', iconUrl: GOOGLE_ICON },
-] as const;
-
 const SIZES = ['1:1', '16:9', '9:16', '4:3'] as const;
 type ImageSize = typeof SIZES[number];
 
@@ -44,8 +39,6 @@ type ImageResolution = typeof RESOLUTIONS[number];
 export default function Image() {
   const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
-  const [selectedModel, setSelectedModel] = useState<(typeof MODELS)[number]['id']>('nano-banana');
-  const [modelPickerOpen, setModelPickerOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState<ImageSize>('1:1');
   const [selectedResolution, setSelectedResolution] = useState<ImageResolution>('1K');
   const [promptImage, setPromptImage] = useState<{ file: File; preview: string } | null>(null);
@@ -53,17 +46,6 @@ export default function Image() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const modelPickerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modelPickerRef.current && !modelPickerRef.current.contains(e.target as Node)) {
-        setModelPickerOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -100,12 +82,22 @@ export default function Image() {
     });
 
     try {
+      // Upload reference image to S3 first if provided
+      let imageUrls: string[] = [];
+      if (promptImage?.file) {
+        toast.loading('Uploading reference image…', { id: toastId });
+        const uploaded = await fileService.uploadFile(promptImage.file);
+        imageUrls = [fileService.getPreviewUrl(uploaded.key)];
+      }
+
+      toast.loading('Generating image…', { id: toastId, description: 'This may take a few seconds.' });
+
       const resultUrl = await imageService.generateImageAndPoll(
         {
-          userId: user.id,
           prompt,
           size: selectedSize,
           resolution: selectedResolution,
+          imageUrls,
         },
         (progress) => {
           toast.loading(`Generating image… ${progress}%`, { id: toastId });
@@ -207,56 +199,6 @@ export default function Image() {
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="model-select-wrapper" ref={modelPickerRef}>
-            <span className="model-select-field-label">Model</span>
-            <button
-              type="button"
-              className="model-select-card model-select-card-inline"
-              onClick={() => setModelPickerOpen((o) => !o)}
-              aria-expanded={modelPickerOpen}
-            >
-              <span className="model-select-card-row">
-                <span
-                  className="model-select-icon model-select-icon-primary"
-                  style={{
-                    WebkitMaskImage: `url(${MODELS.find((m) => m.id === selectedModel)?.iconUrl})`,
-                    maskImage: `url(${MODELS.find((m) => m.id === selectedModel)?.iconUrl})`,
-                  }}
-                  aria-hidden
-                />
-                <span className="model-select-label">
-                  {MODELS.find((m) => m.id === selectedModel)?.name ?? 'Nano Banana'}
-                </span>
-                <Icon icon="mdi:chevron-right" width={20} className="model-select-arrow" />
-              </span>
-            </button>
-            {modelPickerOpen && (
-              <div className="model-picker-dropdown">
-                {MODELS.map((model) => (
-                  <button
-                    key={model.id}
-                    type="button"
-                    className={`model-picker-option ${selectedModel === model.id ? 'selected' : ''}`}
-                    onClick={() => {
-                      setSelectedModel(model.id);
-                      setModelPickerOpen(false);
-                    }}
-                  >
-                    <span
-                      className="model-picker-option-icon model-select-icon-primary"
-                      style={{
-                        WebkitMaskImage: `url(${model.iconUrl})`,
-                        maskImage: `url(${model.iconUrl})`,
-                      }}
-                      aria-hidden
-                    />
-                    <span className="model-picker-option-name">{model.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           <button

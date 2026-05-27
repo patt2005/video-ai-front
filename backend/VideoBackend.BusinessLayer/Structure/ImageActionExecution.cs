@@ -6,6 +6,6 @@ namespace VideoBackend.BusinessLayer.Structure;
 
 public class ImageActionExecution : ImageActions, IImageAction
 {
-    public GenerateImageResponse GenerateImage(GenerateImageDto dto) => GenerateImageActionExecution(dto);
+    public GenerateImageResponse GenerateImage(GenerateImageDto dto, Guid userId) => GenerateImageActionExecution(dto, userId);
     public ImageTaskStatusResponse GetImageTaskStatus(Guid taskId) => GetImageTaskStatusActionExecution(taskId);
 }

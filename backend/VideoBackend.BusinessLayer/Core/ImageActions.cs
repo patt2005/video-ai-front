@@ -15,25 +15,39 @@ public class ImageActions
 {
     private static readonly HttpClient _http = new();
 
-    private static string MapModel(ImageModel model) => model switch
+    protected GenerateImageResponse GenerateImageActionExecution(GenerateImageDto dto, Guid userId)
     {
-        ImageModel.NanoBanana2 => "nano-banana-2-new",
-        _ => "nano-banana-2-new"
-    };
+        var hasImages = dto.ImageUrls != null && dto.ImageUrls.Count > 0;
+        var model = hasImages ? "nano-banana-2-new-edit" : "nano-banana-2-new";
 
-    protected GenerateImageResponse GenerateImageActionExecution(GenerateImageDto dto)
-    {
-        // 1. Submit task to Poyo API
-        var requestBody = new
+        object requestBody;
+        if (hasImages)
         {
-            model = MapModel(dto.Model),
-            input = new
+            requestBody = new
             {
-                prompt = dto.Prompt,
-                size = dto.Size,
-                resolution = dto.Resolution
-            }
-        };
+                model,
+                input = new
+                {
+                    prompt = dto.Prompt,
+                    size = dto.Size,
+                    resolution = dto.Resolution,
+                    image_urls = dto.ImageUrls
+                }
+            };
+        }
+        else
+        {
+            requestBody = new
+            {
+                model,
+                input = new
+                {
+                    prompt = dto.Prompt,
+                    size = dto.Size,
+                    resolution = dto.Resolution
+                }
+            };
+        }
 
         var json = JsonSerializer.Serialize(requestBody);
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.poyo.ai/api/generate/submit")
@@ -50,7 +64,6 @@ public class ImageActions
             ?? throw new Exception($"Poyo API error: {responseBody}");
         var poyoStatus = poyoResponse?["data"]?["status"]?.GetValue<string>() ?? "not_started";
 
-        // 2. Persist task + content in DB
         using var db = new TaskContext();
 
         var content = new Content
@@ -65,7 +78,7 @@ public class ImageActions
             Id = Guid.NewGuid(),
             Prompt = dto.Prompt,
             CreationDate = DateTime.UtcNow,
-            UserId = dto.UserId,
+            UserId = userId,
             ContentId = content.Id,
             Status = GenerationStatus.Pending,
             PoyoTaskId = poyoTaskId,
@@ -106,7 +119,7 @@ public class ImageActions
         var data = poyoResponse?["data"];
 
         var status = data?["status"]?.GetValue<string>() ?? "unknown";
-        var progress = data?["progress"]?.GetValue<int>() ?? 0;
+        var progress = (int)(data?["progress"]?.GetValue<double>() ?? 0);
         var errorMessage = data?["error_message"]?.GetValue<string>();
 
         var imageUrls = new List<string>();

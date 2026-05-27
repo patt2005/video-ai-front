@@ -2,11 +2,15 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:5014';
 
+function authHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export type VideoModel = 'Veo31Fast' | 'Veo31Lite' | 'Veo31Quality';
 export type VideoAspectRatio = '16:9' | '9:16' | '1:1' | '4:3';
 
 export interface CreateVideoTaskParams {
-    userId: string;
     prompt: string;
     aspectRatio: VideoAspectRatio;
     model: VideoModel;
@@ -34,18 +38,18 @@ export interface CreateVideoTaskResult {
 
 async function createTask(params: CreateVideoTaskParams): Promise<CreateVideoTaskResult> {
     const { data } = await axios.post<GenerateVideoResponse>(`${BASE_URL}/api/video/generate`, {
-        userId: params.userId,
         prompt: params.prompt,
         aspectRatio: params.aspectRatio,
         model: params.model,
         imageUrls: params.imageUrls,
-    });
+    }, { headers: authHeaders() });
     return { taskId: data.taskId };
 }
 
 async function pollStatus(taskId: string): Promise<VideoStatusResponse> {
     const { data } = await axios.get<VideoStatusResponse>(
-        `${BASE_URL}/api/video/status/${taskId}`
+        `${BASE_URL}/api/video/status/${taskId}`,
+        { headers: authHeaders() }
     );
     return data;
 }

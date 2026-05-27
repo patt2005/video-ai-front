@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
@@ -8,6 +10,7 @@ namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ImageController : ControllerBase
 {
     internal IImageAction _imageAction;
@@ -26,7 +29,13 @@ public class ImageController : ControllerBase
     [HttpPost("generate")]
     public IActionResult Generate([FromBody] GenerateImageDto dto)
     {
-        var result = _imageAction.GenerateImage(dto);
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub");
+
+        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized("Invalid token");
+
+        var result = _imageAction.GenerateImage(dto, userId);
         return Ok(result);
     }
 

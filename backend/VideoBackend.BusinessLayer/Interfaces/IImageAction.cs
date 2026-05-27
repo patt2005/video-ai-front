@@ -4,6 +4,6 @@ namespace VideoBackend.BusinessLayer.Interfaces;
 
 public interface IImageAction
 {
-    GenerateImageResponse GenerateImage(GenerateImageDto dto);
+    GenerateImageResponse GenerateImage(GenerateImageDto dto, Guid userId);
     ImageTaskStatusResponse GetImageTaskStatus(Guid taskId);
 }

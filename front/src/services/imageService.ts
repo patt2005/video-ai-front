@@ -2,11 +2,16 @@ import axios from 'axios';
 
 const BASE_URL = 'http://localhost:5014';
 
+function authHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export interface CreateImageParams {
-    userId: string;
     prompt: string;
     size: string;
     resolution: string;
+    imageUrls?: string[];
 }
 
 interface GenerateImageResponse {
@@ -35,12 +40,12 @@ async function generateImage(params: CreateImageParams): Promise<string> {
     const { data: task } = await axios.post<GenerateImageResponse>(
         `${BASE_URL}/api/image/generate`,
         {
-            userId: params.userId,
             prompt: params.prompt,
             size: params.size,
             resolution: params.resolution,
-            model: 'NanaBanana2',
-        }
+            imageUrls: params.imageUrls ?? [],
+        },
+        { headers: authHeaders() }
     );
 
     return task.taskId;
@@ -48,7 +53,8 @@ async function generateImage(params: CreateImageParams): Promise<string> {
 
 async function pollStatus(taskId: string): Promise<ImageStatusResponse> {
     const { data } = await axios.get<ImageStatusResponse>(
-        `${BASE_URL}/api/image/status/${taskId}`
+        `${BASE_URL}/api/image/status/${taskId}`,
+        { headers: authHeaders() }
     );
     return data;
 }

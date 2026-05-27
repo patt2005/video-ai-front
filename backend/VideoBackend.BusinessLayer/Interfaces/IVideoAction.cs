@@ -4,6 +4,6 @@ namespace VideoBackend.BusinessLayer.Interfaces;
 
 public interface IVideoAction
 {
-    GenerateVideoResponse GenerateVideo(GenerateVideoDto dto);
+    GenerateVideoResponse GenerateVideo(GenerateVideoDto dto, Guid userId);
     VideoTaskStatusResponse GetVideoTaskStatus(Guid taskId);
 }
