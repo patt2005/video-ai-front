@@ -16,9 +16,10 @@ public class ExploreVideoController : ControllerBase
         UserContext userContext,
         TaskContext taskContext,
         ExploreVideoContext videoContext,
+        SubscriptionContext subscriptionContext,
         IConfiguration configuration)
     {
-        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, subscriptionContext, configuration);
         _video = bl.ExploreVideoAction();
     }
 

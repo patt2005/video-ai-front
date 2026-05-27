@@ -8,6 +8,8 @@ import {userService} from '../../services/userService';
 import {taskService} from '../../services/taskService';
 import {type Task, TaskStatus} from '../../types/generation/task';
 import {UserRole, type User} from "../../types/user/user.ts";
+import {subscriptionService} from '../../services/subscriptionService';
+import {type Subscription, SubscriptionPlan, SubscriptionStatus} from '../../types/subscription/subscription';
 
 function formatRegisterDate(isoDate: string | undefined) {
     if (!isoDate) return '—';
@@ -54,14 +56,32 @@ export default function Admin() {
     const [filterEmail, setFilterEmail] = useState('');
     const [filterRegisterDate, setFilterRegisterDate] = useState('');
     const [filterRole, setFilterRole] = useState<string>('');
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
 
     useEffect(() => {
         const fetchUsers = async () => {
             const data = await userService.getUsers(api);
             setAllUsers(data);
         };
+        const fetchSubscriptions = async () => {
+            try {
+                const data = await subscriptionService.getAll(api);
+                setSubscriptions(data);
+            } catch {
+                setSubscriptions([]);
+            }
+        };
         fetchUsers();
+        fetchSubscriptions();
     }, [api]);
+
+    const subscriptionByUserId = useMemo(() => {
+        const map: Record<string, Subscription> = {};
+        subscriptions
+            .filter((s) => s.status === SubscriptionStatus.Active)
+            .forEach((s) => { map[s.userId] = s; });
+        return map;
+    }, [subscriptions]);
 
     const users = useMemo(() => {
         let list: User[] = allUsers;
@@ -130,6 +150,23 @@ export default function Admin() {
         }
     };
 
+    const handlePlanChange = async (user: User, newPlan: SubscriptionPlan) => {
+        try {
+            const updated = await subscriptionService.setUserPlan(api, user.id, newPlan);
+            if (updated === null) {
+                setSubscriptions((prev) => prev.filter((s) => s.userId !== user.id));
+            } else {
+                setSubscriptions((prev) => {
+                    const exists = prev.some((s) => s.id === updated.id);
+                    return exists ? prev.map((s) => (s.id === updated.id ? updated : s)) : [...prev, updated];
+                });
+            }
+            toast.success(`${user.username} is now on ${newPlan}`);
+        } catch {
+            toast.error('Failed to change plan');
+        }
+    };
+
     const toggleBlock = async (user: User) => {
         try {
             const updated = user.isBlocked
@@ -169,6 +206,7 @@ export default function Admin() {
                             <th>Email</th>
                             <th>Register date</th>
                             <th>Role</th>
+                            <th>Plan</th>
                             <th>Actions</th>
                         </tr>
                         <tr className="admin-table-filter-row">
@@ -226,6 +264,7 @@ export default function Admin() {
                                 </select>
                             </th>
                             <th />
+                            <th />
                         </tr>
                     </thead>
                     <tbody>
@@ -273,6 +312,24 @@ export default function Admin() {
                                                 <option value={UserRole.User}>User</option>
                                             </select>
                                         </td>
+                                        <td>
+                                            {(() => {
+                                                const sub = subscriptionByUserId[user.id];
+                                                const currentPlan = sub?.plan ?? SubscriptionPlan.Starter;
+                                                return (
+                                                    <select
+                                                        className={`admin-plan-select admin-plan-select--${currentPlan.toLowerCase()}`}
+                                                        value={currentPlan}
+                                                        onChange={(e) => handlePlanChange(user, e.target.value as SubscriptionPlan)}
+                                                        aria-label={`Change plan for ${user.username}`}
+                                                    >
+                                                        <option value={SubscriptionPlan.Starter}>Starter</option>
+                                                        <option value={SubscriptionPlan.Pro}>Pro</option>
+                                                        <option value={SubscriptionPlan.Studio}>Studio</option>
+                                                    </select>
+                                                );
+                                            })()}
+                                        </td>
                                         <td className="admin-actions-cell">
                                             <button
                                                 type="button"
@@ -292,7 +349,7 @@ export default function Admin() {
                                     </tr>
                                     {isExpanded && (
                                         <tr className="admin-tasks-row">
-                                            <td colSpan={7} className="admin-tasks-cell">
+                                            <td colSpan={8} className="admin-tasks-cell">
                                                 <div className="admin-tasks-dropdown">
                                                     <h4 className="admin-tasks-dropdown-title">
                                                         Tasks ({tasks.length})

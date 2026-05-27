@@ -397,3 +397,37 @@
 .admin-block-btn--unblock:hover {
   background: rgba(16, 185, 129, 0.1);
 }
+
+/* Plan dropdown in admin table */
+.admin-plan-select {
+  padding: 4px 24px 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  min-width: 90px;
+}
+
+.admin-plan-select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.admin-plan-select--starter {
+  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.admin-plan-select--pro {
+  color: #8b5cf6;
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.admin-plan-select--studio {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.5);
+}

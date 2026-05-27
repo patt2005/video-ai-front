@@ -52,6 +52,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddDbContext<UserContext>();
 builder.Services.AddDbContext<TaskContext>();
 builder.Services.AddDbContext<ExploreVideoContext>();
+builder.Services.AddDbContext<SubscriptionContext>();
 var jwtKey = builder.Configuration["Jwt:Key"]!;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
 var jwtAudience = builder.Configuration["Jwt:Audience"]!;
