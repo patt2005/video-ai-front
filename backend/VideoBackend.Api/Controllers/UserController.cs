@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
@@ -11,7 +13,7 @@ namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserAction _user;
@@ -28,6 +30,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetAll()
     {
         var users = await _user.GetAllUserActionExecution();
@@ -35,6 +38,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var user = await _user.GetUserByIdActionExecution(id);
@@ -43,6 +47,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
         var updated = await _user.UpdateUserActionExecution(id, request.User, request.NewPassword);
@@ -51,6 +56,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/role")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateRole(Guid id, [FromBody] UpdateRoleRequest request)
     {
         var updated = await _user.UpdateUserRoleActionExecution(id, request.Role);
@@ -59,6 +65,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/block")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Block(Guid id)
     {
         var updated = await _user.BlockUserActionExecution(id);
@@ -67,6 +74,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("{id:guid}/unblock")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Unblock(Guid id)
     {
         var updated = await _user.UnblockUserActionExecution(id);
@@ -75,6 +83,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var deleted = await _user.DeleteUserActionExecution(id);
@@ -143,6 +152,62 @@ public class UserController : ControllerBase
         var ok = await _user.VerifyCodeActionExecution(dto.Email, dto.Code);
         if (!ok) return BadRequest(new { error = "Invalid or expired code" });
         return Ok(new { verified = true });
+    }
+
+    [HttpPost("me/ResendVerification")]
+    public async Task<IActionResult> ResendVerificationEmail()
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var ok = await _user.ResendVerificationEmailActionExecution(userId.Value);
+        if (!ok) return BadRequest(new { error = "Email already verified or user not found" });
+        return Ok(new { sent = true });
+    }
+
+    [HttpPost("me/avatar")]
+    [RequestSizeLimit(3 * 1024 * 1024)]
+    public async Task<IActionResult> UploadMyAvatar([FromForm] IFormFile file, [FromServices] IWebHostEnvironment env)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        if (file is null || file.Length == 0) return BadRequest(new { error = "File is required" });
+        if (file.Length > 2 * 1024 * 1024) return BadRequest(new { error = "File too large (max 2MB)" });
+
+        var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+        if (!allowed.Contains(file.ContentType)) return BadRequest(new { error = "Only JPEG, PNG, WEBP allowed" });
+
+        var ext = file.ContentType switch
+        {
+            "image/jpeg" => ".jpg",
+            "image/png" => ".png",
+            "image/webp" => ".webp",
+            _ => ".bin"
+        };
+
+        var avatarsDir = Path.Combine(env.ContentRootPath, "wwwroot", "avatars");
+        Directory.CreateDirectory(avatarsDir);
+
+        var fileName = $"{userId.Value}_{DateTime.UtcNow.Ticks}{ext}";
+        var filePath = Path.Combine(avatarsDir, fileName);
+
+        await using (var stream = System.IO.File.Create(filePath))
+        {
+            await file.CopyToAsync(stream);
+        }
+
+        var relativeUrl = $"/avatars/{fileName}";
+        var updated = await _user.UploadAvatarActionExecution(userId.Value, relativeUrl);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
+    private Guid? GetCurrentUserId()
+    {
+        var claim = User.FindFirst(JwtRegisteredClaimNames.Sub) ?? User.FindFirst(ClaimTypes.NameIdentifier);
+        if (claim is null) return null;
+        return Guid.TryParse(claim.Value, out var id) ? id : null;
     }
 }
 

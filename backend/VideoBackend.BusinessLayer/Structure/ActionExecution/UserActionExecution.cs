@@ -50,4 +50,10 @@ public class UserActionExecution : UserAction, IUserAction
 
     public Task<bool> VerifyCodeActionExecution(string email, string code)
         => VerifyCodeAction(email, code);
+
+    public Task<UserDto?> UploadAvatarActionExecution(Guid userId, string avatarUrl)
+        => UploadAvatarAction(userId, avatarUrl);
+
+    public Task<bool> ResendVerificationEmailActionExecution(Guid userId)
+        => ResendVerificationEmailAction(userId);
 }

@@ -50,4 +50,8 @@ export const authService = {
             return false;
         }
     },
+
+    async resendVerification(api: AxiosInstance): Promise<void> {
+        await api.post('/api/User/me/ResendVerification');
+    },
 };

@@ -18,4 +18,6 @@ public interface IUserAction
     Task<bool> VerifyEmailActionExecution(string token);
     Task SendVerificationCodeActionExecution(string email);
     Task<bool> VerifyCodeActionExecution(string email, string code);
+    Task<UserDto?> UploadAvatarActionExecution(Guid userId, string avatarUrl);
+    Task<bool> ResendVerificationEmailActionExecution(Guid userId);
 }

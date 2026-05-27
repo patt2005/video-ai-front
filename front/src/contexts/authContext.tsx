@@ -37,6 +37,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<LoginResult>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateUser: (patch: Partial<User>) => void;
   isLoggedIn: boolean;
 }
 
@@ -92,10 +93,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     saveUserToStorage(null);
   }, []);
 
+  const updateUser = useCallback((patch: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      saveUserToStorage(next);
+      return next;
+    });
+  }, []);
+
   const isLoggedIn = user !== null;
 
   return (
-      <AuthContext.Provider value={{ user, login,register, logout, isLoggedIn }}>
+      <AuthContext.Provider value={{ user, login, register, logout, updateUser, isLoggedIn }}>
         {children}
       </AuthContext.Provider>
   );

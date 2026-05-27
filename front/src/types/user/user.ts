@@ -13,4 +13,5 @@ export interface User {
     registerDate: string;
     isBlocked: boolean;
     isEmailVerified: boolean;
+    avatarUrl?: string | null;
 }

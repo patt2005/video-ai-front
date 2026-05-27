@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using VideoBackend.Domain.Entities.User;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -38,7 +37,8 @@ public class UserAction
                 Role = u.Role,
                 RegisterDate = u.RegisterDate,
                 IsBlocked = u.IsBlocked,
-                IsEmailVerified = u.IsEmailVerified
+                IsEmailVerified = u.IsEmailVerified,
+                AvatarUrl = u.AvatarUrl
             })
             .ToListAsync();
     }
@@ -55,7 +55,8 @@ public class UserAction
             Role = u.Role,
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
-            IsEmailVerified = u.IsEmailVerified
+            IsEmailVerified = u.IsEmailVerified,
+            AvatarUrl = u.AvatarUrl
         };
     }
 
@@ -81,7 +82,8 @@ public class UserAction
             Role = u.Role,
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
-            IsEmailVerified = u.IsEmailVerified
+            IsEmailVerified = u.IsEmailVerified,
+            AvatarUrl = u.AvatarUrl
         };
     }
 
@@ -101,7 +103,8 @@ public class UserAction
             Role = u.Role,
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
-            IsEmailVerified = u.IsEmailVerified
+            IsEmailVerified = u.IsEmailVerified,
+            AvatarUrl = u.AvatarUrl
         };
     }
 
@@ -127,7 +130,8 @@ public class UserAction
             Role = u.Role,
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
-            IsEmailVerified = u.IsEmailVerified
+            IsEmailVerified = u.IsEmailVerified,
+            AvatarUrl = u.AvatarUrl
         };
     }
 
@@ -217,6 +221,58 @@ public class UserAction
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    protected async Task<bool> ResendVerificationEmailAction(Guid userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null || user.IsEmailVerified) return false;
+
+        var existing = _context.EmailVerificationTokens
+            .Where(t => t.UserId == userId && t.UsedAt == null && t.ExpiresAt > DateTime.UtcNow);
+        foreach (var t in existing) t.UsedAt = DateTime.UtcNow;
+
+        var token = GenerateRefreshTokenString();
+        _context.EmailVerificationTokens.Add(new EmailVerificationToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = token,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.UtcNow
+        });
+        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _emailSender.SendVerificationEmailAsync(user.Email, token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EMAIL ERROR] Resend failed: {ex.Message}");
+        }
+        return true;
+    }
+
+    protected async Task<UserDto?> UploadAvatarAction(Guid userId, string avatarUrl)
+    {
+        var u = await _context.Users.FindAsync(userId);
+        if (u is null) return null;
+
+        u.AvatarUrl = avatarUrl;
+        await _context.SaveChangesAsync();
+
+        return new UserDto
+        {
+            Id = u.Id,
+            Username = u.Username,
+            Email = u.Email,
+            Role = u.Role,
+            RegisterDate = u.RegisterDate,
+            IsBlocked = u.IsBlocked,
+            IsEmailVerified = u.IsEmailVerified,
+            AvatarUrl = u.AvatarUrl
+        };
     }
 
     protected async Task<bool> VerifyEmailAction(string token)
@@ -323,7 +379,8 @@ public class UserAction
             Role = user.Role,
             RegisterDate = user.RegisterDate,
             IsBlocked = user.IsBlocked,
-            IsEmailVerified = user.IsEmailVerified
+            IsEmailVerified = user.IsEmailVerified,
+            AvatarUrl = user.AvatarUrl
         };
     }
 }
