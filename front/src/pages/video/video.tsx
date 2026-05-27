@@ -171,16 +171,12 @@ export default function Video() {
             <div className="video-settings-wrap" ref={settingsRef}>
               <button
                 type="button"
-                className="video-settings-btn"
+                className="video-page-panel-add-btn video-settings-btn"
                 onClick={() => setSettingsOpen((o) => !o)}
                 aria-label="Video settings"
                 disabled={isGenerating}
               >
-                <Icon icon="mdi:tune-variant" width={18} />
-                <span className="video-settings-btn-label">
-                  {MODELS.find((m) => m.id === selectedModel)?.label} · {selectedRatio}
-                </span>
-                <Icon icon="mdi:chevron-down" width={14} className={`video-settings-chevron${settingsOpen ? ' video-settings-chevron--open' : ''}`} />
+                <Icon icon="mdi:tune-variant" width={20} height={20} />
               </button>
               {settingsOpen && (
                 <div className="video-settings-popup">

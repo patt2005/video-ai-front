@@ -85,12 +85,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(frontendCorsPolicy);
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
 
-app.UseCors(frontendCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
