@@ -9,6 +9,7 @@ import Video from './pages/video/video';
 import Edit from './pages/edit/edit';
 import Login from './pages/login/login';
 import SignUp from './pages/login/signup';
+import VerifyEmail from './pages/verify/verifyEmail';
 import Admin from './pages/admin/admin';
 import Profile from './pages/profile/profile';
 import Pricing from './pages/pricing/pricing';
@@ -49,6 +50,7 @@ function AppLayout() {
                     <Routes>
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />
+                        <Route path={paths.verifyEmail} element={<VerifyEmail />} />
                         <Route path={paths.pricing} element={<Pricing />} />
 
                         <Route element={<ProtectedRoute />}>

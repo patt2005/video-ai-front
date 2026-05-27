@@ -25,10 +25,14 @@ export default function Login() {
 
         try {
             await loginSchema.validate(payload, { abortEarly: false });
-            
-            const success = await login (email, password);
-            if (success) {
+
+            const result = await login(email, password);
+            if (result.ok) {
                 navigate(paths.root, { replace: true });
+            } else if (result.reason === 'blocked') {
+                setErrors({ form: 'Your account is blocked. Contact an administrator.' });
+            } else if (result.reason === 'network') {
+                setErrors({ form: 'Network error. Please try again.' });
             } else {
                 setErrors({ form: 'Invalid email or password.' });
             }

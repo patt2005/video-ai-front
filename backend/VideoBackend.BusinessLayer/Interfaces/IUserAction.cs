@@ -12,6 +12,8 @@ public interface IUserAction
     Task<UserDto?> BlockUserActionExecution(Guid id);
     Task<UserDto?> UnblockUserActionExecution(Guid id);
     Task<bool> DeleteUserActionExecution(Guid id);
-    Task<LoginResponseDto?> LoginActionExecution(LoginDto dto);
+    Task<LoginActionResult> LoginActionExecution(LoginDto dto);
+    Task<LoginResponseDto?> RefreshActionExecution(string refreshToken);
     Task<UserDto?> RegisterActionExecution(RegisterDto dto);
+    Task<bool> VerifyEmailActionExecution(string token);
 }

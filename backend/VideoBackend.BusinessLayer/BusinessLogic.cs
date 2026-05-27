@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using VideoBackend.BusinessLayer.Interfaces;
+using VideoBackend.BusinessLayer.Services;
 using VideoBackend.BusinessLayer.Structure;
 using VideoBackend.BusinessLayer.Structure.ActionExecution;
 using VideoBackend.DataAccessLayer.Context;
@@ -29,7 +30,7 @@ public class BusinessLogic
     }
 
     public IUserAction UserAction()
-        => new UserActionExecution(_userContext, _configuration);
+        => new UserActionExecution(_userContext, _configuration, new ResendEmailSender(_configuration));
 
     public ITaskAction TaskAction()
         => new TaskActionExecution(_taskContext);

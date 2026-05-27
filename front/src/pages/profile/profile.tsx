@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { Icon } from '@iconify/react';
+import { ApiContext } from '../../contexts/apiContext';
 import { useAuth } from '../../contexts/authContext';
 import { taskService } from '../../services/taskService';
 import type { Task } from '../../types/generation/task';
+import { ContentType } from '../../types/generation/content';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { VideoResultModal } from '../../components/modals/videoResultModal';
 import '../../styles/Profile.css';
@@ -32,22 +34,30 @@ function formatTaskDate(isoDate: string) {
 
 function formatTaskStatus(status: Task['status']) {
     const labels: Record<Task['status'], string> = {
-        pending: 'Pending',
-        success: 'Completed',
-        failed: 'Failed',
+        Pending: 'Pending',
+        Success: 'Completed',
+        Failed: 'Failed',
     };
     return labels[status];
 }
 
 export default function Profile() {
+    const { api } = useContext(ApiContext)!;
     const { user } = useAuth();
-    const [preview, setPreview] = useState<{ type: 'image' | 'video'; url: string } | null>(null);
+    const [preview, setPreview] = useState<{ type: ContentType; url: string } | null>(null);
     const [taskSearch, setTaskSearch] = useState<string>('');
+    const [allTasks, setAllTasks] = useState<Task[]>([]);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        taskService.getByUserId(api, user.id).then(setAllTasks).catch(() => setAllTasks([]));
+    }, [api, user?.id]);
 
     const userTasks = useMemo(() => {
-        if (!user?.id) return [];
-        return taskService.getTasks(user.id, taskSearch || null);
-    }, [user?.id, taskSearch]);
+        if (!taskSearch.trim()) return allTasks;
+        const term = taskSearch.trim().toLowerCase();
+        return allTasks.filter((t) => t.id.toLowerCase().includes(term));
+    }, [allTasks, taskSearch]);
 
     if (!user) {
         return null;
@@ -92,14 +102,14 @@ export default function Profile() {
                 ) : (
                     <ul className="profile-tasks-list">
                         {userTasks.map((task) => {
-                            const content = taskService.getContent(task.contentId);
-                            const canOpen = content?.url && (content.type === 'image' || content.type === 'video');
+                            const content = task.content ?? null;
+                            const canOpen = !!content?.url && (content.contentType === ContentType.Image || content.contentType === ContentType.Video);
                             return (
                                 <li key={task.id} className="profile-task-item">
                                     <div className="profile-task-main">
-                                        <span className="profile-task-id">#{task.id}</span>
+                                        <span className="profile-task-id">#{task.id.slice(0, 8)}</span>
                                         <span className="profile-task-date">{formatTaskDate(task.creationDate)}</span>
-                                        <span className={`profile-task-status profile-task-status--${task.status}`}>
+                                        <span className={`profile-task-status profile-task-status--${task.status.toLowerCase()}`}>
                                             {formatTaskStatus(task.status)}
                                         </span>
                                     </div>
@@ -107,7 +117,7 @@ export default function Profile() {
                                         <button
                                             type="button"
                                             className="profile-task-open-btn"
-                                            onClick={() => setPreview({ type: content!.type, url: content!.url! })}
+                                            onClick={() => setPreview({ type: content!.contentType, url: content!.url! })}
                                         >
                                             <Icon icon="mdi:open-in-new" width={18} />
                                             View
@@ -123,14 +133,14 @@ export default function Profile() {
             </section>
 
             <ImageResultModal
-                open={preview?.type === 'image'}
+                open={preview?.type === ContentType.Image}
                 onOpenChange={(open) => { if (!open) setPreview(null); }}
-                imageSrc={preview?.type === 'image' ? preview.url : null}
+                imageSrc={preview?.type === ContentType.Image ? preview.url : null}
             />
             <VideoResultModal
-                open={preview?.type === 'video'}
+                open={preview?.type === ContentType.Video}
                 onOpenChange={(open) => { if (!open) setPreview(null); }}
-                videoUrl={preview?.type === 'video' ? preview.url : null}
+                videoUrl={preview?.type === ContentType.Video ? preview.url : null}
             />
         </div>
     );

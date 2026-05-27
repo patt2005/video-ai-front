@@ -35,6 +35,29 @@ public class TaskAction
             .ToListAsync();
     }
 
+    protected async Task<List<TaskDto>> GetTasksByUserIdAction(Guid userId)
+    {
+        return await _context.Tasks
+            .Where(t => t.UserId == userId)
+            .OrderByDescending(t => t.CreationDate)
+            .Select(t => new TaskDto
+            {
+                Id = t.Id,
+                Prompt = t.Prompt,
+                CreationDate = t.CreationDate,
+                UserId = t.UserId,
+                ContentId = t.ContentId,
+                Status = t.Status,
+                Content = t.Content == null ? null : new ContentDto
+                {
+                    Id = t.Content.Id,
+                    ContentType = t.Content.ContentType,
+                    Url = t.Content.Url
+                }
+            })
+            .ToListAsync();
+    }
+
     protected async Task<TaskDto?> GetTaskByIdAction(Guid id)
     {
         var t = await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id);

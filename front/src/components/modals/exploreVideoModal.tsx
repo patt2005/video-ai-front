@@ -56,7 +56,7 @@ function copyUrlToClipboard(url: string) {
 export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoModalProps) {
   const navigate = useNavigate();
 
-  const promptText = video?.prompt ?? (video ? `${video.title}. ${video.subtitle}` : '');
+  const promptText = video?.prompt ?? (video ? `${video.title}. ${video.description}` : '');
   const model = video?.model ?? 'Kling 2.6 Pro';
   const aspectRatio = video?.aspectRatio ?? '1:1';
   const duration = video?.duration ?? '5 sec';

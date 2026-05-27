@@ -10,6 +10,7 @@ export default function Edit() {
   const [referenceImages, setReferenceImages] = useState<RefImage[]>([]);
   const [editPrompt, setEditPrompt] = useState('');
   const [isApplying, setIsApplying] = useState(false);
+  void setEditPrompt;
 
   const videoInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +30,7 @@ export default function Edit() {
     if (sourceVideo?.preview) URL.revokeObjectURL(sourceVideo.preview);
     setSourceVideo(null);
   };
+  void clearSourceVideo;
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

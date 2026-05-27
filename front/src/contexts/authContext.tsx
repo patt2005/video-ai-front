@@ -5,6 +5,7 @@ import { useApi } from '../hooks/useApi';
 import { authService } from '../services/authService';
 
 const TOKEN_STORAGE_KEY = 'token';
+const REFRESH_TOKEN_STORAGE_KEY = 'refresh_token';
 const USER_STORAGE_KEY = 'movyai_user';
 
 function readUserFromStorage(): User | null {
@@ -27,9 +28,13 @@ function saveUserToStorage(user: User | null) {
   }
 }
 
+export type LoginResult =
+  | { ok: true }
+  | { ok: false; reason: 'invalid' | 'blocked' | 'network' };
+
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoggedIn: boolean;
@@ -42,31 +47,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const api = useApi();
   const [user, setUser] = useState<User | null>(readUserFromStorage);
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+  const login = useCallback(async (email: string, password: string): Promise<LoginResult> => {
     try {
       const response = await authService.login(api, { email, password });
 
       localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
+      localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, response.refreshToken);
 
       const loggedUser: User = {
         id: response.userId,
         email: response.email,
         role: response.role as UserRole,
         registerDate: new Date().toISOString(),
+        isBlocked: false,
+        isEmailVerified: false,
       };
 
       setUser(loggedUser);
       saveUserToStorage(loggedUser);
-      return true;
+      return { ok: true };
     } catch (error) {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 403) return { ok: false, reason: 'blocked' };
+      if (status === 401) return { ok: false, reason: 'invalid' };
       console.error('Login failed:', error);
-      return false;
+      return { ok: false, reason: 'network' };
     }
   }, [api]);
    const register = useCallback(async (username: string, email: string, password: string): Promise<boolean> => {
     try {
       await authService.register(api, { username, email, password });
-      return await login(email, password);
+      const result = await login(email, password);
+      return result.ok;
     } catch (error) {
       console.error('Register failed:', error);
       return false;
@@ -75,6 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
     setUser(null);
     saveUserToStorage(null);
   }, []);

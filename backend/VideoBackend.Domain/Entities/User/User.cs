@@ -11,4 +11,5 @@ public class User
     public string Password { get; set; } = string.Empty;
     public DateTime? RegisterDate { get; set; }
     public bool IsBlocked { get; set; }
+    public bool IsEmailVerified { get; set; }
 }

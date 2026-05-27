@@ -6,6 +6,8 @@ namespace VideoBackend.DataAccessLayer.Context;
 public class UserContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<EmailVerificationToken> EmailVerificationTokens { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

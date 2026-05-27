@@ -7,6 +7,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
     token: string;
+    refreshToken: string;
     userId: string;
     email: string;
     role: string;
@@ -27,4 +28,13 @@ export const authService = {
     async register(api: AxiosInstance, request: RegisterRequest): Promise<void> {
         await api.post('/api/User/Register', request);
     },
-}; 
+
+    async refresh(api: AxiosInstance, refreshToken: string): Promise<LoginResponse> {
+        const response = await api.post<LoginResponse>('/api/User/Refresh', { refreshToken });
+        return response.data;
+    },
+
+    async verifyEmail(api: AxiosInstance, token: string): Promise<void> {
+        await api.post('/api/User/VerifyEmail', { token });
+    },
+};

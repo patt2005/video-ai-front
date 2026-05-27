@@ -1,3 +1,5 @@
+import type { Content } from './content';
+
 export const TaskStatus = {
     Pending: "Pending",
     Success: "Success",
@@ -7,9 +9,11 @@ export const TaskStatus = {
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
 export interface Task {
-    id: number;
-    userId: number;
+    id: string;
+    userId: string;
+    prompt?: string | null;
     creationDate: string;
-    contentId: number | null;
+    contentId: string | null;
     status: TaskStatus;
+    content?: Content | null;
 }

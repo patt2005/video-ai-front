@@ -9,8 +9,8 @@ namespace VideoBackend.BusinessLayer.Structure.ActionExecution;
 
 public class UserActionExecution : UserAction, IUserAction
 {
-    public UserActionExecution(UserContext context, IConfiguration configuration)
-        : base(context, configuration) { }
+    public UserActionExecution(UserContext context, IConfiguration configuration, IEmailSender emailSender)
+        : base(context, configuration, emailSender) { }
 
     public Task<List<UserDto>> GetAllUserActionExecution()
         => GetAllUserAction();
@@ -33,9 +33,15 @@ public class UserActionExecution : UserAction, IUserAction
     public Task<bool> DeleteUserActionExecution(Guid id)
         => DeleteUserAction(id);
 
-    public Task<LoginResponseDto?> LoginActionExecution(LoginDto dto)
+    public Task<LoginActionResult> LoginActionExecution(LoginDto dto)
         => LoginAction(dto);
+
+    public Task<LoginResponseDto?> RefreshActionExecution(string refreshToken)
+        => RefreshAction(refreshToken);
 
     public Task<UserDto?> RegisterActionExecution(RegisterDto dto)
         => RegisterAction(dto);
+
+    public Task<bool> VerifyEmailActionExecution(string token)
+        => VerifyEmailAction(token);
 }

@@ -30,6 +30,13 @@ public class TaskController : ControllerBase
         return Ok(tasks);
     }
 
+    [HttpGet("user/{userId:guid}")]
+    public async Task<IActionResult> GetByUserId(Guid userId)
+    {
+        var tasks = await _task.GetTasksByUserIdActionExecution(userId);
+        return Ok(tasks);
+    }
+
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id)
     {

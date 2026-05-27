@@ -10,4 +10,5 @@ public class UserDto
     public UserRole Role { get; set; }
     public DateTime? RegisterDate { get; set; }
     public bool IsBlocked { get; set; }
+    public bool IsEmailVerified { get; set; }
 }

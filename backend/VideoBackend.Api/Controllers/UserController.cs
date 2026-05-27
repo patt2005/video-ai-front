@@ -85,9 +85,13 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        var response = await _user.LoginActionExecution(dto);
-        if (response is null) return Unauthorized("Invalid email or password");
-        return Ok(response);
+        var result = await _user.LoginActionExecution(dto);
+        return result.FailureReason switch
+        {
+            LoginFailureReason.None         => Ok(result.Response),
+            LoginFailureReason.Blocked      => StatusCode(403, new { error = "Account is blocked" }),
+            _                               => Unauthorized(new { error = "Invalid email or password" })
+        };
     }
 
     [HttpPost("Register")]
@@ -97,6 +101,24 @@ public class UserController : ControllerBase
         var created = await _user.RegisterActionExecution(dto);
         if (created is null) return Conflict("Email already is taken");
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+
+    [HttpPost("Refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+    {
+        var response = await _user.RefreshActionExecution(dto.RefreshToken);
+        if (response is null) return Unauthorized(new { error = "Invalid or expired refresh token" });
+        return Ok(response);
+    }
+
+    [HttpPost("VerifyEmail")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto)
+    {
+        var ok = await _user.VerifyEmailActionExecution(dto.Token);
+        if (!ok) return BadRequest(new { error = "Invalid or expired verification token" });
+        return Ok(new { verified = true });
     }
 }
 

@@ -12,4 +12,5 @@ export interface User {
     email: string;
     registerDate: string;
     isBlocked: boolean;
+    isEmailVerified: boolean;
 }

@@ -8,4 +8,5 @@ export const paths = {
     admin: '/admin',
     profile: '/profile',
     pricing: '/pricing',
+    verifyEmail: '/verify-email',
 };

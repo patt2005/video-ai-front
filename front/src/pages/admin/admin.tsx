@@ -6,10 +6,11 @@ import * as Dialog from '@radix-ui/react-dialog';
 import '../../styles/Admin.css';
 import {userService} from '../../services/userService';
 import {taskService} from '../../services/taskService';
-import {type Task, TaskStatus} from '../../types/generation/task';
+import {TaskStatus} from '../../types/generation/task';
 import {UserRole, type User} from "../../types/user/user.ts";
 import {subscriptionService} from '../../services/subscriptionService';
 import {type Subscription, SubscriptionPlan, SubscriptionStatus} from '../../types/subscription/subscription';
+import type {Task} from '../../types/generation/task';
 
 function formatRegisterDate(isoDate: string | undefined) {
     if (!isoDate) return '—';
@@ -119,13 +120,8 @@ export default function Admin() {
         return list;
     }, [allUsers, userSearch, filterId, filterUsername, filterEmail, filterRegisterDate, filterRole]);
 
-    const tasksByUserId = useMemo(() => {
-        const map: Record<string, Task[]> = {};
-        users.forEach((user) => {
-            map[user.id] = taskService.getTasks(user.id, null);
-        });
-        return map;
-    }, [users]);
+    const [tasksByUserId, setTasksByUserId] = useState<Record<string, Task[]>>({});
+    const [loadingTasksFor, setLoadingTasksFor] = useState<string | null>(null);
 
     const handleRoleChange = async (userId: string, newRole: UserRole) => {
         try {
@@ -179,8 +175,20 @@ export default function Admin() {
         }
     };
 
-    const toggleExpand = (userId: string) => {
-        setExpandedUserId((prev) => (prev === userId ? null : userId));
+    const toggleExpand = async (userId: string) => {
+        const opening = expandedUserId !== userId;
+        setExpandedUserId(opening ? userId : null);
+        if (opening && tasksByUserId[userId] === undefined) {
+            try {
+                setLoadingTasksFor(userId);
+                const tasks = await taskService.getByUserId(api, userId);
+                setTasksByUserId((prev) => ({ ...prev, [userId]: tasks }));
+            } catch {
+                setTasksByUserId((prev) => ({ ...prev, [userId]: [] }));
+            } finally {
+                setLoadingTasksFor(null);
+            }
+        }
     };
 
     return (
@@ -271,6 +279,7 @@ export default function Admin() {
                         {users.map((user) => {
                             const tasks = tasksByUserId[user.id] ?? [];
                             const isExpanded = expandedUserId === user.id;
+                            const isLoading = loadingTasksFor === user.id;
                             return (
                                 <Fragment key={user.id}>
                                     <tr
@@ -352,29 +361,31 @@ export default function Admin() {
                                             <td colSpan={8} className="admin-tasks-cell">
                                                 <div className="admin-tasks-dropdown">
                                                     <h4 className="admin-tasks-dropdown-title">
-                                                        Tasks ({tasks.length})
+                                                        Tasks {isLoading ? '(loading…)' : `(${tasks.length})`}
                                                     </h4>
-                                                    {tasks.length === 0 ? (
+                                                    {isLoading ? (
+                                                        <p className="admin-tasks-empty">Loading tasks…</p>
+                                                    ) : tasks.length === 0 ? (
                                                         <p className="admin-tasks-empty">No tasks for this user.</p>
                                                     ) : (
                                                         <table className="admin-tasks-table">
                                                             <thead>
                                                                 <tr>
                                                                     <th>Task ID</th>
+                                                                    <th>Prompt</th>
                                                                     <th>Created</th>
                                                                     <th>Status</th>
-                                                                    <th>Content ID</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 {tasks.map((task) => (
                                                                     <tr key={task.id}>
-                                                                        <td>#{task.id}</td>
+                                                                        <td>#{task.id.slice(0, 8)}</td>
+                                                                        <td>{task.prompt ?? '—'}</td>
                                                                         <td>{formatTaskDate(task.creationDate)}</td>
-                                                                        <td className={`admin-task-status admin-task-status--${task.status}`}>
+                                                                        <td className={`admin-task-status admin-task-status--${task.status.toLowerCase()}`}>
                                                                             {formatTaskStatus(task.status)}
                                                                         </td>
-                                                                        <td>{task.contentId ?? '—'}</td>
                                                                     </tr>
                                                                 ))}
                                                             </tbody>

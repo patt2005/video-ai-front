@@ -6,7 +6,7 @@ export const ContentType = {
 export type ContentType = (typeof ContentType)[keyof typeof ContentType];
 
 export interface Content {
-    id: number;
-    type: ContentType;
+    id: string;
+    contentType: ContentType;
     url: string | null;
 }

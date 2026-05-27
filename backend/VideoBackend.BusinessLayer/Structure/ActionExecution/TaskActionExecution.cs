@@ -12,6 +12,9 @@ public class TaskActionExecution : TaskAction, ITaskAction
     public Task<List<TaskDto>> GetAllTaskActionExecution()
         => GetAllTaskAction();
 
+    public Task<List<TaskDto>> GetTasksByUserIdActionExecution(Guid userId)
+        => GetTasksByUserIdAction(userId);
+
     public Task<TaskDto?> GetTaskByIdActionExecution(Guid id)
         => GetTaskByIdAction(id);
 
