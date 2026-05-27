@@ -4,12 +4,13 @@ using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.User;
+using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "Admin")]
 public class UserController : ControllerBase
 {
     private readonly IUserAction _user;
@@ -47,6 +48,14 @@ public class UserController : ControllerBase
         return Ok(updated);
     }
 
+    [HttpPatch("{id:guid}/role")]
+    public async Task<IActionResult> UpdateRole(Guid id, [FromBody] UpdateRoleRequest request)
+    {
+        var updated = await _user.UpdateUserRoleActionExecution(id, request.Role);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
@@ -78,4 +87,9 @@ public class UpdateUserRequest
 {
     public UserDto User { get; set; } = new();
     public string? NewPassword { get; set; }
+}
+
+public class UpdateRoleRequest
+{
+    public UserRole Role { get; set; }
 }

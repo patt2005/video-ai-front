@@ -74,6 +74,24 @@ public class UserAction
         };
     }
 
+    protected async Task<UserDto?> UpdateUserRoleAction(Guid id, UserRole newRole)
+    {
+        var u = await _context.Users.FindAsync(id);
+        if (u is null) return null;
+
+        u.Role = newRole;
+        await _context.SaveChangesAsync();
+
+        return new UserDto
+        {
+            Id = u.Id,
+            Username = u.Username,
+            Email = u.Email,
+            Role = u.Role,
+            RegisterDate = u.RegisterDate
+        };
+    }
+
     protected async Task<bool> DeleteUserAction(Guid id)
     {
         var u = await _context.Users.FindAsync(id);

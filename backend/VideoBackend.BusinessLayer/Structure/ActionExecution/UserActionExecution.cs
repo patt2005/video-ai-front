@@ -3,6 +3,7 @@ using VideoBackend.BusinessLayer.Core.Action;
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.User;
+using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.BusinessLayer.Structure.ActionExecution;
 
@@ -19,6 +20,9 @@ public class UserActionExecution : UserAction, IUserAction
 
     public Task<UserDto?> UpdateUserActionExecution(Guid id, UserDto dto, string? newPassword)
         => UpdateUserAction(id, dto, newPassword);
+
+    public Task<UserDto?> UpdateUserRoleActionExecution(Guid id, UserRole newRole)
+        => UpdateUserRoleAction(id, newRole);
 
     public Task<bool> DeleteUserActionExecution(Guid id)
         => DeleteUserAction(id);
