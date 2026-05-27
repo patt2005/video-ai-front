@@ -1,7 +1,7 @@
 export const SubscriptionPlan = {
     Starter: 'Starter',
     Pro: 'Pro',
-    Studio: 'Studio',
+    Ultra: 'Ultra',
 } as const;
 
 export type SubscriptionPlan = (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan];

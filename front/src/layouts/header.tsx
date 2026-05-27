@@ -108,6 +108,9 @@ export default function Header() {
           <ProtectedLink to={paths.admin} className="header-btn header-btn--ghost" roles={[UserRole.Admin]}>
             Admin
           </ProtectedLink>
+          <ProtectedLink to={paths.adminSupport} className="header-btn header-btn--ghost" roles={[UserRole.Admin]}>
+            Support
+          </ProtectedLink>
           <ProtectedLink to={paths.profile} className="header-btn header-btn--ghost" authOnly>
             Profile
           </ProtectedLink>
@@ -167,6 +170,9 @@ export default function Header() {
           </ProtectedLink>
           <ProtectedLink to={paths.admin} className="mobile-link mobile-link--action" onClick={closeMenu} roles={[UserRole.Admin]}>
             Admin
+          </ProtectedLink>
+          <ProtectedLink to={paths.adminSupport} className="mobile-link mobile-link--action" onClick={closeMenu} roles={[UserRole.Admin]}>
+            Support
           </ProtectedLink>
           <ProtectedLink to={paths.profile} className="mobile-link mobile-link--action" onClick={closeMenu} authOnly>
             Profile

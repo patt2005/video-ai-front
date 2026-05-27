@@ -4,5 +4,5 @@ public enum SubscriptionPlan
 {
     Starter,
     Pro,
-    Studio
+    Ultra
 }

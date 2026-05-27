@@ -46,4 +46,7 @@ public class BusinessLogic
         => new SubscriptionActionExecution(_subscriptionContext);
 
     public IFileAction FileAction() => new FileActionExecution(_configuration);
+
+    public ISupportAction SupportAction()
+        => new SupportActionExecution(_userContext);
 }

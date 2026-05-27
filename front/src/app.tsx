@@ -11,6 +11,8 @@ import Login from './pages/login/login';
 import SignUp from './pages/login/signup';
 import VerifyEmail from './pages/verify/verifyEmail';
 import Admin from './pages/admin/admin';
+import SupportInbox from './pages/admin/supportInbox';
+import SupportFab from './components/SupportFab';
 import Profile from './pages/profile/profile';
 import Pricing from './pages/pricing/pricing';
 import './App.css';
@@ -53,22 +55,25 @@ function AppLayout() {
                         <Route path={paths.verifyEmail} element={<VerifyEmail />} />
                         <Route path={paths.pricing} element={<Pricing />} />
 
+                        <Route path={paths.root} element={<RootRoute />} />
+                        <Route path={paths.image} element={<Image />} />
+                        <Route path={paths.video} element={<Video />} />
+                        <Route path={paths.edit} element={<Edit />} />
+
                         <Route element={<ProtectedRoute />}>
-                            <Route path={paths.root} element={<RootRoute />} />
-                            <Route path={paths.image} element={<Image />} />
-                            <Route path={paths.video} element={<Video />} />
-                            <Route path={paths.edit} element={<Edit />} />
                             <Route path={paths.profile} element={<Profile />} />
                         </Route>
 
                         <Route element={<ProtectedRoute roles={[UserRole.Admin]} />}>
                             <Route path={paths.admin} element={<Admin />} />
+                            <Route path={paths.adminSupport} element={<SupportInbox />} />
                         </Route>
                     </Routes>
                 </main>
                 </div>
                 <Footer />
             </div>
+            <SupportFab />
         </>
     );
 }

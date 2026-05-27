@@ -6,6 +6,7 @@ export const paths = {
     login: '/login',
     signup: '/signup',
     admin: '/admin',
+    adminSupport: '/admin/support',
     profile: '/profile',
     pricing: '/pricing',
     verifyEmail: '/verify-email',

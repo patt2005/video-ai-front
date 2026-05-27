@@ -118,7 +118,7 @@ export default function Pricing() {
 
                         <div className="pricing-card">
                             <div className="pricing-head">
-                                <h3 className="pricing-name">Studio</h3>
+                                <h3 className="pricing-name">Ultra</h3>
                                 <p className="pricing-desc">For teams and production workflows.</p>
                             </div>
 
@@ -130,10 +130,10 @@ export default function Pricing() {
                             <button
                                 className="pricing-cta"
                                 type="button"
-                                onClick={() => handleSubscribe(SubscriptionPlan.Studio)}
-                                disabled={loading !== null || isCurrent(SubscriptionPlan.Studio)}
+                                onClick={() => handleSubscribe(SubscriptionPlan.Ultra)}
+                                disabled={loading !== null || isCurrent(SubscriptionPlan.Ultra)}
                             >
-                                {isCurrent(SubscriptionPlan.Studio) ? 'Current plan' : loading === SubscriptionPlan.Studio ? 'Starting…' : 'Start Studio'}
+                                {isCurrent(SubscriptionPlan.Ultra) ? 'Current plan' : loading === SubscriptionPlan.Ultra ? 'Starting…' : 'Start Ultra'}
                             </button>
 
                             <ul className="pricing-features">

@@ -334,7 +334,7 @@ export default function Admin() {
                                                     >
                                                         <option value={SubscriptionPlan.Starter}>Starter</option>
                                                         <option value={SubscriptionPlan.Pro}>Pro</option>
-                                                        <option value={SubscriptionPlan.Studio}>Studio</option>
+                                                        <option value={SubscriptionPlan.Ultra}>Ultra</option>
                                                     </select>
                                                 );
                                             })()}
