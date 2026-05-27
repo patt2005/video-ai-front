@@ -47,7 +47,7 @@ export default function Explore() {
               Follow your dreams
             </p>
             <div className="explore-cards-row">
-                {videos.map((video) => (
+                {videos.slice(0, 4).map((video) => (
                     <ExploreCard
                         key={video.title}
                         video={video}
@@ -71,7 +71,7 @@ export default function Explore() {
             <h2 className="explore-section-title">Mixed Media</h2>
 
             <div className="explore-grid">
-                {[...videos, ...videos].slice(0, 7).map((video, index) => (
+                {videos.slice(0, 7).map((video, index) => (
                     <div
                         key={`${video.title}-${index}`}
                         role="button"
@@ -86,9 +86,19 @@ export default function Explore() {
                         }}
                         aria-label={`Open ${video.title}`}
                     >
-                        <video className="explore-grid-item-thumb" autoPlay loop muted playsInline>
-                            <source src={video.videoUrl} type="video/mp4" />
-                        </video>
+                        {video.contentType === 'image' ? (
+                            <img className="explore-grid-item-thumb" src={video.videoUrl} alt={video.title} />
+                        ) : (
+                            <video className="explore-grid-item-thumb" autoPlay loop muted playsInline>
+                                <source src={video.videoUrl} type="video/mp4" />
+                            </video>
+                        )}
+                        {(video.prompt || video.title) && (
+                            <>
+                                <div className="explore-grid-item-gradient" />
+                                <p className="explore-grid-item-prompt">{video.prompt || video.title}</p>
+                            </>
+                        )}
                     </div>
                 ))}
             </div>

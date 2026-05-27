@@ -4,6 +4,11 @@ export interface ExploreVideo {
   description: string;
   prompt?: string;
   model?: string;
+  contentType: 'video' | 'image';
+  userId?: string;
+  userName?: string;
+  userEmail?: string;
+  userAvatar?: string;
   aspectRatio?: string;
   duration?: string;
   fileType?: string;

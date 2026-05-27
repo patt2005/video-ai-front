@@ -15,9 +15,13 @@ export default function ExploreCard({ video, onClick }: ExploreCardProps) {
             onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
             aria-label={onClick ? `Open ${video.title}` : undefined}
         >
-            <video className="explore-card-thumb" autoPlay loop muted playsInline>
-                <source src={video.videoUrl} type="video/mp4" />
-            </video>
+            {video.contentType === 'image' ? (
+                <img className="explore-card-thumb" src={video.videoUrl} alt={video.title} />
+            ) : (
+                <video className="explore-card-thumb" autoPlay loop muted playsInline>
+                    <source src={video.videoUrl} type="video/mp4" />
+                </video>
+            )}
             <h2 className="explore-card-title">{video.title}</h2>
             <p className="explore-card-text">{video.description}</p>
         </div>

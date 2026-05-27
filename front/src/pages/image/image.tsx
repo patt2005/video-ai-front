@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { useAuth } from '../../contexts/authContext';
@@ -7,7 +8,6 @@ import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
 import { imageService } from '../../services/imageService';
-import { fileService } from '../../services/fileService';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   {
@@ -38,27 +38,13 @@ type ImageResolution = typeof RESOLUTIONS[number];
 
 export default function Image() {
   const { user } = useAuth();
-  const [prompt, setPrompt] = useState('');
+  const [searchParams] = useSearchParams();
+  const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
   const [selectedSize, setSelectedSize] = useState<ImageSize>('1:1');
   const [selectedResolution, setSelectedResolution] = useState<ImageResolution>('1K');
-  const [promptImage, setPromptImage] = useState<{ file: File; preview: string } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [resultModalOpen, setResultModalOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
-    if (promptImage?.preview) URL.revokeObjectURL(promptImage.preview);
-    setPromptImage({ file, preview: URL.createObjectURL(file) });
-    e.target.value = '';
-  };
-
-  const clearPromptImage = () => {
-    if (promptImage?.preview) URL.revokeObjectURL(promptImage.preview);
-    setPromptImage(null);
-  };
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -82,22 +68,12 @@ export default function Image() {
     });
 
     try {
-      // Upload reference image to S3 first if provided
-      let imageUrls: string[] = [];
-      if (promptImage?.file) {
-        toast.loading('Uploading reference image…', { id: toastId });
-        const uploaded = await fileService.uploadFile(promptImage.file);
-        imageUrls = [fileService.getPreviewUrl(uploaded.key)];
-      }
-
-      toast.loading('Generating image…', { id: toastId, description: 'This may take a few seconds.' });
-
       const resultUrl = await imageService.generateImageAndPoll(
         {
           prompt,
           size: selectedSize,
           resolution: selectedResolution,
-          imageUrls,
+          imageUrls: [],
         },
         (progress) => {
           toast.loading(`Generating image… ${progress}%`, { id: toastId });
@@ -122,106 +98,80 @@ export default function Image() {
       <div className="image-page-row">
         <div className="image-create-panel">
           <div className="image-create-left">
-          <div className="prompt-area">
-            <div className="prompt-image-picker">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="prompt-image-input"
-                aria-label="Select image from computer"
-                onChange={handleImageSelect}
-              />
-              {promptImage ? (
-                <div className="prompt-image-preview-wrap">
-                  <img
-                    src={promptImage.preview}
-                    alt="Prompt reference"
-                    className="prompt-image-preview"
-                  />
-                  <button
-                    type="button"
-                    className="prompt-image-clear"
-                    onClick={clearPromptImage}
-                    aria-label="Remove image"
-                  >
-                    <Icon icon="mdi:close" width={14} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="prompt-image-placeholder"
-                  onClick={() => fileInputRef.current?.click()}
-                  aria-label="Upload image as prompt"
-                >
-                  <img src="/upload.png" alt="" width={24} height={24} className="prompt-image-placeholder-icon" />
-                  <span>Add image</span>
-                </button>
-              )}
-            </div>
+            {/* Prompt — grows to fill space */}
             <textarea
-              className="prompt-input"
+              className="prompt-input image-prompt-grow"
               placeholder="Describe the scene you imagine"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              rows={3}
             />
-          </div>
 
-          <div className="image-option-group">
-            <span className="model-select-field-label">Size</span>
-            <div className="image-option-pills">
-              {SIZES.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  className={`image-option-pill${selectedSize === s ? ' image-option-pill--active' : ''}`}
-                  onClick={() => setSelectedSize(s)}
-                >
-                  {s}
-                </button>
-              ))}
+            {/* Bottom controls */}
+            <div className="image-bottom-controls">
+              {/* Model picker (display only) */}
+              <div className="image-model-row">
+                <img
+                  src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-avatar/avatars/nanobanana.webp"
+                  alt="Nano Banana"
+                  className="image-model-icon"
+                />
+                <span className="image-model-name">Nano Banana</span>
+              </div>
+
+              <div className="image-option-group">
+                <span className="model-select-field-label">Size</span>
+                <div className="image-option-pills">
+                  {SIZES.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className={`image-option-pill${selectedSize === s ? ' image-option-pill--active' : ''}`}
+                      onClick={() => setSelectedSize(s)}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="image-option-group">
+                <span className="model-select-field-label">Resolution</span>
+                <div className="image-option-pills">
+                  {RESOLUTIONS.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      className={`image-option-pill${selectedResolution === r ? ' image-option-pill--active' : ''}`}
+                      onClick={() => setSelectedResolution(r)}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="generate-btn"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+              >
+                {isGenerating ? (
+                  <span className="image-generate-loading">
+                    <Icon icon="mdi:loading" width={20} className="image-generate-spinner" />
+                    Generating…
+                  </span>
+                ) : (
+                  'Generate'
+                )}
+              </button>
             </div>
-          </div>
 
-          <div className="image-option-group">
-            <span className="model-select-field-label">Resolution</span>
-            <div className="image-option-pills">
-              {RESOLUTIONS.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  className={`image-option-pill${selectedResolution === r ? ' image-option-pill--active' : ''}`}
-                  onClick={() => setSelectedResolution(r)}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="generate-btn"
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            {isGenerating ? (
-              <span className="image-generate-loading">
-                <Icon icon="mdi:loading" width={20} className="image-generate-spinner" />
-                Generating…
-              </span>
-            ) : (
-              'Generate'
-            )}
-          </button>
-
-          <ImageResultModal
-            open={resultModalOpen}
-            onOpenChange={setResultModalOpen}
-            imageSrc={generatedImage}
-          />
+            <ImageResultModal
+              open={resultModalOpen}
+              onOpenChange={setResultModalOpen}
+              imageSrc={generatedImage}
+            />
           </div>
         </div>
 

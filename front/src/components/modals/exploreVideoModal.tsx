@@ -11,7 +11,7 @@ type ExploreVideoModalProps = {
   video: ExploreVideo | null;
 };
 
-async function downloadVideo(url: string) {
+async function downloadMedia(url: string, contentType: 'video' | 'image') {
   try {
     const res = await fetch(url, { mode: 'cors' });
     if (!res.ok) throw new Error('Download failed');
@@ -19,7 +19,9 @@ async function downloadVideo(url: string) {
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = `explore-video-${Date.now()}.mp4`;
+    link.download = contentType === 'image'
+      ? `explore-image-${Date.now()}.jpg`
+      : `explore-video-${Date.now()}.mp4`;
     link.click();
     URL.revokeObjectURL(blobUrl);
   } catch {
@@ -57,14 +59,13 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
   const navigate = useNavigate();
 
   const promptText = video?.prompt ?? (video ? `${video.title}. ${video.description}` : '');
-  const model = video?.model ?? 'Kling 2.6 Pro';
-  const aspectRatio = video?.aspectRatio ?? '1:1';
-  const duration = video?.duration ?? '5 sec';
-  const fileType = video?.fileType ?? 'MP4';
+
+  const isImage = video?.contentType === 'image';
 
   const handleRecreate = () => {
     onOpenChange(false);
-    navigate(`/video?prompt=${encodeURIComponent(promptText)}`);
+    const dest = isImage ? '/image' : '/video';
+    navigate(`${dest}?prompt=${encodeURIComponent(promptText)}`);
   };
 
   return (
@@ -77,7 +78,14 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
         >
           <div className="explore-video-modal-layout">
             <div className="explore-video-modal-media">
-              {video && (
+              {video && (isImage ? (
+                <img
+                  src={video.videoUrl}
+                  alt={video.title}
+                  className="explore-video-modal-video"
+                  style={{ objectFit: 'contain' }}
+                />
+              ) : (
                 <video
                   src={video.videoUrl}
                   controls
@@ -85,7 +93,7 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
                   className="explore-video-modal-video"
                   aria-label={video.title}
                 />
-              )}
+              ))}
             </div>
             <div className="explore-video-modal-panel">
               <div className="explore-video-modal-panel-top">
@@ -93,7 +101,7 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
                   <button
                     type="button"
                     className="explore-video-modal-download"
-                    onClick={() => video && downloadVideo(video.videoUrl)}
+                    onClick={() => video && downloadMedia(video.videoUrl, video.contentType)}
                     disabled={!video}
                   >
                     <Icon icon="mdi:download" width={20} />
@@ -123,31 +131,20 @@ export function ExploreVideoModal({ open, onOpenChange, video }: ExploreVideoMod
                 <h3 className="explore-video-modal-label">Prompt</h3>
                 <div className="explore-video-modal-prompt-text">{promptText || '—'}</div>
               </div>
-              <div className="explore-video-modal-settings">
-                <h3 className="explore-video-modal-label">Settings</h3>
-                <div className="explore-video-modal-setting">
-                  <span className="explore-video-modal-setting-label">Model</span>
-                  <span className="explore-video-modal-setting-value">{model}</span>
-                </div>
-                <div className="explore-video-modal-setting">
-                  <span className="explore-video-modal-setting-label">Aspect ratio</span>
-                  <span className="explore-video-modal-setting-value">
-                    <Icon icon="mdi:checkbox-blank" width={16} className="explore-video-modal-setting-icon" />
-                    {aspectRatio}
-                  </span>
-                </div>
-                <div className="explore-video-modal-setting">
-                  <span className="explore-video-modal-setting-label">Duration</span>
-                  <span className="explore-video-modal-setting-value">
-                    <Icon icon="mdi:clock-outline" width={16} className="explore-video-modal-setting-icon" />
-                    {duration}
-                  </span>
-                </div>
-                <div className="explore-video-modal-setting">
-                  <span className="explore-video-modal-setting-label">File type</span>
-                  <span className="explore-video-modal-setting-value">{fileType}</span>
-                </div>
-              </div>
+              {video?.userId && (
+                <button
+                  type="button"
+                  className="explore-video-modal-user"
+                  onClick={() => { onOpenChange(false); navigate(`/profile/${video.userId}`); }}
+                >
+                  {video.userAvatar ? (
+                    <img src={video.userAvatar} alt={video.userName ?? 'Creator'} className="explore-video-modal-user-avatar" />
+                  ) : (
+                    <Icon icon="mdi:account-circle" width={18} />
+                  )}
+                  <span>{video.userName ?? video.userEmail ?? 'View creator'}</span>
+                </button>
+              )}
               <button
                 type="button"
                 className="explore-video-modal-recreate"

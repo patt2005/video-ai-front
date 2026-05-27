@@ -9,6 +9,7 @@ public class TaskContext : DbContext
 {
     public DbSet<Task> Tasks { get; set; }
     public DbSet<Content> Contents { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -18,5 +19,10 @@ public class TaskContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().ToTable("Users");
+        modelBuilder.Entity<Task>()
+            .HasOne(t => t.User)
+            .WithMany()
+            .HasForeignKey(t => t.UserId)
+            .IsRequired(false);
     }
 }

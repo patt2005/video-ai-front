@@ -60,6 +60,42 @@
   gap: 1.25rem;
 }
 
+.image-prompt-grow {
+  flex: 1;
+  min-height: 120px;
+  resize: none;
+}
+
+.image-bottom-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.image-model-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+}
+
+.image-model-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.image-model-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .prompt-area {
   display: flex;
   flex-direction: column;
@@ -167,7 +203,7 @@
   color: var(--text);
   font-family: inherit;
   font-size: 0.95rem;
-  resize: vertical;
+  resize: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
 }

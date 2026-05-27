@@ -14,6 +14,7 @@ import Admin from './pages/admin/admin';
 import SupportInbox from './pages/admin/supportInbox';
 import SupportFab from './components/SupportFab';
 import Profile from './pages/profile/profile';
+import PublicProfile from './pages/profile/publicProfile';
 import Pricing from './pages/pricing/pricing';
 import './App.css';
 import {paths} from './routes/paths.ts';
@@ -62,6 +63,7 @@ function AppLayout() {
 
                         <Route element={<ProtectedRoute />}>
                             <Route path={paths.profile} element={<Profile />} />
+                            <Route path={paths.publicProfile} element={<PublicProfile />} />
                         </Route>
 
                         <Route element={<ProtectedRoute roles={[UserRole.Admin]} />}>

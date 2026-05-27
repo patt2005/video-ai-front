@@ -46,6 +46,15 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [HttpGet("{id:guid}/public")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicProfile(Guid id)
+    {
+        var user = await _user.GetUserByIdActionExecution(id);
+        if (user is null) return NotFound();
+        return Ok(new { id = user.Id, userName = user.Username, userAvatar = (string?)null });
+    }
+
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)

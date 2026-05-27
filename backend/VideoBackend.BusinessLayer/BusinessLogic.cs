@@ -36,7 +36,7 @@ public class BusinessLogic
         => new TaskActionExecution(_taskContext);
 
     public IExploreVideoAction ExploreVideoAction()
-        => new ExploreVideoActionExecution(_videoContext);
+        => new ExploreVideoActionExecution(_videoContext, _taskContext);
 
     public IVideoAction VideoAction() => new VideoActionExecution();
 

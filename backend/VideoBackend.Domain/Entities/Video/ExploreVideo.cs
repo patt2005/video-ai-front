@@ -3,7 +3,9 @@ namespace VideoBackend.Domain.Entities.Video;
 public class ExploreVideo
 {
     public Guid Id { get; set; }
-    public string Title { get; set; } =  string.Empty;
+    public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string VideoUrl { get; set; } = string.Empty;
+    public string? Prompt { get; set; }
+    public string? Model { get; set; }
 }

@@ -2,29 +2,58 @@ using Microsoft.EntityFrameworkCore;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.Video;
 using VideoBackend.Domain.Entities.Video;
+using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.BusinessLayer.Core.Action;
 
 public class ExploreVideoAction
 {
     protected readonly ExploreVideoContext _context;
+    protected readonly TaskContext _taskContext;
 
-    public ExploreVideoAction(ExploreVideoContext context)
+    public ExploreVideoAction(ExploreVideoContext context, TaskContext taskContext)
     {
         _context = context;
+        _taskContext = taskContext;
     }
 
     protected async Task<List<ExploreVideoDto>> GetAllExploreVideoAction()
     {
-        return await _context.ExploreVideos
+        var curated = await _context.ExploreVideos
             .Select(v => new ExploreVideoDto
             {
                 Id = v.Id,
                 Title = v.Title,
                 Description = v.Description,
-                VideoUrl = v.VideoUrl
+                VideoUrl = v.VideoUrl,
+                Prompt = v.Prompt,
+                Model = v.Model,
+                ContentType = "video"
             })
             .ToListAsync();
+
+        var tasks = await _taskContext.Tasks
+            .Include(t => t.Content)
+            .Include(t => t.User)
+            .Where(t => t.Content != null && t.Content.Url != null)
+            .ToListAsync();
+
+        var userGenerated = tasks.Select(t => new ExploreVideoDto
+        {
+            Id = t.Content!.Id,
+            Title = string.Empty,
+            Description = string.Empty,
+            VideoUrl = t.Content.Url!,
+            Prompt = t.Content.Prompt,
+            Model = t.Content.Model,
+            ContentType = t.Content.ContentType == ContentType.Image ? "image" : "video",
+            UserId = t.UserId,
+            UserName = t.User?.Username,
+            UserEmail = t.User?.Email,
+            UserAvatar = null
+        }).ToList();
+
+        return curated.Concat(userGenerated).ToList();
     }
 
     protected async Task<ExploreVideoDto?> GetExploreVideoByIdAction(Guid id)

@@ -7,7 +7,7 @@ namespace VideoBackend.BusinessLayer.Structure.ActionExecution;
 
 public class ExploreVideoActionExecution : ExploreVideoAction, IExploreVideoAction
 {
-    public ExploreVideoActionExecution(ExploreVideoContext context) : base(context) { }
+    public ExploreVideoActionExecution(ExploreVideoContext context, TaskContext taskContext) : base(context, taskContext) { }
 
     public Task<List<ExploreVideoDto>> GetAllExploreVideoActionExecution()
         => GetAllExploreVideoAction();

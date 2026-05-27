@@ -21,7 +21,6 @@ const ASPECT_RATIOS: VideoAspectRatio[] = ['16:9', '9:16', '1:1', '4:3'];
 export default function Video() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string; url: string } | null>(null);
   const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
   const [selectedModel, setSelectedModel] = useState<VideoModel>('Veo31Fast');
   const [selectedRatio, setSelectedRatio] = useState<VideoAspectRatio>('16:9');
@@ -29,7 +28,6 @@ export default function Video() {
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,7 +63,7 @@ export default function Video() {
     });
 
     try {
-      const imageUrls = referenceImage ? [referenceImage.url] : [];
+      const imageUrls: string[] = [];
 
       const url = await videoService.generateVideoAndPoll(
         {
@@ -90,21 +88,6 @@ export default function Video() {
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
-    if (referenceImage?.preview) URL.revokeObjectURL(referenceImage.preview);
-    // Use object URL as placeholder — in a real flow you'd upload and get a hosted URL
-    const preview = URL.createObjectURL(file);
-    setReferenceImage({ file, preview, url: preview });
-    e.target.value = '';
-  };
-
-  const clearReferenceImage = () => {
-    if (referenceImage?.preview) URL.revokeObjectURL(referenceImage.preview);
-    setReferenceImage(null);
   };
 
   return (
@@ -132,42 +115,6 @@ export default function Video() {
 
         <div className="video-page-panel-inner">
           <div className="video-page-panel-bar">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="video-page-panel-file-input"
-              aria-label="Upload image reference"
-              onChange={handleImageSelect}
-            />
-            {referenceImage ? (
-              <div className="video-page-panel-ref-wrap">
-                <img
-                  src={referenceImage.preview}
-                  alt="Reference"
-                  className="video-page-panel-ref-thumb"
-                />
-                <button
-                  type="button"
-                  className="video-page-panel-ref-clear"
-                  onClick={clearReferenceImage}
-                  aria-label="Remove reference image"
-                >
-                  <Icon icon="mdi:close" width={14} />
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                className="video-page-panel-add-btn"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Add image reference"
-                disabled={selectedModel === 'Veo31Lite'}
-                title={selectedModel === 'Veo31Lite' ? 'Image-to-video not supported by Lite model' : undefined}
-              >
-                <Icon icon="mdi:plus" width={22} height={22} />
-              </button>
-            )}
             <div className="video-settings-wrap" ref={settingsRef}>
               <button
                 type="button"

@@ -1,89 +1,60 @@
 import { useRef, useState } from 'react';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
+import { useAuth } from '../../contexts/authContext';
 import '../../styles/edit.css';
 
-type RefImage = { file: File; preview: string };
+type OutputMode = 'image' | 'video';
 
 export default function Edit() {
-  const [sourceVideo, setSourceVideo] = useState<{ file: File; preview: string } | null>(null);
-  const [referenceImages, setReferenceImages] = useState<RefImage[]>([]);
-  const [editPrompt, setEditPrompt] = useState('');
+  const { user } = useAuth();
+  const [sourceImage, setSourceImage] = useState<{ file: File; preview: string } | null>(null);
+  const [prompt, setPrompt] = useState('');
+  const [outputMode, setOutputMode] = useState<OutputMode>('image');
   const [isApplying, setIsApplying] = useState(false);
-  void setEditPrompt;
-
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-
-  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith('video/')) {
-      toast.error('Invalid file', { description: 'Please select a video file.' });
-      return;
-    }
-    if (sourceVideo?.preview) URL.revokeObjectURL(sourceVideo.preview);
-    setSourceVideo({ file, preview: URL.createObjectURL(file) });
-    e.target.value = '';
-  };
-
-  const clearSourceVideo = () => {
-    if (sourceVideo?.preview) URL.revokeObjectURL(sourceVideo.preview);
-    setSourceVideo(null);
-  };
-  void clearSourceVideo;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files?.length) return;
-    const newRefs: RefImage[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (!file.type.startsWith('image/')) continue;
-      newRefs.push({ file, preview: URL.createObjectURL(file) });
+    const file = e.target.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+      toast.error('Invalid file', { description: 'Please select an image file.' });
+      return;
     }
-    if (newRefs.length) {
-      setReferenceImages((prev) => [...prev, ...newRefs].slice(0, 4));
-    }
+    if (sourceImage?.preview) URL.revokeObjectURL(sourceImage.preview);
+    setSourceImage({ file, preview: URL.createObjectURL(file) });
     e.target.value = '';
   };
 
-  const removeReferenceImage = (index: number) => {
-    setReferenceImages((prev) => {
-      const next = [...prev];
-      URL.revokeObjectURL(next[index].preview);
-      next.splice(index, 1);
-      return next;
-    });
+  const clearSourceImage = () => {
+    if (sourceImage?.preview) URL.revokeObjectURL(sourceImage.preview);
+    setSourceImage(null);
   };
 
-  const handleApplyEdit = async () => {
-    if (!sourceVideo) {
-      toast.error('No video', {
-        description: 'Upload a video to edit first.',
-      });
+  const handleApply = async () => {
+    if (!sourceImage) {
+      toast.error('No image selected', { description: 'Upload a starting image first.' });
       return;
     }
-    if (!editPrompt.trim()) {
-      toast.error('Edit prompt is empty', {
-        description: 'Describe how you want to edit the video (e.g. "change the sky to sunset", "add rain").',
-      });
+    if (!prompt.trim()) {
+      toast.error('Prompt is empty', { description: 'Describe what you want to generate.' });
+      return;
+    }
+    if (!user?.id) {
+      toast.error('Not logged in');
       return;
     }
 
     setIsApplying(true);
-    const toastId = toast.loading('Applying edit…', {
-      description: 'AI is editing your video. This may take a minute.',
+    const toastId = toast.loading(`Generating ${outputMode}…`, {
+      description: 'This may take a moment.',
     });
 
     try {
-      // TODO: call backend (e.g. Veo 3 / Sora-style API) with:
-      // - sourceVideo.file (or URL)
-      // - referenceImages (optional)
-      // - editPrompt
+      // TODO: wire up image-to-image / image-to-video API
       await new Promise((r) => setTimeout(r, 3000));
-      toast.success('Edit applied', { id: toastId });
+      toast.success('Done!', { id: toastId });
     } catch (err) {
-      toast.error('Edit failed', {
+      toast.error('Generation failed', {
         id: toastId,
         description: err instanceof Error ? err.message : 'Something went wrong.',
       });
@@ -95,146 +66,124 @@ export default function Edit() {
   return (
     <div className="edit-page">
       <div className="edit-page-inner">
-        <header className="edit-page-header">
-          <h1 className="edit-page-title">Edit video with AI</h1>
-          <p className="edit-page-subtitle">
-            Upload a video, add reference images (optional), and describe your edit. Models like Veo 3 or Sora will apply the changes.
-          </p>
+
+        {/* Header */}
+        <header className="edit-header">
+          <h1 className="edit-header-title">Edit with AI</h1>
+          <p className="edit-header-sub">Upload a starting image, describe your idea, and generate a new image or video.</p>
         </header>
 
-        <div className="edit-page-layout">
+        <div className="edit-layout">
+
+          {/* Left — controls */}
           <div className="edit-panel">
-            {/* Source video */}
-            <div className="edit-section">
-              <label className="edit-section-label">Source video</label>
-              <input
-                ref={videoInputRef}
-                type="file"
-                accept="video/*"
-                className="edit-file-input"
-                aria-label="Upload video to edit"
-                onChange={handleVideoSelect}
-              />
-              {sourceVideo ? (
-                  <a></a>
-                // <div className="edit-video-preview-wrap">
-                //   <video
-                //     src={sourceVideo.preview}
-                //     className="edit-video-preview"
-                //     controls
-                //     muted
-                //     playsInline
-                //     aria-label="Source video preview"
-                //   />
-                //   <button
-                //     type="button"
-                //     className="edit-video-clear"
-                //     onClick={clearSourceVideo}
-                //     aria-label="Remove video"
-                //   >
-                //     <Icon icon="mdi:close" width={18} />
-                //   </button>
-                // </div>
-              ) : (
+
+            {/* Image upload */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="edit-file-input-hidden"
+              onChange={handleImageSelect}
+            />
+            {sourceImage ? (
+              <div className="edit-source-preview">
+                <img src={sourceImage.preview} alt="Source" className="edit-source-img" />
                 <button
                   type="button"
-                  className="edit-upload-area"
-                  onClick={() => videoInputRef.current?.click()}
-                  aria-label="Upload video"
+                  className="edit-source-clear"
+                  onClick={clearSourceImage}
+                  aria-label="Remove image"
                 >
-                  <Icon icon="mdi:video-plus" width={32} height={32} className="edit-upload-icon" />
-                  <span>Upload video to edit</span>
+                  <Icon icon="mdi:close" width={16} />
                 </button>
-              )}
-            </div>
-
-            {/* Reference images */}
-            <div className="edit-section edit-section--ref-images">
-              <input
-                ref={imageInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="edit-file-input"
-                aria-label="Add reference images"
-                onChange={handleImageSelect}
-              />
-              <div className="edit-ref-images">
-                {referenceImages.map((ref, i) => (
-                  <div key={i} className="edit-ref-thumb-wrap">
-                    <img src={ref.preview} alt="" className="edit-ref-thumb" />
-                    <button
-                      type="button"
-                      className="edit-ref-remove"
-                      onClick={() => removeReferenceImage(i)}
-                      aria-label="Remove reference image"
-                    >
-                      <Icon icon="mdi:close" width={14} />
-                    </button>
-                  </div>
-                ))}
+                <button
+                  type="button"
+                  className="edit-source-replace"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Icon icon="mdi:image-edit" width={16} />
+                  Replace
+                </button>
               </div>
+            ) : (
+              <button
+                type="button"
+                className="edit-upload-zone"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="edit-upload-icon-wrap">
+                  <Icon icon="mdi:image-plus" width={32} height={32} />
+                </div>
+                <span className="edit-upload-label">Upload starting image</span>
+                <span className="edit-upload-hint">PNG, JPG, WEBP up to 20 MB</span>
+              </button>
+            )}
+
+            {/* Prompt */}
+            <textarea
+              className="edit-prompt"
+              placeholder="Describe what you want to generate from this image…"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+
+            {/* Bottom bar — output mode + generate */}
+            <div className="edit-bottom-bar">
+
+              {/* Output mode toggle */}
+              <div className="edit-mode-toggle">
+                <button
+                  type="button"
+                  className={`edit-mode-btn${outputMode === 'image' ? ' edit-mode-btn--active' : ''}`}
+                  onClick={() => setOutputMode('image')}
+                >
+                  <Icon icon="mdi:image" width={16} />
+                  Image
+                </button>
+                <button
+                  type="button"
+                  className={`edit-mode-btn${outputMode === 'video' ? ' edit-mode-btn--active' : ''}`}
+                  onClick={() => setOutputMode('video')}
+                >
+                  <Icon icon="mdi:video" width={16} />
+                  Video
+                </button>
+              </div>
+
+              {/* Generate */}
+              <button
+                type="button"
+                className="edit-generate-btn"
+                onClick={handleApply}
+                disabled={isApplying || !sourceImage || !prompt.trim()}
+              >
+                {isApplying ? (
+                  <>
+                    <Icon icon="mdi:loading" width={18} className="edit-spinner" />
+                    Generating…
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:auto-awesome" width={18} />
+                    Generate
+                  </>
+                )}
+              </button>
             </div>
-
-            {/* Edit prompt */}
-            {/*<div className="edit-section">*/}
-            {/*  <label className="edit-section-label" htmlFor="edit-prompt">Edit prompt</label>*/}
-            {/*  <textarea*/}
-            {/*    id="edit-prompt"*/}
-            {/*    className="edit-prompt-input"*/}
-            {/*    placeholder="e.g. Change the sky to a dramatic sunset, add light rain, make the scene look like winter..."*/}
-            {/*    value={editPrompt}*/}
-            {/*    onChange={(e) => setEditPrompt(e.target.value)}*/}
-            {/*    rows={4}*/}
-            {/*    aria-label="Describe how to edit the video"*/}
-            {/*  />*/}
-            {/*</div>*/}
-
-            <button
-              type="button"
-              className="edit-apply-btn"
-              onClick={handleApplyEdit}
-              disabled={isApplying || !sourceVideo || !editPrompt.trim()}
-            >
-              {isApplying ? (
-                <span className="edit-apply-loading">
-                  <Icon icon="mdi:loading" width={20} className="edit-apply-spinner" />
-                  Applying…
-                </span>
-              ) : (
-                'Apply edit'
-              )}
-            </button>
           </div>
 
-          <aside className="edit-tips">
-            <div className="edit-tips-image-wrap">
-              <img
-                src="https://placehold.co/400x220/1f2937/9ca3af?text=How+it+works"
-                alt=""
-                className="edit-tips-image"
-              />
+          {/* Right — result / placeholder */}
+          <div className="edit-result-panel">
+            <div className="edit-result-empty">
+              <div className="edit-result-empty-icon">
+                <Icon icon="mdi:image-auto-adjust" width={48} />
+              </div>
+              <p className="edit-result-empty-title">Your result will appear here</p>
+              <p className="edit-result-empty-sub">Upload an image and describe what you want to create</p>
             </div>
-            <h2 className="edit-tips-title">How it works</h2>
-            <ul className="edit-tips-list">
-              <li>
-                <Icon icon="mdi:video" width={20} aria-hidden />
-                <span>Upload the video you want to change.</span>
-              </li>
-              <li>
-                <Icon icon="mdi:image-multiple" width={20} aria-hidden />
-                <span>Optionally add reference images for style or content.</span>
-              </li>
-              <li>
-                <Icon icon="mdi:lead-pencil" width={20} aria-hidden />
-                <span>Describe the edit in plain language (e.g. “add snow”, “change to night”).</span>
-              </li>
-              <li>
-                <Icon icon="mdi:robot" width={20} aria-hidden />
-                <span>AI (Veo 3 / Sora-style) will apply your edit to the video.</span>
-              </li>
-            </ul>
-          </aside>
+          </div>
+
         </div>
       </div>
     </div>
