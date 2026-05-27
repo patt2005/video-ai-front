@@ -2,5 +2,7 @@ namespace VideoBackend.Domain.Enums;
 
 public enum VideoModel
 {
-    GoogleVeo31
+    Veo31Fast,
+    Veo31Lite,
+    Veo31Quality
 }

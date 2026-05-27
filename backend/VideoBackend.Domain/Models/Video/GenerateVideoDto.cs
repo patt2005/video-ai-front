@@ -6,6 +6,7 @@ public class GenerateVideoDto
 {
     public Guid UserId { get; set; }
     public string Prompt { get; set; } = string.Empty;
-    public string? ImageUrl { get; set; }
-    public VideoModel Model { get; set; } = VideoModel.GoogleVeo31;
+    public string AspectRatio { get; set; } = "16:9";
+    public List<string>? ImageUrls { get; set; }
+    public VideoModel Model { get; set; } = VideoModel.Veo31Fast;
 }

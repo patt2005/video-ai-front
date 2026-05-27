@@ -6,52 +6,36 @@ using VideoBackend.DataAccessLayer;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Entities.Task;
 using VideoBackend.Domain.Enums;
-using VideoBackend.Domain.Models.Video;
+using VideoBackend.Domain.Models.Image;
 using EntityTask = VideoBackend.Domain.Entities.Task.Task;
 
 namespace VideoBackend.BusinessLayer.Core;
 
-public class VideoActions
+public class ImageActions
 {
     private static readonly HttpClient _http = new();
 
-    private static string MapModel(VideoModel model) => model switch
+    private static string MapModel(ImageModel model) => model switch
     {
-        VideoModel.Veo31Fast => "veo3.1-fast",
-        VideoModel.Veo31Lite => "veo3.1-lite",
-        VideoModel.Veo31Quality => "veo3.1-quality",
-        _ => "veo3.1-fast"
+        ImageModel.NanoBanana2 => "nano-banana-2-new",
+        _ => "nano-banana-2-new"
     };
 
-    protected GenerateVideoResponse GenerateVideoActionExecution(GenerateVideoDto dto)
+    protected GenerateImageResponse GenerateImageActionExecution(GenerateImageDto dto)
     {
-        // Build input object — image_urls only for fast/quality models
-        var model = MapModel(dto.Model);
-        object input;
-
-        if (dto.ImageUrls != null && dto.ImageUrls.Count > 0 && dto.Model != VideoModel.Veo31Lite)
+        // 1. Submit task to Poyo API
+        var requestBody = new
         {
+            model = MapModel(dto.Model),
             input = new
             {
                 prompt = dto.Prompt,
-                duration = 8,
-                aspect_ratio = dto.AspectRatio,
-                image_urls = dto.ImageUrls
-            };
-        }
-        else
-        {
-            input = new
-            {
-                prompt = dto.Prompt,
-                duration = 8,
-                aspect_ratio = dto.AspectRatio
-            };
-        }
+                size = dto.Size,
+                resolution = dto.Resolution
+            }
+        };
 
-        var requestBody = new { model, input };
         var json = JsonSerializer.Serialize(requestBody);
-
         var request = new HttpRequestMessage(HttpMethod.Post, "https://api.poyo.ai/api/generate/submit")
         {
             Content = new StringContent(json, Encoding.UTF8, "application/json")
@@ -66,12 +50,13 @@ public class VideoActions
             ?? throw new Exception($"Poyo API error: {responseBody}");
         var poyoStatus = poyoResponse?["data"]?["status"]?.GetValue<string>() ?? "not_started";
 
+        // 2. Persist task + content in DB
         using var db = new TaskContext();
 
         var content = new Content
         {
             Id = Guid.NewGuid(),
-            ContentType = ContentType.Video,
+            ContentType = ContentType.Image,
             Url = null,
         };
 
@@ -90,7 +75,7 @@ public class VideoActions
         db.Tasks.Add(task);
         db.SaveChanges();
 
-        return new GenerateVideoResponse
+        return new GenerateImageResponse
         {
             TaskId = task.Id,
             PoyoTaskId = poyoTaskId,
@@ -98,7 +83,7 @@ public class VideoActions
         };
     }
 
-    protected VideoTaskStatusResponse GetVideoTaskStatusActionExecution(Guid taskId)
+    protected ImageTaskStatusResponse GetImageTaskStatusActionExecution(Guid taskId)
     {
         using var db = new TaskContext();
 
@@ -108,6 +93,7 @@ public class VideoActions
         if (string.IsNullOrEmpty(task.PoyoTaskId))
             throw new InvalidOperationException("Task has no associated Poyo task ID");
 
+        // Poll Poyo for current status
         var request = new HttpRequestMessage(
             HttpMethod.Get,
             $"https://api.poyo.ai/api/generate/status/{task.PoyoTaskId}");
@@ -123,7 +109,7 @@ public class VideoActions
         var progress = data?["progress"]?.GetValue<int>() ?? 0;
         var errorMessage = data?["error_message"]?.GetValue<string>();
 
-        var videoUrls = new List<string>();
+        var imageUrls = new List<string>();
         var files = data?["files"]?.AsArray();
         if (files != null)
         {
@@ -131,19 +117,20 @@ public class VideoActions
             {
                 var fileType = file?["file_type"]?.GetValue<string>();
                 var fileUrl = file?["file_url"]?.GetValue<string>();
-                if (fileType == "video" && fileUrl != null)
-                    videoUrls.Add(fileUrl);
+                if (fileType == "image" && fileUrl != null)
+                    imageUrls.Add(fileUrl);
             }
         }
 
+        // Update DB if finished or failed
         if (status == "finished")
         {
             task.Status = GenerationStatus.Success;
-            if (videoUrls.Count > 0)
+            if (imageUrls.Count > 0)
             {
                 var content = db.Contents.Find(task.ContentId);
                 if (content != null)
-                    content.Url = videoUrls[0];
+                    content.Url = imageUrls[0];
             }
             db.SaveChanges();
         }
@@ -153,13 +140,13 @@ public class VideoActions
             db.SaveChanges();
         }
 
-        return new VideoTaskStatusResponse
+        return new ImageTaskStatusResponse
         {
             TaskId = task.Id,
             PoyoTaskId = task.PoyoTaskId!,
             Status = status,
             Progress = progress,
-            VideoUrls = videoUrls,
+            ImageUrls = imageUrls,
             ErrorMessage = errorMessage,
         };
     }

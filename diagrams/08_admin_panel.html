@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagrama 8 — Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 40px 24px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #e879f9;
+      margin-bottom: 8px;
+    }
+    header p {
+      font-size: 0.95rem;
+      color: #94a3b8;
+    }
+    .diagram-wrap {
+      background: #1e2130;
+      border: 1px solid #2d3148;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diagrama 8 — Admin Panel</h1>
+    <p>MovyAI · Admin Page · userService + taskService + filtrare + gestionare useri</p>
+  </header>
+  <div class="diagram-wrap">
+    <div class="mermaid">
+sequenceDiagram
+    actor A as Admin
+    participant AP as Admin Page
+    participant US as userService
+    participant TS as taskService
+
+    AP->>US: getUsers()
+    US-->>AP: mockUsers[]
+    AP->>TS: getTasks()
+    TS-->>AP: mockGenerationTasks[]
+    AP-->>A: Randeaza tabel cu toti userii
+
+    alt Filtrare useri
+        A->>AP: Introduce text in campuri (ID, username, email, data, rol)
+        AP->>AP: Aplica filtre combinate cu AND logic (case-insensitive)
+        AP-->>A: Tabel actualizat cu userii filtrati
+    end
+
+    alt Expand user — vizualizare taskuri
+        A->>AP: Click buton Expand pe un user
+        AP->>AP: setExpandedUserId(userId)
+        AP->>TS: getTasks() filtrate dupa userId
+        TS-->>AP: Task[] pentru acel user
+        AP-->>A: Afiseaza tabel nested cu taskurile userului (ID, data, status, contentId)
+    end
+
+    alt Schimbare rol user
+        A->>AP: Selecteaza rol nou din dropdown (Admin sau User)
+        AP->>US: updateUserRole(userId, newRole)
+        US->>US: Actualizeaza rolul in starea mock locala
+        US-->>AP: success
+        AP-->>A: Dropdown actualizat cu noul rol
+    end
+
+    alt Stergere user
+        A->>AP: Click buton Delete pe un user
+        AP->>AP: Adauga userId in deletedIds Set
+        AP->>AP: Filtreaza userii — exclude deletedIds
+        AP-->>A: Userul dispare din tabel (soft delete)
+    end
+    </div>
+  </div>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'dark', securityLevel: 'loose' });
+  </script>
+</body>
+</html>

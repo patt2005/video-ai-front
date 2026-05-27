@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>UML Class Diagram – Content Entity</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #3a3a4a;
+      margin-bottom: 36px;
+      letter-spacing: 0.5px;
+    }
+
+    .diagram-wrapper {
+      position: relative;
+      width: 920px;
+      height: 640px;
+    }
+
+    .connectors {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .uml-class {
+      position: absolute;
+      width: 225px;
+      border: 1.5px solid #9aa0b0;
+      border-radius: 4px;
+      background: #fdf9ee;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
+      font-size: 13px;
+    }
+
+    .uml-class .class-name {
+      background: #f0e8c8;
+      border-bottom: 1.5px solid #9aa0b0;
+      text-align: center;
+      font-weight: 700;
+      padding: 8px 6px;
+      font-size: 14px;
+      color: #2c2c3e;
+    }
+
+    .uml-class .section {
+      border-bottom: 1px solid #c8c0a0;
+      padding: 8px 10px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .uml-class .section:last-child {
+      border-bottom: none;
+    }
+
+    .uml-class .section .field {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pub  { color: #2a7a2a; font-weight: 600; min-width: 12px; }
+    .priv { color: #bb3333; font-weight: 600; min-width: 12px; }
+
+    /* Positions */
+    #cls-content      { top: 220px; left: 345px; }
+    #cls-task         { top: 30px;  left: 630px; }
+    #cls-imageservice { top: 30px;  left: 30px;  }
+    #cls-videoservice { top: 390px; left: 30px;  }
+    #cls-fileservice  { top: 390px; left: 630px; }
+  </style>
+</head>
+<body>
+
+<h1>UML Class Diagram — Content Entity (MovyAI)</h1>
+
+<div class="diagram-wrapper">
+
+  <!-- ═══ SVG CONNECTORS ═══ -->
+  <svg class="connectors" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- open arrow -->
+      <marker id="arr" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+      <!-- filled diamond (composition) -->
+      <marker id="diamond" markerWidth="13" markerHeight="9"
+              refX="1" refY="4.5" orient="auto">
+        <polygon points="1,4.5 7,1 13,4.5 7,8" fill="#555" stroke="#555" stroke-width="1"/>
+      </marker>
+      <!-- dashed arrow (dependency) -->
+      <marker id="arr-dep" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+    </defs>
+
+    <!--
+      Content  centre: (345+225/2, 220+~155/2) = (457, 298)
+      Task     centre: (630+225/2, 30+~155/2)  = (742, 108)
+      ImageService centre: (30+225/2, 30+~145/2)  = (142, 103)
+      VideoService centre: (30+225/2, 390+~145/2) = (142, 463)
+      FileService  centre: (630+225/2, 390+~130/2) = (742, 455)
+    -->
+
+    <!-- Task ◆──→ Content  (Task composes Content via contentId) -->
+    <line x1="630" y1="135" x2="572" y2="255"
+          stroke="#555" stroke-width="1.5"
+          marker-start="url(#diamond)"
+          marker-end="url(#arr)"/>
+    <text x="598" y="192" font-size="11" fill="#555" font-style="italic">contentId</text>
+
+    <!-- ImageService --→ Content  (creates Content of type Image) -->
+    <line x1="255" y1="125" x2="345" y2="258"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="255" y="188" font-size="11" fill="#555" font-style="italic">«creates»</text>
+
+    <!-- VideoService --→ Content  (creates Content of type Video) -->
+    <line x1="255" y1="430" x2="345" y2="338"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="256" y="392" font-size="11" fill="#555" font-style="italic">«creates»</text>
+
+    <!-- FileService --→ Content  (provides url used to build Content) -->
+    <line x1="630" y1="430" x2="572" y2="342"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="580" y="398" font-size="11" fill="#555" font-style="italic">«provides url»</text>
+
+  </svg>
+
+  <!-- ═══ CLASS: Content (central) ═══ -->
+  <div class="uml-class" id="cls-content">
+    <div class="class-name">Content</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> id: number</div>
+      <div class="field"><span class="priv">-</span> type: ContentType</div>
+      <div class="field"><span class="priv">-</span> url: string | null</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> getUrl(): string | null</div>
+      <div class="field"><span class="pub">+</span> getType(): ContentType</div>
+      <div class="field"><span class="pub">+</span> isImage(): boolean</div>
+      <div class="field"><span class="pub">+</span> isVideo(): boolean</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: Task ═══ -->
+  <div class="uml-class" id="cls-task">
+    <div class="class-name">Task</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> id: number</div>
+      <div class="field"><span class="priv">-</span> userId: number</div>
+      <div class="field"><span class="priv">-</span> creationDate: string</div>
+      <div class="field"><span class="priv">-</span> contentId: number | null</div>
+      <div class="field"><span class="priv">-</span> status: TaskStatus</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> getStatus(): TaskStatus</div>
+      <div class="field"><span class="pub">+</span> isPending(): boolean</div>
+      <div class="field"><span class="pub">+</span> hasContent(): boolean</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ImageService ═══ -->
+  <div class="uml-class" id="cls-imageservice">
+    <div class="class-name">ImageService</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> delayMs: number</div>
+      <div class="field"><span class="priv">-</span> showcaseImages: string[]</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> generateImage(params,</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;opts): Promise&lt;string&gt;</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: VideoService ═══ -->
+  <div class="uml-class" id="cls-videoservice">
+    <div class="class-name">VideoService</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> BASE_URL: string</div>
+      <div class="field"><span class="priv">-</span> intervalMs: number</div>
+      <div class="field"><span class="priv">-</span> maxWaitMs: number</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> createTask(params):</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;string&gt;</div>
+      <div class="field"><span class="pub">+</span> pollTask(id):</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;PollResult&gt;</div>
+      <div class="field"><span class="pub">+</span> pollUntilComplete(id):</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;PollResult&gt;</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: FileService ═══ -->
+  <div class="uml-class" id="cls-fileservice">
+    <div class="class-name">FileService</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> uploadDelayMs: number</div>
+      <div class="field"><span class="priv">-</span> mockUploadUrls: object</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> uploadFile(file):</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;UploadResult&gt;</div>
+      <div class="field"><span class="pub">+</span> uploadFiles(files):</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;UploadResult[]&gt;</div>
+    </div>
+  </div>
+
+</div><!-- /diagram-wrapper -->
+
+</body>
+</html>

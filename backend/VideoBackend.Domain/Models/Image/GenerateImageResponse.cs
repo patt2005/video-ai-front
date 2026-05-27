@@ -1,6 +1,6 @@
-namespace VideoBackend.Domain.Models.Video;
+namespace VideoBackend.Domain.Models.Image;
 
-public class GenerateVideoResponse
+public class GenerateImageResponse
 {
     public Guid TaskId { get; set; }
     public string PoyoTaskId { get; set; } = string.Empty;

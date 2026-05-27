@@ -5,7 +5,15 @@
       "Bash(dotnet build *)",
       "Bash(dotnet add *)",
       "Bash(dotnet ef migrations *)",
-      "Bash(dotnet ef database *)"
+      "Bash(dotnet ef database *)",
+      "Bash(git checkout *)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(find . -name \"*.AssemblyInfoInputs.cache\" -delete)",
+      "Bash(dotnet clean *)",
+      "Bash(ls *.csproj)",
+      "Bash(ls */*.csproj)"
     ]
   }
 }

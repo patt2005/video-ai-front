@@ -12,4 +12,5 @@ public class Task
     public Guid ContentId { get; set; }
     public Content? Content { get; set; }
     public GenerationStatus Status { get; set; }
+    public string? PoyoTaskId { get; set; }
 }

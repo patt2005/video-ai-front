@@ -212,6 +212,41 @@
   border-color: var(--border);
 }
 
+.image-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.image-option-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.image-option-pill {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-muted);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  font-family: inherit;
+}
+
+.image-option-pill:hover {
+  background: var(--border-light);
+}
+
+.image-option-pill--active {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .model-select-wrapper {
   position: relative;
   display: flex;

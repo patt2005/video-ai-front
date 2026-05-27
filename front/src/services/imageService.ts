@@ -1,30 +1,102 @@
-import { ContentType } from '../types/generation/content';
-import { taskService } from './taskService';
-import { SHOWCASE_IMAGES } from '../_mock/images';
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:5014';
 
 export interface CreateImageParams {
+    userId: string;
     prompt: string;
-    imageUrl: string | null;
+    size: string;
+    resolution: string;
 }
 
-export interface GenerateImageOptions {
-    userId?: number | string;
+interface GenerateImageResponse {
+    taskId: string;
+    poyoTaskId: string;
+    status: string;
 }
 
-function delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+interface ImageStatusResponse {
+    taskId: string;
+    poyoTaskId: string;
+    status: 'not_started' | 'running' | 'finished' | 'failed';
+    progress: number;
+    imageUrls: string[];
+    errorMessage: string | null;
+}
+
+export interface ImagePollResult {
+    status: 'not_started' | 'running' | 'finished' | 'failed';
+    progress: number;
+    imageUrls: string[];
+    errorMessage: string | null;
+}
+
+async function generateImage(params: CreateImageParams): Promise<string> {
+    const { data: task } = await axios.post<GenerateImageResponse>(
+        `${BASE_URL}/api/image/generate`,
+        {
+            userId: params.userId,
+            prompt: params.prompt,
+            size: params.size,
+            resolution: params.resolution,
+            model: 'NanaBanana2',
+        }
+    );
+
+    return task.taskId;
+}
+
+async function pollStatus(taskId: string): Promise<ImageStatusResponse> {
+    const { data } = await axios.get<ImageStatusResponse>(
+        `${BASE_URL}/api/image/status/${taskId}`
+    );
+    return data;
+}
+
+async function generateImageAndPoll(
+    params: CreateImageParams,
+    onProgress?: (progress: number) => void,
+    intervalMs = 3000,
+    maxWaitMs = 300000
+): Promise<string> {
+    const taskId = await generateImage(params);
+
+    const start = Date.now();
+
+    return new Promise<string>((resolve, reject) => {
+        const interval = setInterval(async () => {
+            try {
+                const result = await pollStatus(taskId);
+
+                if (onProgress) {
+                    onProgress(result.progress ?? 0);
+                }
+
+                if (result.status === 'finished') {
+                    clearInterval(interval);
+                    const url = result.imageUrls?.[0];
+                    if (url) {
+                        resolve(url);
+                    } else {
+                        reject(new Error('Generation finished but no image URL returned.'));
+                    }
+                } else if (result.status === 'failed') {
+                    clearInterval(interval);
+                    reject(new Error(result.errorMessage ?? 'Image generation failed.'));
+                } else if (Date.now() - start >= maxWaitMs) {
+                    clearInterval(interval);
+                    reject(new Error('Image generation timed out.'));
+                }
+            } catch (err) {
+                clearInterval(interval);
+                reject(err);
+            }
+        }, intervalMs);
+    });
 }
 
 export const imageService = {
-    async generateImage(
-        params: CreateImageParams,
-        options?: GenerateImageOptions
-    ): Promise<string> {
-        await delay(4000);
-        const resultUrl = SHOWCASE_IMAGES[0];
-        if (options?.userId != null) {
-            taskService.addTask(options.userId, ContentType.Image, resultUrl);
-        }
-        return resultUrl;
-    },
+    generateImage,
+    pollStatus,
+    generateImageAndPoll,
 };

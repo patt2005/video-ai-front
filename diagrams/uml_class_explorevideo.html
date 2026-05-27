@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>UML Class Diagram – ExploreVideo Entity</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #3a3a4a;
+      margin-bottom: 36px;
+      letter-spacing: 0.5px;
+    }
+
+    .diagram-wrapper {
+      position: relative;
+      width: 940px;
+      height: 640px;
+    }
+
+    .connectors {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .uml-class {
+      position: absolute;
+      width: 230px;
+      border: 1.5px solid #9aa0b0;
+      border-radius: 4px;
+      background: #fdf9ee;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.15);
+      font-size: 13px;
+    }
+
+    .uml-class .class-name {
+      background: #f0e8c8;
+      border-bottom: 1.5px solid #9aa0b0;
+      text-align: center;
+      font-weight: 700;
+      padding: 8px 6px;
+      font-size: 14px;
+      color: #2c2c3e;
+    }
+
+    .uml-class .section {
+      border-bottom: 1px solid #c8c0a0;
+      padding: 8px 10px;
+      line-height: 1.75;
+      color: #333;
+    }
+
+    .uml-class .section:last-child {
+      border-bottom: none;
+    }
+
+    .uml-class .section .field {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pub  { color: #2a7a2a; font-weight: 600; min-width: 12px; }
+    .priv { color: #bb3333; font-weight: 600; min-width: 12px; }
+
+    /* Positions */
+    #cls-explorevideo   { top: 220px; left: 355px; }
+    #cls-exploreservice { top: 30px;  left: 355px; }
+    #cls-explorepage    { top: 30px;  left: 30px;  }
+    #cls-explorecard    { top: 420px; left: 30px;  }
+    #cls-exploremodal   { top: 30px;  left: 670px; }
+    #cls-exploredto     { top: 420px; left: 670px; }
+  </style>
+</head>
+<body>
+
+<h1>UML Class Diagram — ExploreVideo Entity (MovyAI)</h1>
+
+<div class="diagram-wrapper">
+
+  <!-- ═══ SVG CONNECTORS ═══ -->
+  <svg class="connectors" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- open arrow (association) -->
+      <marker id="arr" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+      <!-- filled diamond (composition) -->
+      <marker id="diamond" markerWidth="13" markerHeight="9"
+              refX="1" refY="4.5" orient="auto">
+        <polygon points="1,4.5 7,1 13,4.5 7,8" fill="#555" stroke="#555" stroke-width="1"/>
+      </marker>
+      <!-- dashed arrow (dependency) -->
+      <marker id="arr-dep" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+    </defs>
+
+    <!--
+      ExploreVideo   centre: (355+230/2, 220+~175/2) = (470, 308)
+      ExploreService centre: (355+230/2, 30+~130/2)  = (470, 95)
+      ExplorePage    centre: (30+230/2,  30+~155/2)  = (145, 108)
+      ExploreCard    centre: (30+230/2,  420+~130/2) = (145, 485)
+      ExploreModal   centre: (670+230/2, 30+~175/2)  = (785, 118)
+      ExploreVideoDto centre: (670+230/2, 420+~130/2)= (785, 485)
+    -->
+
+    <!-- ExploreService ──→ ExploreVideo  (produces/returns ExploreVideo list) -->
+    <line x1="470" y1="160" x2="470" y2="220"
+          stroke="#555" stroke-width="1.5"
+          marker-end="url(#arr)"/>
+    <text x="478" y="194" font-size="11" fill="#555" font-style="italic">returns</text>
+
+    <!-- ExplorePage --→ ExploreVideo  (stores selected video in state) -->
+    <line x1="260" y1="120" x2="355" y2="268"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="256" y="192" font-size="11" fill="#555" font-style="italic">«uses»</text>
+
+    <!-- ExploreCard ──→ ExploreVideo  (receives video as prop) -->
+    <line x1="230" y1="458" x2="355" y2="348"
+          stroke="#555" stroke-width="1.5"
+          marker-end="url(#arr)"/>
+    <text x="238" y="412" font-size="11" fill="#555" font-style="italic">video: prop</text>
+
+    <!-- ExploreModal ──→ ExploreVideo  (receives video as prop) -->
+    <line x1="670" y1="148" x2="585" y2="268"
+          stroke="#555" stroke-width="1.5"
+          marker-end="url(#arr)"/>
+    <text x="594" y="205" font-size="11" fill="#555" font-style="italic">video: prop</text>
+
+    <!-- ExploreVideoDto --→ ExploreVideo  (mapped to ExploreVideo via mapDto) -->
+    <line x1="700" y1="458" x2="585" y2="348"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="614" y="415" font-size="11" fill="#555" font-style="italic">«maps to»</text>
+
+  </svg>
+
+  <!-- ═══ CLASS: ExploreVideo (central) ═══ -->
+  <div class="uml-class" id="cls-explorevideo">
+    <div class="class-name">ExploreVideo</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> videoUrl: string</div>
+      <div class="field"><span class="priv">-</span> title: string</div>
+      <div class="field"><span class="priv">-</span> description: string</div>
+      <div class="field"><span class="priv">-</span> prompt?: string</div>
+      <div class="field"><span class="priv">-</span> model?: string</div>
+      <div class="field"><span class="priv">-</span> aspectRatio?: string</div>
+      <div class="field"><span class="priv">-</span> duration?: string</div>
+      <div class="field"><span class="priv">-</span> fileType?: string</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> getPromptText(): string</div>
+      <div class="field"><span class="pub">+</span> getModel(): string</div>
+      <div class="field"><span class="pub">+</span> getVideoUrl(): string</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ExploreService ═══ -->
+  <div class="uml-class" id="cls-exploreservice">
+    <div class="class-name">ExploreService</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> BASE_URL: string</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> getAll():</div>
+      <div class="field">&nbsp;&nbsp;&nbsp;Promise&lt;ExploreVideo[]&gt;</div>
+      <div class="field"><span class="priv">-</span> mapDto(dto): ExploreVideo</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ExplorePage ═══ -->
+  <div class="uml-class" id="cls-explorepage">
+    <div class="class-name">ExplorePage</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> videos: ExploreVideo[]</div>
+      <div class="field"><span class="priv">-</span> selectedVideo: ExploreVideo | null</div>
+      <div class="field"><span class="priv">-</span> modalOpen: boolean</div>
+      <div class="field"><span class="priv">-</span> loading: boolean</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> handleCardClick(video): void</div>
+      <div class="field"><span class="pub">+</span> fetchVideos(): Promise&lt;void&gt;</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ExploreCard ═══ -->
+  <div class="uml-class" id="cls-explorecard">
+    <div class="class-name">ExploreCard</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> video: ExploreVideo</div>
+      <div class="field"><span class="priv">-</span> onClick?: () =&gt; void</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> render(): JSX.Element</div>
+      <div class="field"><span class="pub">+</span> handleKeyDown(e): void</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ExploreVideoModal ═══ -->
+  <div class="uml-class" id="cls-exploremodal">
+    <div class="class-name">ExploreVideoModal</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> open: boolean</div>
+      <div class="field"><span class="priv">-</span> video: ExploreVideo | null</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> handleRecreate(): void</div>
+      <div class="field"><span class="pub">+</span> downloadVideo(url): Promise&lt;void&gt;</div>
+      <div class="field"><span class="pub">+</span> shareUrl(url, title): Promise&lt;void&gt;</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: ExploreVideoDto ═══ -->
+  <div class="uml-class" id="cls-exploredto">
+    <div class="class-name">ExploreVideoDto</div>
+    <div class="section">
+      <div class="field"><span class="priv">-</span> id: string</div>
+      <div class="field"><span class="priv">-</span> title: string</div>
+      <div class="field"><span class="priv">-</span> description: string</div>
+      <div class="field"><span class="priv">-</span> videoUrl: string</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="pub">+</span> toExploreVideo(): ExploreVideo</div>
+    </div>
+  </div>
+
+</div><!-- /diagram-wrapper -->
+
+</body>
+</html>

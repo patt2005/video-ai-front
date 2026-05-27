@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>UML Class Diagram – Task Entity</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #3a3a4a;
+      margin-bottom: 36px;
+      letter-spacing: 0.5px;
+    }
+
+    .diagram-wrapper {
+      position: relative;
+      width: 900px;
+      height: 620px;
+    }
+
+    /* SVG layer for connectors */
+    .connectors {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* UML Class Box */
+    .uml-class {
+      position: absolute;
+      width: 220px;
+      border: 1.5px solid #9aa0b0;
+      border-radius: 4px;
+      background: #fdf9ee;
+      box-shadow: 2px 3px 8px rgba(0,0,0,0.18);
+      font-size: 13px;
+    }
+
+    .uml-class .class-name {
+      background: #f0e8c8;
+      border-bottom: 1.5px solid #9aa0b0;
+      text-align: center;
+      font-weight: 700;
+      padding: 8px 6px;
+      font-size: 14px;
+      color: #2c2c3e;
+    }
+
+    .uml-class .section {
+      border-bottom: 1px solid #c8c0a0;
+      padding: 8px 10px;
+      line-height: 1.7;
+      color: #333;
+    }
+
+    .uml-class .section:last-child {
+      border-bottom: none;
+    }
+
+    .uml-class .section .field {
+      display: flex;
+      gap: 4px;
+    }
+
+    .uml-class .section .field .vis {
+      color: #888;
+      font-weight: 600;
+      min-width: 12px;
+    }
+
+    /* Visibility symbols */
+    .pub  { color: #2a7a2a; }
+    .priv { color: #bb3333; }
+
+    /* Positions */
+    #cls-task        { top: 200px; left: 330px; }
+    #cls-user        { top: 30px;  left: 620px; }
+    #cls-content     { top: 390px; left: 620px; }
+    #cls-taskservice { top: 30px;  left: 30px;  }
+    #cls-videoservice{ top: 390px; left: 30px;  }
+  </style>
+</head>
+<body>
+
+<h1>UML Class Diagram — Task Entity (MovyAI)</h1>
+
+<div class="diagram-wrapper">
+
+  <!-- ═══ SVG CONNECTORS ═══ -->
+  <svg class="connectors" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- open arrow (association) -->
+      <marker id="arr-open" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+      <!-- filled diamond (composition) -->
+      <marker id="diamond-filled" markerWidth="12" markerHeight="8"
+              refX="0" refY="4" orient="auto">
+        <polygon points="0,4 6,0 12,4 6,8" fill="#555" stroke="#555" stroke-width="1"/>
+      </marker>
+      <!-- open diamond (aggregation) -->
+      <marker id="diamond-open" markerWidth="12" markerHeight="8"
+              refX="12" refY="4" orient="auto">
+        <polygon points="0,4 6,0 12,4 6,8" fill="#fdf9ee" stroke="#555" stroke-width="1.3"/>
+      </marker>
+      <!-- dashed arrow (dependency) -->
+      <marker id="arr-dep" markerWidth="10" markerHeight="7"
+              refX="9" refY="3.5" orient="auto">
+        <polyline points="0,0 9,3.5 0,7" fill="none" stroke="#555" stroke-width="1.4"/>
+      </marker>
+    </defs>
+
+    <!--
+      Task (330,200,w=220,h≈160) centre ≈ (440,280)
+      User (620,30,w=220,h≈160) centre ≈ (730,110)
+      Content (620,390,w=220,h≈160) centre ≈ (730,470)
+      TaskService (30,30,w=220,h≈190) centre ≈ (140,125)
+      VideoService (30,390,w=220,h≈160) centre ≈ (140,470)
+    -->
+
+    <!-- Task → User  (association: Task.userId refs User.id)  -->
+    <line x1="550" y1="245" x2="620" y2="120"
+          stroke="#555" stroke-width="1.5" marker-end="url(#arr-open)"/>
+    <text x="573" y="185" font-size="11" fill="#555" font-style="italic">userId</text>
+
+    <!-- Task ◆→ Content  (composition: Task has contentId → Content) -->
+    <line x1="550" y1="300" x2="620" y2="430"
+          stroke="#555" stroke-width="1.5"
+          marker-start="url(#diamond-filled)"
+          marker-end="url(#arr-open)"/>
+    <text x="562" y="378" font-size="11" fill="#555" font-style="italic">contentId</text>
+
+    <!-- TaskService --→ Task  (dependency: creates/reads Task) -->
+    <line x1="250" y1="120" x2="330" y2="245"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="252" y="178" font-size="11" fill="#555" font-style="italic">«creates»</text>
+
+    <!-- VideoService --→ Task  (dependency: polls Task status) -->
+    <line x1="250" y1="450" x2="330" y2="320"
+          stroke="#555" stroke-width="1.5" stroke-dasharray="6,4"
+          marker-end="url(#arr-dep)"/>
+    <text x="256" y="400" font-size="11" fill="#555" font-style="italic">«uses»</text>
+  </svg>
+
+  <!-- ═══ CLASS: Task ═══ -->
+  <div class="uml-class" id="cls-task">
+    <div class="class-name">Task</div>
+    <div class="section">
+      <div class="field"><span class="vis priv">-</span> id: number</div>
+      <div class="field"><span class="vis priv">-</span> userId: number</div>
+      <div class="field"><span class="vis priv">-</span> creationDate: string</div>
+      <div class="field"><span class="vis priv">-</span> contentId: number | null</div>
+      <div class="field"><span class="vis priv">-</span> status: TaskStatus</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="vis pub">+</span> getStatus(): TaskStatus</div>
+      <div class="field"><span class="vis pub">+</span> isPending(): boolean</div>
+      <div class="field"><span class="vis pub">+</span> hasContent(): boolean</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: User ═══ -->
+  <div class="uml-class" id="cls-user">
+    <div class="class-name">User</div>
+    <div class="section">
+      <div class="field"><span class="vis priv">-</span> id: string</div>
+      <div class="field"><span class="vis priv">-</span> email: string</div>
+      <div class="field"><span class="vis priv">-</span> username?: string</div>
+      <div class="field"><span class="vis priv">-</span> role: UserRole</div>
+      <div class="field"><span class="vis priv">-</span> registerDate: string</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="vis pub">+</span> getRole(): UserRole</div>
+      <div class="field"><span class="vis pub">+</span> isAdmin(): boolean</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: Content ═══ -->
+  <div class="uml-class" id="cls-content">
+    <div class="class-name">Content</div>
+    <div class="section">
+      <div class="field"><span class="vis priv">-</span> id: number</div>
+      <div class="field"><span class="vis priv">-</span> type: ContentType</div>
+      <div class="field"><span class="vis priv">-</span> url: string | null</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="vis pub">+</span> getUrl(): string | null</div>
+      <div class="field"><span class="vis pub">+</span> getType(): ContentType</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: TaskService ═══ -->
+  <div class="uml-class" id="cls-taskservice">
+    <div class="class-name">TaskService</div>
+    <div class="section">
+      <div class="field"><span class="vis priv">-</span> mockTasks: Task[]</div>
+      <div class="field"><span class="vis priv">-</span> mockContent: Content[]</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="vis pub">+</span> getTasks(userId): Task[]</div>
+      <div class="field"><span class="vis pub">+</span> getContent(id): Content | null</div>
+      <div class="field"><span class="vis pub">+</span> addTask(userId, type, url): Task</div>
+    </div>
+  </div>
+
+  <!-- ═══ CLASS: VideoService ═══ -->
+  <div class="uml-class" id="cls-videoservice">
+    <div class="class-name">VideoService</div>
+    <div class="section">
+      <div class="field"><span class="vis priv">-</span> BASE_URL: string</div>
+      <div class="field"><span class="vis priv">-</span> intervalMs: number</div>
+      <div class="field"><span class="vis priv">-</span> maxWaitMs: number</div>
+    </div>
+    <div class="section">
+      <div class="field"><span class="vis pub">+</span> createTask(params): Promise&lt;string&gt;</div>
+      <div class="field"><span class="vis pub">+</span> pollTask(id): Promise&lt;PollResult&gt;</div>
+      <div class="field"><span class="vis pub">+</span> pollUntilComplete(id): Promise&lt;PollResult&gt;</div>
+    </div>
+  </div>
+
+</div><!-- /diagram-wrapper -->
+
+
+</body>
+</html>

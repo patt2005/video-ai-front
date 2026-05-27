@@ -1,26 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
-using VideoBackend.Domain.Models.Video;
+using VideoBackend.Domain.Models.Image;
 
 namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class VideoController : ControllerBase
+public class ImageController : ControllerBase
 {
-    internal IVideoAction _videoAction;
+    internal IImageAction _imageAction;
 
-    public VideoController()
+    public ImageController()
     {
         var bl = new BusinessLogic();
-        _videoAction = bl.VideoAction();
+        _imageAction = bl.ImageAction();
     }
 
     [HttpPost("generate")]
-    public IActionResult Generate([FromBody] GenerateVideoDto dto)
+    public IActionResult Generate([FromBody] GenerateImageDto dto)
     {
-        var result = _videoAction.GenerateVideo(dto);
+        var result = _imageAction.GenerateImage(dto);
         return Ok(result);
     }
 
@@ -29,7 +29,7 @@ public class VideoController : ControllerBase
     {
         try
         {
-            var result = _videoAction.GetVideoTaskStatus(taskId);
+            var result = _imageAction.GetImageTaskStatus(taskId);
             return Ok(result);
         }
         catch (KeyNotFoundException)

@@ -6,8 +6,7 @@ import '../../styles/Image.css';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { ImageTutorialStepCard, type ImageTutorialStep } from './imageTutorialStepCard';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
-import { type CreateImageParams, imageService } from '../../services/imageService';
-import { fileService } from '../../services/fileService';
+import { imageService } from '../../services/imageService';
 
 const IMAGE_TUTORIAL_STEPS: ImageTutorialStep[] = [
   {
@@ -36,11 +35,19 @@ const MODELS = [
   { id: 'nano-banana', name: 'Nano Banana', iconUrl: GOOGLE_ICON },
 ] as const;
 
+const SIZES = ['1:1', '16:9', '9:16', '4:3'] as const;
+type ImageSize = typeof SIZES[number];
+
+const RESOLUTIONS = ['1K', '2K', '4K'] as const;
+type ImageResolution = typeof RESOLUTIONS[number];
+
 export default function Image() {
   const { user } = useAuth();
   const [prompt, setPrompt] = useState('');
   const [selectedModel, setSelectedModel] = useState<(typeof MODELS)[number]['id']>('nano-banana');
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<ImageSize>('1:1');
+  const [selectedResolution, setSelectedResolution] = useState<ImageResolution>('1K');
   const [promptImage, setPromptImage] = useState<{ file: File; preview: string } | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -79,6 +86,13 @@ export default function Image() {
       return;
     }
 
+    if (!user?.id) {
+      toast.error('Not logged in', {
+        description: 'You must be logged in to generate images.',
+      });
+      return;
+    }
+
     setIsGenerating(true);
     setGeneratedImage(null);
     const toastId = toast.loading('Generating image…', {
@@ -86,26 +100,21 @@ export default function Image() {
     });
 
     try {
-        let imageUrl: string | null = null;
-        const file = fileInputRef.current?.files?.[0];
-        if (file) {
-          const result = await fileService.uploadFile(file);
-          if (result) imageUrl = result.url;
-        }
-
-        const params: CreateImageParams = {
-          imageUrl,
+      const resultUrl = await imageService.generateImageAndPoll(
+        {
+          userId: user.id,
           prompt,
-        };
+          size: selectedSize,
+          resolution: selectedResolution,
+        },
+        (progress) => {
+          toast.loading(`Generating image… ${progress}%`, { id: toastId });
+        }
+      );
 
-        const resultUrl = await imageService.generateImage(params, {
-          userId: user?.id,
-        });
-        setGeneratedImage(resultUrl);
-        setIsGenerating(false);
-        setResultModalOpen(true);
-
-        toast.dismiss(toastId);
+      setGeneratedImage(resultUrl);
+      setResultModalOpen(true);
+      toast.dismiss(toastId);
     } catch (err) {
       toast.error('Generation failed', {
         id: toastId,
@@ -166,6 +175,38 @@ export default function Image() {
               onChange={(e) => setPrompt(e.target.value)}
               rows={3}
             />
+          </div>
+
+          <div className="image-option-group">
+            <span className="model-select-field-label">Size</span>
+            <div className="image-option-pills">
+              {SIZES.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`image-option-pill${selectedSize === s ? ' image-option-pill--active' : ''}`}
+                  onClick={() => setSelectedSize(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="image-option-group">
+            <span className="model-select-field-label">Resolution</span>
+            <div className="image-option-pills">
+              {RESOLUTIONS.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  className={`image-option-pill${selectedResolution === r ? ' image-option-pill--active' : ''}`}
+                  onClick={() => setSelectedResolution(r)}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="model-select-wrapper" ref={modelPickerRef}>

@@ -1,6 +1,7 @@
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.BusinessLayer.Structure;
 
+
 namespace VideoBackend.BusinessLayer;
 
 public class BusinessLogic
@@ -12,4 +13,6 @@ public class BusinessLogic
     public IExploreVideoAction ExploreVideoAction() => new ExploreVideoActionExecution();
 
     public IVideoAction VideoAction() => new VideoActionExecution();
+
+    public IImageAction ImageAction() => new ImageActionExecution();
 }

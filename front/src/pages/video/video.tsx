@@ -5,17 +5,26 @@ import { toast } from 'sonner';
 import { useAuth } from '../../contexts/authContext';
 import '../../styles/Video.css';
 import { VideoResultModal } from '../../components/modals/videoResultModal';
-import { videoService, type CreateVideoTaskParams } from '../../services/videoService';
-import { fileService } from '../../services/fileService';
+import { videoService, type VideoModel, type VideoAspectRatio } from '../../services/videoService';
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;
 
+const MODELS: { id: VideoModel; label: string }[] = [
+  { id: 'Veo31Fast', label: 'Fast' },
+  { id: 'Veo31Lite', label: 'Lite' },
+  { id: 'Veo31Quality', label: 'Quality' },
+];
+
+const ASPECT_RATIOS: VideoAspectRatio[] = ['16:9', '9:16', '1:1', '4:3'];
+
 export default function Video() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string } | null>(null);
+  const [referenceImage, setReferenceImage] = useState<{ file: File; preview: string; url: string } | null>(null);
   const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
+  const [selectedModel, setSelectedModel] = useState<VideoModel>('Veo31Fast');
+  const [selectedRatio, setSelectedRatio] = useState<VideoAspectRatio>('16:9');
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
@@ -29,52 +38,43 @@ export default function Video() {
       return;
     }
 
+    if (!user?.id) {
+      toast.error('Not logged in', {
+        description: 'You must be logged in to generate videos.',
+      });
+      return;
+    }
+
     const promptText = prompt;
     setIsGenerating(true);
     setPrompt('');
     const toastId = toast.loading('Generating video…', {
-      description: 'This may take a few seconds.',
+      description: 'Videos take 90–300 seconds. Hang tight.',
     });
 
-    let imageUrl: string | null = null;
-
     try {
-      if (fileInputRef.current !== null) {
-        const file = fileInputRef.current.files?.[0];
-        if (file) {
-          const result = await fileService.uploadFile(file);
-          if (result) imageUrl = result.url;
+      const imageUrls = referenceImage ? [referenceImage.url] : [];
+
+      const url = await videoService.generateVideoAndPoll(
+        {
+          userId: user.id,
+          prompt: promptText,
+          aspectRatio: selectedRatio,
+          model: selectedModel,
+          imageUrls,
+        },
+        (progress) => {
+          toast.loading(`Generating video… ${progress}%`, { id: toastId });
         }
-      }
+      );
 
-      const params: CreateVideoTaskParams = {
-        imageUrl,
-        prompt: promptText,
-      };
-
-      const { taskId } = await videoService.createTask(params);
-
-      toast.loading('Generating video…', {
-        id: toastId,
-        description: 'Polling for result…',
-      });
-
-      const result = await videoService.pollTaskUntilComplete(taskId);
-
-      if (result.status === 'Success' && result.url) {
-        setResultVideoUrl(result.url);
-        setResultModalOpen(true);
-        toast.dismiss(toastId);
-      } else {
-        toast.error('Generation failed', {
-          id: toastId,
-          description: result.error ?? 'Something went wrong.',
-        });
-      }
+      setResultVideoUrl(url);
+      setResultModalOpen(true);
+      toast.dismiss(toastId);
     } catch (err) {
       toast.error('Generation failed', {
         id: toastId,
-        description: 'Something went wrong.',
+        description: err instanceof Error ? err.message : 'Something went wrong.',
       });
     } finally {
       setIsGenerating(false);
@@ -85,7 +85,9 @@ export default function Video() {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith('image/')) return;
     if (referenceImage?.preview) URL.revokeObjectURL(referenceImage.preview);
-    setReferenceImage({ file, preview: URL.createObjectURL(file) });
+    // Use object URL as placeholder — in a real flow you'd upload and get a hosted URL
+    const preview = URL.createObjectURL(file);
+    setReferenceImage({ file, preview, url: preview });
     e.target.value = '';
   };
 
@@ -116,6 +118,36 @@ export default function Video() {
             Add a reference image (optional), describe your idea, then hit the arrow to generate.
           </p>
         </header>
+
+        <div className="video-page-options">
+          <div className="video-page-option-group">
+            {MODELS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={`video-option-pill${selectedModel === m.id ? ' video-option-pill--active' : ''}`}
+                onClick={() => setSelectedModel(m.id)}
+                disabled={isGenerating}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <div className="video-page-option-group">
+            {ASPECT_RATIOS.map((r) => (
+              <button
+                key={r}
+                type="button"
+                className={`video-option-pill${selectedRatio === r ? ' video-option-pill--active' : ''}`}
+                onClick={() => setSelectedRatio(r)}
+                disabled={isGenerating}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="video-page-panel-inner">
           <div className="video-page-panel-bar">
             <input
@@ -148,6 +180,8 @@ export default function Video() {
                 className="video-page-panel-add-btn"
                 onClick={() => fileInputRef.current?.click()}
                 aria-label="Add image reference"
+                disabled={selectedModel === 'Veo31Lite'}
+                title={selectedModel === 'Veo31Lite' ? 'Image-to-video not supported by Lite model' : undefined}
               >
                 <Icon icon="mdi:plus" width={22} height={22} />
               </button>
@@ -159,6 +193,7 @@ export default function Video() {
               aria-label="Video prompt"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !isGenerating) handleGenerateClick(); }}
             />
             <button
               type="button"
@@ -169,7 +204,10 @@ export default function Video() {
               disabled={isGenerating}
             >
               <span className="video-page-panel-arrow-icon">
-                <Icon icon="mdi:arrow-right" width={ARROW_ICON_SIZE} height={ARROW_ICON_SIZE} />
+                {isGenerating
+                  ? <Icon icon="mdi:loading" width={ARROW_ICON_SIZE} height={ARROW_ICON_SIZE} className="video-generate-spinner" />
+                  : <Icon icon="mdi:arrow-right" width={ARROW_ICON_SIZE} height={ARROW_ICON_SIZE} />
+                }
               </span>
             </button>
           </div>

@@ -6,6 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 VideoBackend.DataAccessLayer.DbSession.ConnectionString =
     builder.Configuration.GetConnectionString("DefaultConnection");
 
+VideoBackend.DataAccessLayer.PoyoSession.ApiKey =
+    builder.Configuration["Poyo:ApiKey"];
+
 var frontendCorsPolicy = "FrontendCors";
 
 builder.Services.AddControllers()
