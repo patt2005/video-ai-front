@@ -11,4 +11,5 @@ public class UserDto
     public DateTime? RegisterDate { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsEmailVerified { get; set; }
+    public string? AvatarUrl { get; set; }
 }

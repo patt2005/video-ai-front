@@ -11,8 +11,8 @@
   --accent: #8b5cf6;
   --link: #646cff;
   --link-hover: #4450f1;
-  --header-bg: #6e6969;
-  --header-border: #333;
+  --header-bg: rgba(10, 10, 10, 0.80);
+  --header-border: rgba(255, 255, 255, 0.10);
   --header-text: #f9fafb;
   --header-nav-bg: rgba(255, 255, 255, 0.08);
   --header-btn-ghost-bg: rgba(255, 255, 255, 0.1);
@@ -35,8 +35,8 @@
   --accent: #7c3aed;
   --link: #4f46e5;
   --link-hover: #4338ca;
-  --header-bg: #f5e6c8;
-  --header-border: #e0d2b5;
+  --header-bg: rgba(255, 255, 255, 0.80);
+  --header-border: rgba(0, 0, 0, 0.08);
   --header-text: #1f2933;
   --header-nav-bg: rgba(255, 255, 255, 0.55);
   --header-btn-ghost-bg: rgba(255, 255, 255, 0.25);
@@ -369,6 +369,10 @@ html[data-theme='light'] {
   outline: none;
 }
 
+.login-field input::placeholder {
+  color: rgba(0, 0, 0, 0.30);
+}
+
 .login-field input:focus {
   border-color: rgba(168, 85, 247, 0.55);
   box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.18);
@@ -534,6 +538,10 @@ html[data-theme="dark"] .login-field input {
   background: rgba(0,0,0,0.35);
   border: 1px solid rgba(255,255,255,0.10);
   color: rgba(255,255,255,0.90);
+}
+
+html[data-theme="dark"] .login-field input::placeholder {
+  color: rgba(255,255,255,0.25);
 }
 
 html[data-theme="dark"] .login-field--error input {
@@ -777,7 +785,39 @@ html[data-theme="dark"] .signup-page .signup-title-accent {
 
 .signup-page .signup-links {
   justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+  font-size: 13px;
 }
+
+.signup-page .signup-links .login-link {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.signup-page .signup-links .login-link:not(:disabled):hover {
+  background: rgba(139, 92, 246, 0.12);
+}
+
+.signup-page .signup-links .login-link:disabled {
+  cursor: not-allowed;
+  font-weight: 400;
+  color: rgba(167, 139, 250, 0.50) !important;
+}
+
+.signup-page .signup-links-separator {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.18);
+  align-self: center;
+}
+
 .signup-page .login-link {
   color: #7c3aed;
 }

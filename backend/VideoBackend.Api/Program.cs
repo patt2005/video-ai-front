@@ -91,6 +91,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors(frontendCorsPolicy);
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

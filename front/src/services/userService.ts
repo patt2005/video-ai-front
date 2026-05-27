@@ -25,4 +25,13 @@ export const userService = {
     async deleteUser(api: AxiosInstance, userId: string): Promise<void> {
         await api.delete(`/api/User/${userId}`);
     },
+
+    async uploadAvatar(api: AxiosInstance, file: File): Promise<User> {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await api.post<User>('/api/User/me/avatar', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data;
+    },
 };

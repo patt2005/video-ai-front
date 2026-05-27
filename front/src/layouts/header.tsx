@@ -76,7 +76,6 @@ export default function Header() {
               key={item.to}
               to={item.to}
               className={`header-link ${pathname === item.to ? 'is-active' : ''}`}
-              authOnly
               excludeRoles={[UserRole.Admin]}
             >
               {item.label}
@@ -152,7 +151,6 @@ export default function Header() {
               to={item.to}
               className={`mobile-link ${pathname === item.to ? 'is-active' : ''}`}
               onClick={closeMenu}
-              authOnly
               excludeRoles={[UserRole.Admin]}
             >
               {item.label}

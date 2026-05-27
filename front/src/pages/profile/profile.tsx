@@ -1,13 +1,27 @@
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { toast } from 'sonner';
 import { ApiContext } from '../../contexts/apiContext';
 import { useAuth } from '../../contexts/authContext';
 import { taskService } from '../../services/taskService';
+import { subscriptionService } from '../../services/subscriptionService';
+import { userService } from '../../services/userService';
 import type { Task } from '../../types/generation/task';
+import type { Subscription } from '../../types/subscription/subscription';
 import { ContentType } from '../../types/generation/content';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { VideoResultModal } from '../../components/modals/videoResultModal';
+import { paths } from '../../routes/paths';
 import '../../styles/Profile.css';
+
+const API_BASE_URL = 'http://localhost:5014';
+
+function resolveAvatarUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${API_BASE_URL}${url}`;
+}
 
 function formatRole(role: string) {
     return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
@@ -43,14 +57,18 @@ function formatTaskStatus(status: Task['status']) {
 
 export default function Profile() {
     const { api } = useContext(ApiContext)!;
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
     const [preview, setPreview] = useState<{ type: ContentType; url: string } | null>(null);
     const [taskSearch, setTaskSearch] = useState<string>('');
     const [allTasks, setAllTasks] = useState<Task[]>([]);
+    const [subscription, setSubscription] = useState<Subscription | null>(null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         if (!user?.id) return;
         taskService.getByUserId(api, user.id).then(setAllTasks).catch(() => setAllTasks([]));
+        subscriptionService.getMine(api).then(setSubscription).catch(() => setSubscription(null));
     }, [api, user?.id]);
 
     const userTasks = useMemo(() => {
@@ -59,29 +77,126 @@ export default function Profile() {
         return allTasks.filter((t) => t.id.toLowerCase().includes(term));
     }, [allTasks, taskSearch]);
 
+    const stats = useMemo(() => ({
+        total: allTasks.length,
+        completed: allTasks.filter((t) => t.status === 'Success').length,
+        pending: allTasks.filter((t) => t.status === 'Pending').length,
+    }), [allTasks]);
+
     if (!user) {
         return null;
     }
 
+    const displayName = user.username || user.email?.split('@')[0] || 'User';
     const displayEmail = user.email || `${user.username}@movyai.app`;
     const registerDateFormatted = formatRegisterDate(user.registerDate);
+    const plan = subscription?.plan ?? 'Starter';
+    const initial = displayName.charAt(0).toUpperCase();
+    const avatarSrc = resolveAvatarUrl(user.avatarUrl);
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        e.target.value = '';
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image too large (max 2MB)');
+            return;
+        }
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+            toast.error('Only JPEG, PNG, WEBP allowed');
+            return;
+        }
+
+        try {
+            setUploadingAvatar(true);
+            const updated = await userService.uploadAvatar(api, file);
+            updateUser({ avatarUrl: updated.avatarUrl });
+            toast.success('Avatar updated');
+        } catch {
+            toast.error('Upload failed');
+        } finally {
+            setUploadingAvatar(false);
+        }
+    };
 
     return (
         <div className="page-wrapper profile-wrapper">
             <h1 className="page-title profile-title">My Profile</h1>
-            <div className="profile-card">
-                <div className="profile-content">
-                    <Icon icon="solar:user-circle-bold" width="80" color="#8b5cf6" />
-                    <div>
-                        <h2 className="profile-name">{user.username}</h2>
-                        <p className="profile-email">{displayEmail}</p>
-                        <span className="profile-role">Role: {formatRole(user.role)}</span>
-                        {registerDateFormatted && (
-                            <p className="profile-register-date">
-                                Member since: {registerDateFormatted}
-                            </p>
+
+            <div className="profile-card profile-card--hero">
+                <button
+                    type="button"
+                    className="profile-avatar profile-avatar--clickable"
+                    onClick={handleAvatarClick}
+                    disabled={uploadingAvatar}
+                    aria-label="Change profile photo"
+                    title="Click to change photo"
+                >
+                    {avatarSrc ? (
+                        <img src={avatarSrc} alt="" className="profile-avatar-img" />
+                    ) : (
+                        <span>{initial}</span>
+                    )}
+                    <span className="profile-avatar-overlay" aria-hidden>
+                        <Icon icon={uploadingAvatar ? 'mdi:loading' : 'mdi:camera-outline'} width={26} className={uploadingAvatar ? 'profile-avatar-spinner' : ''} />
+                    </span>
+                </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarChange}
+                />
+                <div className="profile-info">
+                    <h2 className="profile-name">{displayName}</h2>
+                    <p className="profile-email">
+                        <Icon icon="mdi:email-outline" width={16} />
+                        {displayEmail}
+                    </p>
+                    <div className="profile-badges">
+                        <span className={`profile-badge profile-badge--role-${user.role.toLowerCase()}`}>
+                            {formatRole(user.role)}
+                        </span>
+                        <span className={`profile-badge profile-badge--plan-${plan.toLowerCase()}`}>
+                            {plan}
+                        </span>
+                        {user.isEmailVerified ? (
+                            <span className="profile-badge profile-badge--verified">
+                                <Icon icon="mdi:check-circle" width={14} /> Verified
+                            </span>
+                        ) : (
+                            <Link to={paths.verifyEmail} className="profile-badge profile-badge--unverified profile-badge--clickable" title="Click to verify your email">
+                                <Icon icon="mdi:alert-circle-outline" width={14} /> Unverified
+                            </Link>
                         )}
                     </div>
+                    {registerDateFormatted && (
+                        <p className="profile-register-date">
+                            <Icon icon="mdi:calendar-outline" width={14} />
+                            Member since {registerDateFormatted}
+                        </p>
+                    )}
+                </div>
+            </div>
+
+            <div className="profile-stats">
+                <div className="profile-stat">
+                    <span className="profile-stat-value">{stats.total}</span>
+                    <span className="profile-stat-label">Total tasks</span>
+                </div>
+                <div className="profile-stat">
+                    <span className="profile-stat-value profile-stat-value--success">{stats.completed}</span>
+                    <span className="profile-stat-label">Completed</span>
+                </div>
+                <div className="profile-stat">
+                    <span className="profile-stat-value profile-stat-value--pending">{stats.pending}</span>
+                    <span className="profile-stat-label">Pending</span>
                 </div>
             </div>
 

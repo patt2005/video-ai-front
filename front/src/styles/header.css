@@ -4,7 +4,9 @@
   z-index: 100;
   flex-shrink: 0;
   min-height: 56px;
-  background: transparent;
+  background: var(--header-bg, rgba(15, 15, 15, 0.85));
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
   border-bottom: 1px solid var(--header-border, rgba(255, 255, 255, 0.08));
   box-shadow: none;
   transition: background-color 0.3s, border-color 0.3s;

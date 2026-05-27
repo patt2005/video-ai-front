@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { object, string, ref, ValidationError } from 'yup';
 import { useAuth } from '../../contexts/authContext';
@@ -34,6 +34,15 @@ export default function SignUp() {
     const [codeError, setCodeError] = useState('');
     const [sending, setSending] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
+
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const id = setInterval(() => {
+            setResendCooldown((s) => (s <= 1 ? 0 : s - 1));
+        }, 1000);
+        return () => clearInterval(id);
+    }, [resendCooldown]);
 
     const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,6 +67,7 @@ export default function SignUp() {
         try {
             await authService.sendVerificationCode(api, email);
             setStep('code');
+            setResendCooldown(60);
         } catch {
             setErrors({ form: 'Failed to send verification code. Please try again.' });
         } finally {
@@ -94,10 +104,12 @@ export default function SignUp() {
     };
 
     const handleResend = async () => {
+        if (resendCooldown > 0) return;
         setCodeError('');
         setSending(true);
         try {
             await authService.sendVerificationCode(api, email);
+            setResendCooldown(60);
         } catch {
             setCodeError('Failed to resend code. Please try again.');
         } finally {
@@ -253,16 +265,19 @@ export default function SignUp() {
                                     <button
                                         type="button"
                                         className="login-link"
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                         onClick={handleResend}
-                                        disabled={sending}
+                                        disabled={sending || resendCooldown > 0}
                                     >
-                                        {sending ? 'Resending…' : "Didn't receive a code? Resend"}
+                                        {sending
+                                            ? 'Resending…'
+                                            : resendCooldown > 0
+                                                ? `Resend in ${resendCooldown}s`
+                                                : "Didn't receive a code? Resend"}
                                     </button>
+                                    <span className="signup-links-separator" aria-hidden />
                                     <button
                                         type="button"
                                         className="login-link"
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                                         onClick={() => { setStep('form'); setCode(''); setCodeError(''); }}
                                     >
                                         Change email
