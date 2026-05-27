@@ -1,12 +1,15 @@
-using VideoBackend.Domain.Entities.User;
+using VideoBackend.Domain.Dtos.User;
+using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.BusinessLayer.Interfaces;
 
 public interface IUserAction
 {
-    IEnumerable<User> GetAllUsers();
-    User? GetUserById(Guid id);
-    User CreateUser(User user);
-    User? UpdateUser(Guid id, User request);
-    bool DeleteUser(Guid id);
+    Task<List<UserDto>> GetAllUserActionExecution();
+    Task<UserDto?> GetUserByIdActionExecution(Guid id);
+    Task<UserDto?> UpdateUserActionExecution(Guid id, UserDto dto, string? newPassword);
+    Task<UserDto?> UpdateUserRoleActionExecution(Guid id, UserRole newRole);
+    Task<bool> DeleteUserActionExecution(Guid id);
+    Task<LoginResponseDto?> LoginActionExecution(LoginDto dto);
+    Task<UserDto?> RegisterActionExecution(RegisterDto dto);
 }

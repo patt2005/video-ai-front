@@ -1,63 +1,95 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
-using VideoBackend.Domain.Entities.User;
+using VideoBackend.DataAccessLayer.Context;
+using VideoBackend.Domain.Dtos.User;
+using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "Admin")]
 public class UserController : ControllerBase
 {
-    internal IUserAction _userAction;
+    private readonly IUserAction _user;
 
-    public UserController()
+    public UserController(
+        UserContext userContext,
+        TaskContext taskContext,
+        ExploreVideoContext videoContext,
+        IConfiguration configuration)
     {
-        var bl = new BusinessLogic();
-        _userAction = bl.UserAction();
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
+        _user = bl.UserAction();
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var users = _userAction.GetAllUsers();
+        var users = await _user.GetAllUserActionExecution();
         return Ok(users);
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var user = _userAction.GetUserById(id);
-        if (user is null)
-            return NotFound();
-
+        var user = await _user.GetUserByIdActionExecution(id);
+        if (user is null) return NotFound();
         return Ok(user);
     }
 
-    [HttpPost]
-    public IActionResult Create([FromBody] User user)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserRequest request)
     {
-        var created = _userAction.CreateUser(user);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        var updated = await _user.UpdateUserActionExecution(id, request.User, request.NewPassword);
+        if (updated is null) return NotFound();
+        return Ok(updated);
     }
 
-    [HttpPut("{id:guid}")]
-    public IActionResult Update(Guid id, [FromBody] User request)
+    [HttpPatch("{id:guid}/role")]
+    public async Task<IActionResult> UpdateRole(Guid id, [FromBody] UpdateRoleRequest request)
     {
-        var updated = _userAction.UpdateUser(id, request);
-        if (updated is null)
-            return NotFound();
-
+        var updated = await _user.UpdateUserRoleActionExecution(id, request.Role);
+        if (updated is null) return NotFound();
         return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var deleted = _userAction.DeleteUser(id);
-        if (!deleted)
-            return NotFound();
-
+        var deleted = await _user.DeleteUserActionExecution(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
+
+    [HttpPost("Login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    {
+        var response = await _user.LoginActionExecution(dto);
+        if (response is null) return Unauthorized("Invalid email or password");
+        return Ok(response);
+    }
+
+    [HttpPost("Register")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    {
+        var created = await _user.RegisterActionExecution(dto);
+        if (created is null) return Conflict("Email already is taken");
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+    }
+}
+
+public class UpdateUserRequest
+{
+    public UserDto User { get; set; } = new();
+    public string? NewPassword { get; set; }
+}
+
+public class UpdateRoleRequest
+{
+    public UserRole Role { get; set; }
 }

@@ -1,13 +1,12 @@
-using VideoBackend.Domain.Entities.Video;
-using VideoBackend.Domain.Models.Video;
+using VideoBackend.Domain.Dtos.Video;
 
 namespace VideoBackend.BusinessLayer.Interfaces;
 
 public interface IExploreVideoAction
 {
-    IEnumerable<ExploreVideo> GetAllVideos();
-    ExploreVideo? GetVideoById(Guid id);
-    ExploreVideo CreateVideo(ExploreVideoDto dto);
-    ExploreVideo? UpdateVideo(Guid id, ExploreVideo request);
-    bool DeleteVideo(Guid id);
+    Task<List<ExploreVideoDto>> GetAllExploreVideoActionExecution();
+    Task<ExploreVideoDto?> GetExploreVideoByIdActionExecution(Guid id);
+    Task<ExploreVideoDto> CreateExploreVideoActionExecution(ExploreVideoDto dto);
+    Task<ExploreVideoDto?> UpdateExploreVideoActionExecution(Guid id, ExploreVideoDto dto);
+    Task<bool> DeleteExploreVideoActionExecution(Guid id);
 }

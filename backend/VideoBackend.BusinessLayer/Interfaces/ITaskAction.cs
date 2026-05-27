@@ -1,12 +1,12 @@
-using EntityTask = VideoBackend.Domain.Entities.Task.Task;
+using VideoBackend.Domain.Dtos.Task;
 
 namespace VideoBackend.BusinessLayer.Interfaces;
 
 public interface ITaskAction
 {
-    IEnumerable<EntityTask> GetAllTasks();
-    EntityTask? GetTaskById(Guid id);
-    EntityTask CreateTask(EntityTask task);
-    EntityTask? UpdateTask(Guid id, EntityTask request);
-    bool DeleteTask(Guid id);
+    Task<List<TaskDto>> GetAllTaskActionExecution();
+    Task<TaskDto?> GetTaskByIdActionExecution(Guid id);
+    Task<TaskDto> CreateTaskActionExecution(TaskDto dto);
+    Task<TaskDto?> UpdateTaskActionExecution(Guid id, TaskDto dto);
+    Task<bool> DeleteTaskActionExecution(Guid id);
 }

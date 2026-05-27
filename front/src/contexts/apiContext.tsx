@@ -19,19 +19,34 @@ export function ApiProvider({ children }: ApiProviderProps) {
 
         instance.interceptors.request.use((config) => {
             config.headers['Content-Type'] = 'application/json';
+
+            const token = localStorage.getItem('token');
+            if (token) {
+                config.headers['Authorization'] = `Bearer ${token}`;
+            }
+
             return config;
         });
 
         instance.interceptors.response.use(
             (response) => response,
             (error: AxiosError) => {
+                if (error.response?.status === 401) {
+                    const requestUrl = error.config?.url ?? '';
+                    const isLoginRequest = requestUrl.includes('/Login');
+                    if (!isLoginRequest) {
+                        localStorage.removeItem('token');
+                        window.location.href = '/login';
+                    }
+                }
                 if (error.response?.status === 500) {
                     console.error('[API] Internal server error (500):', error);
-                    console.error('A apărut o eroare internă pe server.');
                 }
                 return Promise.reject(error);
             }
-        );
+        
+
+    );
 
         return instance;
     }, []);

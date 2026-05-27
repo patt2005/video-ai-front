@@ -25,7 +25,8 @@ export default function Login() {
 
         try {
             await loginSchema.validate(payload, { abortEarly: false });
-            const success = login(email, password);
+            
+            const success = await login (email, password);
             if (success) {
                 navigate(paths.root, { replace: true });
             } else {
@@ -56,7 +57,7 @@ export default function Login() {
 
             <div className="login-card">
                 <div className="login-card-head">
-                    <h2 className="login-card-title">Sign in</h2>
+                    <h2 className="login-card-title">Log in</h2>
                 </div>
 
                 <form className="login-form" onSubmit={handleSubmit}>
@@ -108,7 +109,7 @@ export default function Login() {
                             Forgot password?
                         </button>
                         <button className="login-primary" type="submit">
-                            Sign In
+                            Log in
                         </button>
                     </div>
                 </form>

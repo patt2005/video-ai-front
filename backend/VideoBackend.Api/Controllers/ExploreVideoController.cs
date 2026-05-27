@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
-using VideoBackend.Domain.Entities.Video;
-using VideoBackend.Domain.Models.Video;
+using VideoBackend.DataAccessLayer.Context;
+using VideoBackend.Domain.Dtos.Video;
 
 namespace VideoBackend.Api.Controllers;
 
@@ -10,55 +10,53 @@ namespace VideoBackend.Api.Controllers;
 [Route("api/[controller]")]
 public class ExploreVideoController : ControllerBase
 {
-    internal IExploreVideoAction _exploreVideoAction;
+    private readonly IExploreVideoAction _video;
 
-    public ExploreVideoController()
+    public ExploreVideoController(
+        UserContext userContext,
+        TaskContext taskContext,
+        ExploreVideoContext videoContext,
+        IConfiguration configuration)
     {
-        var bl = new BusinessLogic();
-        _exploreVideoAction = bl.ExploreVideoAction();
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
+        _video = bl.ExploreVideoAction();
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var videos = _exploreVideoAction.GetAllVideos();
+        var videos = await _video.GetAllExploreVideoActionExecution();
         return Ok(videos);
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var video = _exploreVideoAction.GetVideoById(id);
-        if (video is null)
-            return NotFound();
-
+        var video = await _video.GetExploreVideoByIdActionExecution(id);
+        if (video is null) return NotFound();
         return Ok(video);
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] ExploreVideoDto dto)
+    public async Task<IActionResult> Create([FromBody] ExploreVideoDto dto)
     {
-        var created = _exploreVideoAction.CreateVideo(dto);
+        var created = await _video.CreateExploreVideoActionExecution(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:guid}")]
-    public IActionResult Update(Guid id, [FromBody] ExploreVideo request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] ExploreVideoDto dto)
     {
-        var updated = _exploreVideoAction.UpdateVideo(id, request);
-        if (updated is null)
-            return NotFound();
-
+        var updated = await _video.UpdateExploreVideoActionExecution(id, dto);
+        if (updated is null) return NotFound();
         return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var deleted = _exploreVideoAction.DeleteVideo(id);
-        if (!deleted)
-            return NotFound();
-
+        var deleted = await _video.DeleteExploreVideoActionExecution(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
 }

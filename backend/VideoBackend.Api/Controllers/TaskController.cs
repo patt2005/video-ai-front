@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
-using EntityTask = VideoBackend.Domain.Entities.Task.Task;
+using VideoBackend.DataAccessLayer.Context;
+using VideoBackend.Domain.Dtos.Task;
 
 namespace VideoBackend.Api.Controllers;
 
@@ -9,55 +10,53 @@ namespace VideoBackend.Api.Controllers;
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    internal ITaskAction _taskAction;
+    private readonly ITaskAction _task;
 
-    public TaskController()
+    public TaskController(
+        UserContext userContext,
+        TaskContext taskContext,
+        ExploreVideoContext videoContext,
+        IConfiguration configuration)
     {
-        var bl = new BusinessLogic();
-        _taskAction = bl.TaskAction();
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
+        _task = bl.TaskAction();
     }
 
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<IActionResult> GetAll()
     {
-        var tasks = _taskAction.GetAllTasks();
+        var tasks = await _task.GetAllTaskActionExecution();
         return Ok(tasks);
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var task = _taskAction.GetTaskById(id);
-        if (task is null)
-            return NotFound();
-
+        var task = await _task.GetTaskByIdActionExecution(id);
+        if (task is null) return NotFound();
         return Ok(task);
     }
 
     [HttpPost]
-    public IActionResult Create([FromBody] EntityTask task)
+    public async Task<IActionResult> Create([FromBody] TaskDto dto)
     {
-        var created = _taskAction.CreateTask(task);
+        var created = await _task.CreateTaskActionExecution(dto);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:guid}")]
-    public IActionResult Update(Guid id, [FromBody] EntityTask request)
+    public async Task<IActionResult> Update(Guid id, [FromBody] TaskDto dto)
     {
-        var updated = _taskAction.UpdateTask(id, request);
-        if (updated is null)
-            return NotFound();
-
+        var updated = await _task.UpdateTaskActionExecution(id, dto);
+        if (updated is null) return NotFound();
         return Ok(updated);
     }
 
     [HttpDelete("{id:guid}")]
-    public IActionResult Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var deleted = _taskAction.DeleteTask(id);
-        if (!deleted)
-            return NotFound();
-
+        var deleted = await _task.DeleteTaskActionExecution(id);
+        if (!deleted) return NotFound();
         return NoContent();
     }
 }
