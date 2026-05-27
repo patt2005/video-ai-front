@@ -9,4 +9,5 @@ public class UserDto
     public string Email { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public DateTime? RegisterDate { get; set; }
+    public bool IsBlocked { get; set; }
 }

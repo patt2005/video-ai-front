@@ -130,6 +130,18 @@ export default function Admin() {
         }
     };
 
+    const toggleBlock = async (user: User) => {
+        try {
+            const updated = user.isBlocked
+                ? await userService.unblockUser(api, user.id)
+                : await userService.blockUser(api, user.id);
+            setAllUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
+            toast.success(updated.isBlocked ? `Blocked ${user.username}` : `Unblocked ${user.username}`);
+        } catch {
+            toast.error('Failed to update block status');
+        }
+    };
+
     const toggleExpand = (userId: string) => {
         setExpandedUserId((prev) => (prev === userId ? null : userId));
     };
@@ -242,7 +254,12 @@ export default function Admin() {
                                             </button>
                                         </td>
                                         <td>{user.id}</td>
-                                        <td>{user.username}</td>
+                                        <td>
+                                            <span className="admin-username">{user.username}</span>
+                                            {user.isBlocked && (
+                                                <span className="admin-status-badge admin-status-badge--blocked">Blocked</span>
+                                            )}
+                                        </td>
                                         <td>{user.email ?? '—'}</td>
                                         <td>{formatRegisterDate(user.registerDate)}</td>
                                         <td>
@@ -256,7 +273,14 @@ export default function Admin() {
                                                 <option value={UserRole.User}>User</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td className="admin-actions-cell">
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleBlock(user)}
+                                                className={`admin-block-btn ${user.isBlocked ? 'admin-block-btn--unblock' : ''}`}
+                                            >
+                                                {user.isBlocked ? 'Unblock' : 'Block'}
+                                            </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setUserToDelete(user)}

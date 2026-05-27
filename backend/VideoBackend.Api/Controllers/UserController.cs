@@ -56,6 +56,22 @@ public class UserController : ControllerBase
         return Ok(updated);
     }
 
+    [HttpPatch("{id:guid}/block")]
+    public async Task<IActionResult> Block(Guid id)
+    {
+        var updated = await _user.BlockUserActionExecution(id);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
+    [HttpPatch("{id:guid}/unblock")]
+    public async Task<IActionResult> Unblock(Guid id)
+    {
+        var updated = await _user.UnblockUserActionExecution(id);
+        if (updated is null) return NotFound();
+        return Ok(updated);
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {

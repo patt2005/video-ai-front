@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Read(//Users/silviu/Documents/video-ai-front/front/**)",
+      "Bash(grep -rln \"from.*user/user\" src/)",
+      "Bash(grep -rn \"id:.*number\" src/_mock/)",
+      "Bash(git -C /Users/silviu/Documents/video-ai-front/backend diff --stat)",
+      "Bash(git *)",
+      "Bash(dotnet build *)"
     ]
   }
 }

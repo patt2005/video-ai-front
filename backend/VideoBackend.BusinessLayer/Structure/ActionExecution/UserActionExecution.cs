@@ -24,6 +24,12 @@ public class UserActionExecution : UserAction, IUserAction
     public Task<UserDto?> UpdateUserRoleActionExecution(Guid id, UserRole newRole)
         => UpdateUserRoleAction(id, newRole);
 
+    public Task<UserDto?> BlockUserActionExecution(Guid id)
+        => BlockUserAction(id);
+
+    public Task<UserDto?> UnblockUserActionExecution(Guid id)
+        => UnblockUserAction(id);
+
     public Task<bool> DeleteUserActionExecution(Guid id)
         => DeleteUserAction(id);
 
