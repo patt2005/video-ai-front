@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
+using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Models.Image;
 
 namespace VideoBackend.Api.Controllers;
@@ -11,9 +12,13 @@ public class ImageController : ControllerBase
 {
     internal IImageAction _imageAction;
 
-    public ImageController()
+    public ImageController(
+        UserContext userContext,
+        TaskContext taskContext,
+        ExploreVideoContext videoContext,
+        IConfiguration configuration)
     {
-        var bl = new BusinessLogic();
+        var bl = new BusinessLogic(userContext, taskContext, videoContext, configuration);
         _imageAction = bl.ImageAction();
     }
 

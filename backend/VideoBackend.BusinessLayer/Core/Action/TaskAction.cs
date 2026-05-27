@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.Task;
 using EntityTask = VideoBackend.Domain.Entities.Task.Task;
-using TaskStatus = VideoBackend.Domain.Enums.TaskStatus;
 
 namespace VideoBackend.BusinessLayer.Core.Action;
 
