@@ -4,6 +4,7 @@ using VideoBackend.BusinessLayer;
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.User;
+using System.ComponentModel.DataAnnotations;
 using VideoBackend.Domain.Enums;
 
 namespace VideoBackend.Api.Controllers;
@@ -118,6 +119,29 @@ public class UserController : ControllerBase
     {
         var ok = await _user.VerifyEmailActionExecution(dto.Token);
         if (!ok) return BadRequest(new { error = "Invalid or expired verification token" });
+        return Ok(new { verified = true });
+    }
+
+    [HttpPost("SendCode")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SendCode([FromBody] SendVerificationCodeDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email))
+            return BadRequest(new { error = "Email is required" });
+
+        await _user.SendVerificationCodeActionExecution(dto.Email);
+        return Ok(new { sent = true });
+    }
+
+    [HttpPost("VerifyCode")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyCode([FromBody] VerifyCodeDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Code))
+            return BadRequest(new { error = "Email and code are required" });
+
+        var ok = await _user.VerifyCodeActionExecution(dto.Email, dto.Code);
+        if (!ok) return BadRequest(new { error = "Invalid or expired code" });
         return Ok(new { verified = true });
     }
 }

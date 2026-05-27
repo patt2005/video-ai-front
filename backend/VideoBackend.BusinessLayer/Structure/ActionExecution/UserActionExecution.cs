@@ -44,4 +44,10 @@ public class UserActionExecution : UserAction, IUserAction
 
     public Task<bool> VerifyEmailActionExecution(string token)
         => VerifyEmailAction(token);
+
+    public Task SendVerificationCodeActionExecution(string email)
+        => SendVerificationCodeAction(email);
+
+    public Task<bool> VerifyCodeActionExecution(string email, string code)
+        => VerifyCodeAction(email, code);
 }

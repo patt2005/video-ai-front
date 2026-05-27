@@ -37,4 +37,17 @@ export const authService = {
     async verifyEmail(api: AxiosInstance, token: string): Promise<void> {
         await api.post('/api/User/VerifyEmail', { token });
     },
+
+    async sendVerificationCode(api: AxiosInstance, email: string): Promise<void> {
+        await api.post('/api/User/SendCode', { email });
+    },
+
+    async verifyCode(api: AxiosInstance, email: string, code: string): Promise<boolean> {
+        try {
+            await api.post('/api/User/VerifyCode', { email, code });
+            return true;
+        } catch {
+            return false;
+        }
+    },
 };

@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using VideoBackend.Domain.Entities.User;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -240,6 +241,41 @@ public class UserAction
         var bytes = new byte[64];
         RandomNumberGenerator.Fill(bytes);
         return Convert.ToBase64String(bytes);
+    }
+
+    protected async Task SendVerificationCodeAction(string email)
+    {
+        // Invalidate any previous unused codes for this email
+        var existing = _context.EmailVerificationCodes
+            .Where(c => c.Email == email && !c.Used && c.ExpiresAt > DateTime.UtcNow);
+        foreach (var c in existing) c.Used = true;
+
+        var code = Random.Shared.Next(100000, 999999).ToString();
+        _context.EmailVerificationCodes.Add(new EmailVerificationCode
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            Code = code,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            CreatedAt = DateTime.UtcNow,
+            Used = false
+        });
+        await _context.SaveChangesAsync();
+        await _emailSender.SendVerificationCodeAsync(email, code);
+    }
+
+    protected async Task<bool> VerifyCodeAction(string email, string code)
+    {
+        var stored = await _context.EmailVerificationCodes
+            .Where(c => c.Email == email && c.Code == code && !c.Used && c.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(c => c.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (stored is null) return false;
+
+        stored.Used = true;
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     protected async Task<UserDto?> RegisterAction(RegisterDto dto)

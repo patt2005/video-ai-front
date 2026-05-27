@@ -16,4 +16,6 @@ public interface IUserAction
     Task<LoginResponseDto?> RefreshActionExecution(string refreshToken);
     Task<UserDto?> RegisterActionExecution(RegisterDto dto);
     Task<bool> VerifyEmailActionExecution(string token);
+    Task SendVerificationCodeActionExecution(string email);
+    Task<bool> VerifyCodeActionExecution(string email, string code);
 }

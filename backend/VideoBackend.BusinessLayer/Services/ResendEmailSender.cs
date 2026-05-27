@@ -20,6 +20,40 @@ public class ResendEmailSender : IEmailSender
         _appBaseUrl = configuration["App:BaseUrl"] ?? "http://localhost:5173";
     }
 
+    public async Task SendVerificationCodeAsync(string toEmail, string code)
+    {
+        if (string.IsNullOrEmpty(_apiKey))
+        {
+            Console.WriteLine($"[EMAIL FALLBACK] Resend not configured. Verification code for {toEmail}: {code}");
+            return;
+        }
+
+        var html = $@"
+<div style=""font-family:sans-serif;max-width:480px;margin:0 auto"">
+  <h2 style=""color:#7c3aed"">Your MovyAI verification code</h2>
+  <p style=""font-size:15px"">Use the code below to verify your email address. It expires in 10 minutes.</p>
+  <div style=""font-size:40px;font-weight:bold;letter-spacing:10px;text-align:center;padding:24px 0;color:#111"">{code}</div>
+  <p style=""font-size:13px;color:#888"">If you didn't request this, you can safely ignore this email.</p>
+</div>";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Content = new StringContent(JsonSerializer.Serialize(new
+        {
+            from = _fromEmail,
+            to = new[] { toEmail },
+            subject = "Your MovyAI verification code",
+            html
+        }), Encoding.UTF8, "application/json");
+
+        var response = await _http.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[EMAIL ERROR] Resend returned {response.StatusCode}: {body}");
+        }
+    }
+
     public async Task SendVerificationEmailAsync(string toEmail, string token)
     {
         var link = $"{_appBaseUrl}/verify-email?token={Uri.EscapeDataString(token)}";

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
@@ -28,7 +28,19 @@ export default function Video() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [resultModalOpen, setResultModalOpen] = useState(false);
   const [resultVideoUrl, setResultVideoUrl] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleGenerateClick = async () => {
     if (!prompt.trim()) {
@@ -118,35 +130,6 @@ export default function Video() {
           </p>
         </header>
 
-        <div className="video-page-options">
-          <div className="video-page-option-group">
-            {MODELS.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                className={`video-option-pill${selectedModel === m.id ? ' video-option-pill--active' : ''}`}
-                onClick={() => setSelectedModel(m.id)}
-                disabled={isGenerating}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-          <div className="video-page-option-group">
-            {ASPECT_RATIOS.map((r) => (
-              <button
-                key={r}
-                type="button"
-                className={`video-option-pill${selectedRatio === r ? ' video-option-pill--active' : ''}`}
-                onClick={() => setSelectedRatio(r)}
-                disabled={isGenerating}
-              >
-                {r}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="video-page-panel-inner">
           <div className="video-page-panel-bar">
             <input
@@ -185,6 +168,52 @@ export default function Video() {
                 <Icon icon="mdi:plus" width={22} height={22} />
               </button>
             )}
+            <div className="video-settings-wrap" ref={settingsRef}>
+              <button
+                type="button"
+                className="video-settings-btn"
+                onClick={() => setSettingsOpen((o) => !o)}
+                aria-label="Video settings"
+                disabled={isGenerating}
+              >
+                <Icon icon="mdi:tune-variant" width={18} />
+                <span className="video-settings-btn-label">
+                  {MODELS.find((m) => m.id === selectedModel)?.label} · {selectedRatio}
+                </span>
+                <Icon icon="mdi:chevron-down" width={14} className={`video-settings-chevron${settingsOpen ? ' video-settings-chevron--open' : ''}`} />
+              </button>
+              {settingsOpen && (
+                <div className="video-settings-popup">
+                  <p className="video-settings-popup-label">Model</p>
+                  <div className="video-settings-popup-row">
+                    {MODELS.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`video-option-pill${selectedModel === m.id ? ' video-option-pill--active' : ''}`}
+                        onClick={() => setSelectedModel(m.id)}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="video-settings-popup-label">Aspect ratio</p>
+                  <div className="video-settings-popup-row">
+                    {ASPECT_RATIOS.map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        className={`video-option-pill${selectedRatio === r ? ' video-option-pill--active' : ''}`}
+                        onClick={() => setSelectedRatio(r)}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <input
               type="text"
               className="video-page-panel-input"
