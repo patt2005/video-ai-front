@@ -15,6 +15,7 @@ namespace VideoBackend.Api.Controllers;
 public class SubscriptionController : ControllerBase
 {
     private readonly ISubscriptionAction _subscription;
+    private readonly IConfiguration _configuration;
 
     public SubscriptionController(
         UserContext userContext,
@@ -25,6 +26,20 @@ public class SubscriptionController : ControllerBase
     {
         var bl = new BusinessLogic(userContext, taskContext, videoContext, subscriptionContext, configuration);
         _subscription = bl.SubscriptionAction();
+        _configuration = configuration;
+    }
+
+    [HttpGet("config")]
+    [AllowAnonymous]
+    public IActionResult GetPaddleConfig()
+    {
+        return Ok(new PaddleConfigDto
+        {
+            Environment = _configuration["Paddle:Environment"] ?? "sandbox",
+            ClientToken = _configuration["Paddle:ClientToken"] ?? string.Empty,
+            PriceProId = _configuration["Paddle:PricePro"] ?? string.Empty,
+            PriceUltraId = _configuration["Paddle:PriceUltra"] ?? string.Empty
+        });
     }
 
     [HttpGet]
@@ -59,8 +74,36 @@ public class SubscriptionController : ControllerBase
         var userId = GetCurrentUserId();
         if (userId is null) return Unauthorized();
 
+        if (dto.Plan != VideoBackend.Domain.Enums.SubscriptionPlan.Starter)
+            return BadRequest(new { error = "Paid plans must be activated via Paddle checkout" });
+
         var sub = await _subscription.SubscribeActionExecution(userId.Value, dto.Plan);
         return Ok(sub);
+    }
+
+    [HttpPost("sync")]
+    public async Task<IActionResult> Sync([FromBody] SyncSubscriptionDto dto)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        if (string.IsNullOrWhiteSpace(dto.PaddleSubscriptionId))
+            return BadRequest(new { error = "PaddleSubscriptionId is required" });
+
+        var sub = await _subscription.SyncFromPaddleActionExecution(userId.Value, dto.PaddleSubscriptionId);
+        if (sub is null) return BadRequest(new { error = "Could not sync subscription from Paddle" });
+        return Ok(sub);
+    }
+
+    [HttpPatch("me/cancel")]
+    public async Task<IActionResult> CancelMine()
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var ok = await _subscription.CancelMyActionExecution(userId.Value);
+        if (!ok) return BadRequest(new { error = "No active subscription to cancel" });
+        return Ok(new { cancelled = true });
     }
 
     [HttpPatch("{id:guid}/cancel")]

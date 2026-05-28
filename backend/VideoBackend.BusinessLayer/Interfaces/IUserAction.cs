@@ -20,4 +20,6 @@ public interface IUserAction
     Task<bool> VerifyCodeActionExecution(string email, string code);
     Task<UserDto?> UploadAvatarActionExecution(Guid userId, string avatarUrl);
     Task<bool> ResendVerificationEmailActionExecution(Guid userId);
+    Task RequestPasswordResetActionExecution(string email);
+    Task<bool> ResetPasswordActionExecution(string token, string newPassword);
 }

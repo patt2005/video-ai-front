@@ -8,7 +8,7 @@ function authHeaders() {
 }
 
 export type VideoModel = 'Veo31Fast' | 'Veo31Lite' | 'Veo31Quality';
-export type VideoAspectRatio = '16:9' | '9:16' | '1:1' | '4:3';
+export type VideoAspectRatio = '16:9' | '9:16';
 
 export interface CreateVideoTaskParams {
     prompt: string;

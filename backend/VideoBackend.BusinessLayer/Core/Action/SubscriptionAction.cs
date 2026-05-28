@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Dtos.Subscription;
 using VideoBackend.Domain.Entities.Subscription;
@@ -9,25 +11,20 @@ namespace VideoBackend.BusinessLayer.Core.Action;
 public class SubscriptionAction
 {
     protected readonly SubscriptionContext _context;
+    protected readonly IPaddleService _paddle;
+    protected readonly IConfiguration _configuration;
 
-    public SubscriptionAction(SubscriptionContext context)
+    public SubscriptionAction(SubscriptionContext context, IPaddleService paddle, IConfiguration configuration)
     {
         _context = context;
+        _paddle = paddle;
+        _configuration = configuration;
     }
 
     protected async Task<List<SubscriptionDto>> GetAllSubscriptionAction()
     {
         return await _context.Subscriptions
-            .Select(s => new SubscriptionDto
-            {
-                Id = s.Id,
-                UserId = s.UserId,
-                Plan = s.Plan,
-                Status = s.Status,
-                StartDate = s.StartDate,
-                EndDate = s.EndDate,
-                CancelledAt = s.CancelledAt
-            })
+            .Select(s => ToDto(s))
             .ToListAsync();
     }
 
@@ -38,17 +35,7 @@ public class SubscriptionAction
             .OrderByDescending(x => x.StartDate)
             .FirstOrDefaultAsync();
 
-        if (s is null) return null;
-        return new SubscriptionDto
-        {
-            Id = s.Id,
-            UserId = s.UserId,
-            Plan = s.Plan,
-            Status = s.Status,
-            StartDate = s.StartDate,
-            EndDate = s.EndDate,
-            CancelledAt = s.CancelledAt
-        };
+        return s is null ? null : ToDto(s);
     }
 
     protected async Task<SubscriptionDto> SubscribeAction(Guid userId, SubscriptionPlan plan)
@@ -61,16 +48,7 @@ public class SubscriptionAction
         {
             existing.Plan = plan;
             await _context.SaveChangesAsync();
-            return new SubscriptionDto
-            {
-                Id = existing.Id,
-                UserId = existing.UserId,
-                Plan = existing.Plan,
-                Status = existing.Status,
-                StartDate = existing.StartDate,
-                EndDate = existing.EndDate,
-                CancelledAt = existing.CancelledAt
-            };
+            return ToDto(existing);
         }
 
         var entity = new Subscription
@@ -84,16 +62,7 @@ public class SubscriptionAction
         _context.Subscriptions.Add(entity);
         await _context.SaveChangesAsync();
 
-        return new SubscriptionDto
-        {
-            Id = entity.Id,
-            UserId = entity.UserId,
-            Plan = entity.Plan,
-            Status = entity.Status,
-            StartDate = entity.StartDate,
-            EndDate = entity.EndDate,
-            CancelledAt = entity.CancelledAt
-        };
+        return ToDto(entity);
     }
 
     protected async Task<SubscriptionDto?> SetUserPlanAction(Guid userId, SubscriptionPlan plan)
@@ -109,16 +78,7 @@ public class SubscriptionAction
             existing.CancelledAt = DateTime.UtcNow;
             existing.EndDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
-            return new SubscriptionDto
-            {
-                Id = existing.Id,
-                UserId = existing.UserId,
-                Plan = existing.Plan,
-                Status = existing.Status,
-                StartDate = existing.StartDate,
-                EndDate = existing.EndDate,
-                CancelledAt = existing.CancelledAt
-            };
+            return ToDto(existing);
         }
 
         return await SubscribeAction(userId, plan);
@@ -133,16 +93,137 @@ public class SubscriptionAction
         s.CancelledAt = DateTime.UtcNow;
         s.EndDate = DateTime.UtcNow;
         await _context.SaveChangesAsync();
-
-        return new SubscriptionDto
-        {
-            Id = s.Id,
-            UserId = s.UserId,
-            Plan = s.Plan,
-            Status = s.Status,
-            StartDate = s.StartDate,
-            EndDate = s.EndDate,
-            CancelledAt = s.CancelledAt
-        };
+        return ToDto(s);
     }
+
+    protected async Task<SubscriptionDto?> SyncFromPaddleAction(Guid userId, string paddleSubscriptionId)
+    {
+        var snapshot = await _paddle.GetSubscriptionAsync(paddleSubscriptionId);
+        if (snapshot is null) return null;
+
+        var plan = MapPriceToPlan(snapshot.PriceId);
+        if (plan is null)
+        {
+            Console.WriteLine($"[PADDLE] Unknown price id {snapshot.PriceId}");
+            return null;
+        }
+
+        return await UpsertFromPaddleAsync(userId, snapshot, plan.Value);
+    }
+
+    protected async Task<bool> CancelMyAction(Guid userId)
+    {
+        var s = await _context.Subscriptions
+            .Where(x => x.UserId == userId && x.Status == SubscriptionStatus.Active)
+            .OrderByDescending(x => x.StartDate)
+            .FirstOrDefaultAsync();
+
+        if (s is null) return false;
+
+        if (!string.IsNullOrEmpty(s.PaddleSubscriptionId))
+        {
+            var ok = await _paddle.CancelSubscriptionAsync(s.PaddleSubscriptionId);
+            if (!ok) return false;
+            s.CancelledAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        s.Status = SubscriptionStatus.Cancelled;
+        s.CancelledAt = DateTime.UtcNow;
+        s.EndDate = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    protected async Task ApplyPaddleWebhookAction(string eventType, PaddleSubscriptionSnapshot snapshot, Guid? userIdHint)
+    {
+        var existing = await _context.Subscriptions
+            .FirstOrDefaultAsync(x => x.PaddleSubscriptionId == snapshot.Id);
+
+        var userId = existing?.UserId ?? userIdHint;
+        if (userId is null) return;
+
+        var plan = MapPriceToPlan(snapshot.PriceId);
+
+        if (eventType.StartsWith("subscription.canceled", StringComparison.OrdinalIgnoreCase) && existing is not null)
+        {
+            existing.Status = SubscriptionStatus.Cancelled;
+            existing.CancelledAt = snapshot.CanceledAt ?? DateTime.UtcNow;
+            existing.EndDate = snapshot.CanceledAt ?? DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return;
+        }
+
+        if (plan is null) return;
+        await UpsertFromPaddleAsync(userId.Value, snapshot, plan.Value);
+    }
+
+    private async Task<SubscriptionDto> UpsertFromPaddleAsync(Guid userId, PaddleSubscriptionSnapshot snapshot, SubscriptionPlan plan)
+    {
+        var others = _context.Subscriptions
+            .Where(x => x.UserId == userId && x.Status == SubscriptionStatus.Active && x.PaddleSubscriptionId != snapshot.Id);
+        foreach (var o in others)
+        {
+            o.Status = SubscriptionStatus.Cancelled;
+            o.CancelledAt = DateTime.UtcNow;
+            o.EndDate = DateTime.UtcNow;
+        }
+
+        var existing = await _context.Subscriptions
+            .FirstOrDefaultAsync(x => x.PaddleSubscriptionId == snapshot.Id);
+
+        if (existing is null)
+        {
+            existing = new Subscription
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                StartDate = snapshot.StartedAt ?? DateTime.UtcNow,
+                PaddleSubscriptionId = snapshot.Id
+            };
+            _context.Subscriptions.Add(existing);
+        }
+
+        existing.Plan = plan;
+        existing.PaddleCustomerId = snapshot.CustomerId;
+        existing.NextBillDate = snapshot.NextBilledAt;
+        existing.Status = snapshot.Status switch
+        {
+            "canceled" => SubscriptionStatus.Cancelled,
+            "expired" => SubscriptionStatus.Expired,
+            _ => SubscriptionStatus.Active
+        };
+        if (existing.Status == SubscriptionStatus.Cancelled)
+        {
+            existing.CancelledAt = snapshot.CanceledAt ?? DateTime.UtcNow;
+            existing.EndDate = snapshot.CanceledAt ?? DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+        return ToDto(existing);
+    }
+
+    private SubscriptionPlan? MapPriceToPlan(string priceId)
+    {
+        if (string.IsNullOrEmpty(priceId)) return null;
+        if (string.Equals(priceId, _configuration["Paddle:PricePro"], StringComparison.Ordinal))
+            return SubscriptionPlan.Pro;
+        if (string.Equals(priceId, _configuration["Paddle:PriceUltra"], StringComparison.Ordinal))
+            return SubscriptionPlan.Ultra;
+        return null;
+    }
+
+    private static SubscriptionDto ToDto(Subscription s) => new()
+    {
+        Id = s.Id,
+        UserId = s.UserId,
+        Plan = s.Plan,
+        Status = s.Status,
+        StartDate = s.StartDate,
+        EndDate = s.EndDate,
+        CancelledAt = s.CancelledAt,
+        PaddleSubscriptionId = s.PaddleSubscriptionId,
+        NextBillDate = s.NextBillDate
+    };
 }

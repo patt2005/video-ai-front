@@ -100,7 +100,7 @@ export default function Login() {
                             <div className="li-field">
                                 <label htmlFor="li-password" className="li-label">
                                     Password
-                                    <button type="button" className="li-forgot">Forgot?</button>
+                                    <Link to={paths.forgotPassword} className="li-forgot">Forgot?</Link>
                                 </label>
                                 <div className={`li-input-wrap${errors.password ? ' li-input-error' : ''}`}>
                                     <span className="li-input-ico">

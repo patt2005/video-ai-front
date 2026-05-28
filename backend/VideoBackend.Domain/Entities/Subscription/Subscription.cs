@@ -12,4 +12,7 @@ public class Subscription
     public DateTime? EndDate { get; set; }
     public DateTime? CancelledAt { get; set; }
     public string? ExternalId { get; set; }
+    public string? PaddleSubscriptionId { get; set; }
+    public string? PaddleCustomerId { get; set; }
+    public DateTime? NextBillDate { get; set; }
 }

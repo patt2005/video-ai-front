@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using VideoBackend.BusinessLayer.Core.Action;
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
@@ -8,7 +9,8 @@ namespace VideoBackend.BusinessLayer.Structure.ActionExecution;
 
 public class SubscriptionActionExecution : SubscriptionAction, ISubscriptionAction
 {
-    public SubscriptionActionExecution(SubscriptionContext context) : base(context) { }
+    public SubscriptionActionExecution(SubscriptionContext context, IPaddleService paddle, IConfiguration configuration)
+        : base(context, paddle, configuration) { }
 
     public Task<List<SubscriptionDto>> GetAllSubscriptionActionExecution()
         => GetAllSubscriptionAction();
@@ -24,4 +26,13 @@ public class SubscriptionActionExecution : SubscriptionAction, ISubscriptionActi
 
     public Task<SubscriptionDto?> CancelSubscriptionActionExecution(Guid id)
         => CancelSubscriptionAction(id);
+
+    public Task<SubscriptionDto?> SyncFromPaddleActionExecution(Guid userId, string paddleSubscriptionId)
+        => SyncFromPaddleAction(userId, paddleSubscriptionId);
+
+    public Task<bool> CancelMyActionExecution(Guid userId)
+        => CancelMyAction(userId);
+
+    public Task ApplyPaddleWebhookActionExecution(string eventType, PaddleSubscriptionSnapshot snapshot, Guid? userIdHint)
+        => ApplyPaddleWebhookAction(eventType, snapshot, userIdHint);
 }

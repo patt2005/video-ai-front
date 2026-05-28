@@ -163,6 +163,32 @@ public class UserController : ControllerBase
         return Ok(new { verified = true });
     }
 
+    [HttpPost("ForgotPassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Email))
+            return BadRequest(new { error = "Email is required" });
+
+        await _user.RequestPasswordResetActionExecution(dto.Email);
+        return Ok(new { sent = true });
+    }
+
+    [HttpPost("ResetPassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Token) || string.IsNullOrEmpty(dto.NewPassword))
+            return BadRequest(new { error = "Token and new password are required" });
+
+        if (dto.NewPassword.Length < 8)
+            return BadRequest(new { error = "Password must be at least 8 characters" });
+
+        var ok = await _user.ResetPasswordActionExecution(dto.Token, dto.NewPassword);
+        if (!ok) return BadRequest(new { error = "Invalid or expired reset token" });
+        return Ok(new { reset = true });
+    }
+
     [HttpPost("me/ResendVerification")]
     public async Task<IActionResult> ResendVerificationEmail()
     {

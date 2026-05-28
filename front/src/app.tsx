@@ -10,6 +10,8 @@ import Edit from './pages/edit/edit';
 import Login from './pages/login/login';
 import SignUp from './pages/login/signup';
 import VerifyEmail from './pages/verify/verifyEmail';
+import ForgotPassword from './pages/forgot-password/forgotPassword';
+import ResetPassword from './pages/forgot-password/resetPassword';
 import Admin from './pages/admin/admin';
 import SupportInbox from './pages/admin/supportInbox';
 import SupportFab from './components/SupportFab';
@@ -60,6 +62,8 @@ function AppLayout() {
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />
                         <Route path={paths.verifyEmail} element={<VerifyEmail />} />
+                        <Route path={paths.forgotPassword} element={<ForgotPassword />} />
+                        <Route path={paths.resetPassword} element={<ResetPassword />} />
                         <Route path={paths.pricing} element={<Pricing />} />
                         <Route path={paths.terms} element={<Terms />} />
                         <Route path={paths.privacy} element={<Privacy />} />

@@ -10,4 +10,7 @@ public interface ISubscriptionAction
     Task<SubscriptionDto> SubscribeActionExecution(Guid userId, SubscriptionPlan plan);
     Task<SubscriptionDto?> SetUserPlanActionExecution(Guid userId, SubscriptionPlan plan);
     Task<SubscriptionDto?> CancelSubscriptionActionExecution(Guid id);
+    Task<SubscriptionDto?> SyncFromPaddleActionExecution(Guid userId, string paddleSubscriptionId);
+    Task<bool> CancelMyActionExecution(Guid userId);
+    Task ApplyPaddleWebhookActionExecution(string eventType, VideoBackend.BusinessLayer.Interfaces.PaddleSubscriptionSnapshot snapshot, Guid? userIdHint);
 }

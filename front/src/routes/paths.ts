@@ -13,4 +13,6 @@ export const paths = {
     verifyEmail: '/verify-email',
     terms: '/terms',
     privacy: '/privacy',
+    forgotPassword: '/forgot-password',
+    resetPassword: '/reset-password',
 };

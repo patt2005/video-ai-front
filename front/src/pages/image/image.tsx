@@ -43,17 +43,31 @@ export default function Image() {
 
     setIsGenerating(true);
     setGeneratedImage(null);
-    const toastId = toast.loading('Generating image…', { description: 'This may take a few seconds.' });
+    const toastId = toast.loading('Generating image… 0%', { description: 'This may take a few seconds.' });
+
+    let fakeProgress = 0;
+    const fakeInterval = setInterval(() => {
+      if (fakeProgress >= 95) return;
+      const increment = fakeProgress < 40 ? 4 : fakeProgress < 70 ? 2 : fakeProgress < 90 ? 0.8 : 0.3;
+      fakeProgress = Math.min(95, fakeProgress + increment);
+      toast.loading(`Generating image… ${Math.floor(fakeProgress)}%`, {
+        id: toastId,
+        description: 'This may take a few seconds.',
+      });
+    }, 600);
 
     try {
       const resultUrl = await imageService.generateImageAndPoll(
-        { prompt, size: selectedSize, resolution: selectedResolution, imageUrls: [] },
-        (progress) => toast.loading(`Generating image… ${progress}%`, { id: toastId }),
+        { prompt, size: selectedSize, resolution: selectedResolution, imageUrls: [] }
       );
+
+      clearInterval(fakeInterval);
+      toast.loading('Generating image… 100%', { id: toastId, description: 'Done!' });
       setGeneratedImage(resultUrl);
       setResultModalOpen(true);
-      toast.dismiss(toastId);
+      setTimeout(() => toast.dismiss(toastId), 400);
     } catch (err) {
+      clearInterval(fakeInterval);
       toast.error('Generation failed', {
         id: toastId,
         description: err instanceof Error ? err.message : 'Something went wrong.',

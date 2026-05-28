@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
 import { ApiContext } from '../../contexts/apiContext';
 import { useAuth } from '../../contexts/authContext';
+import { usePaddle } from '../../contexts/paddleContext';
 import { subscriptionService } from '../../services/subscriptionService';
 import { SubscriptionPlan, type Subscription } from '../../types/subscription/subscription';
 import { paths } from '../../routes/paths';
@@ -94,10 +95,11 @@ function CellValue({ val }: { val?: string }) {
 
 export default function Pricing() {
   const { api } = useContext(ApiContext)!;
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
+  const { config: paddleConfig, ready: paddleReady, openCheckout } = usePaddle();
   const navigate = useNavigate();
   const [currentSub, setCurrentSub] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState<SubscriptionPlan | null>(null);
+  const [loading, setLoading] = useState<SubscriptionPlan | 'cancel' | null>(null);
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -106,15 +108,80 @@ export default function Pricing() {
     subscriptionService.getMine(api).then(setCurrentSub).catch(() => setCurrentSub(null));
   }, [api, isLoggedIn]);
 
+  const priceIdFor = (plan: SubscriptionPlan): string | null => {
+    if (!paddleConfig) return null;
+    if (plan === SubscriptionPlan.Pro) return paddleConfig.priceProId || null;
+    if (plan === SubscriptionPlan.Ultra) return paddleConfig.priceUltraId || null;
+    return null;
+  };
+
   const handleSubscribe = async (plan: SubscriptionPlan) => {
-    if (!isLoggedIn) { navigate(paths.login); return; }
+    if (!isLoggedIn || !user) {
+      navigate(paths.login);
+      return;
+    }
+
+    if (plan === SubscriptionPlan.Starter) {
+      try {
+        setLoading(plan);
+        const sub = await subscriptionService.subscribe(api, plan);
+        setCurrentSub(sub);
+        toast.success('Now on Starter plan');
+      } catch {
+        toast.error('Failed to subscribe');
+      } finally {
+        setLoading(null);
+      }
+      return;
+    }
+
+    const priceId = priceIdFor(plan);
+    if (!priceId) {
+      toast.error('Paddle price not configured for this plan');
+      return;
+    }
+    if (!paddleReady) {
+      toast.error('Checkout not ready yet, please try again');
+      return;
+    }
+
     try {
       setLoading(plan);
-      const sub = await subscriptionService.subscribe(api, plan);
-      setCurrentSub(sub);
-      toast.success(`Now on ${plan} plan`);
+      await openCheckout({
+        priceId,
+        email: user.email,
+        userId: user.id,
+        handlers: {
+          onCompleted: async (paddleSubscriptionId) => {
+            try {
+              const sub = await subscriptionService.syncFromPaddle(api, paddleSubscriptionId);
+              setCurrentSub(sub);
+              toast.success(`Now on ${plan} plan`);
+            } catch {
+              toast.error('Payment succeeded but sync failed. Refresh in a moment.');
+            } finally {
+              setLoading(null);
+            }
+          },
+          onClosed: () => setLoading(null),
+        },
+      });
     } catch {
-      toast.error('Failed to subscribe');
+      toast.error('Could not open checkout');
+      setLoading(null);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!currentSub) return;
+    try {
+      setLoading('cancel');
+      await subscriptionService.cancelMine(api);
+      const fresh = await subscriptionService.getMine(api);
+      setCurrentSub(fresh);
+      toast.success('Subscription cancelled');
+    } catch {
+      toast.error('Failed to cancel subscription');
     } finally {
       setLoading(null);
     }
@@ -123,9 +190,12 @@ export default function Pricing() {
   const isCurrent = (plan: SubscriptionPlan) =>
     currentSub?.status === 'Active' && currentSub?.plan === plan;
 
+  const hasPaidActive = currentSub?.status === 'Active' &&
+    (currentSub.plan === SubscriptionPlan.Pro || currentSub.plan === SubscriptionPlan.Ultra);
+
   const ctaLabel = (plan: SubscriptionPlan, defaultLabel: string) => {
     if (isCurrent(plan)) return 'Current plan';
-    if (loading === plan) return 'Starting…';
+    if (loading === plan) return 'Opening checkout…';
     return defaultLabel;
   };
 
@@ -161,6 +231,20 @@ export default function Pricing() {
             </div>
             <span className="pr-save-badge">SAVE 20%</span>
           </div>
+
+          {hasPaidActive && (
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <button
+                type="button"
+                className="pr-tier-cta"
+                style={{ maxWidth: 240, margin: '0 auto' }}
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel subscription'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
