@@ -24,18 +24,7 @@ const BILLED = {
   Ultra:   { monthly: 'Per seat, billed monthly', annual: '$468/seat yearly · save $120' },
 };
 
-const CREDIT_PACKS = [
-  { credits: '500',    price: '$8',   ratio: '$0.016 / credit', best: false },
-  { credits: '2,000',  price: '$28',  ratio: '$0.014 / credit', best: false },
-  { credits: '5,000',  price: '$60',  ratio: '$0.012 / credit', best: true  },
-  { credits: '10,000', price: '$110', ratio: '$0.011 / credit', best: false },
-];
-
 const FAQ_ITEMS = [
-  {
-    q: "What's a credit, exactly?",
-    a: "One credit buys one 1K image render. 2K costs 2 credits, 4K costs 5. A second of video costs 8 credits. Your dashboard shows the price before you generate, and unused credits roll over for 90 days.",
-  },
   {
     q: 'Can I switch plans or cancel any time?',
     a: "Yes. Upgrade or downgrade instantly — we prorate the difference. Cancel any time from the billing page and you'll keep access until the end of your paid period.",
@@ -43,10 +32,6 @@ const FAQ_ITEMS = [
   {
     q: 'Do I own what I generate?',
     a: 'On Pro and Ultra, yes — full commercial license, no watermark, no royalty. On Starter, generations are for personal and evaluation use.',
-  },
-  {
-    q: 'What happens to leftover credits?',
-    a: 'Plan credits roll over for 90 days. Top-up pack credits never expire and are spent after plan credits.',
   },
   {
     q: 'How are charges handled for teams?',
@@ -60,15 +45,10 @@ const FAQ_ITEMS = [
 
 const COMPARE_ROWS: { section?: string; label?: string; starter?: string; pro?: string; ultra?: string }[] = [
   { section: 'Generation' },
-  { label: 'Monthly credits',       starter: '30',    pro: '1,000',     ultra: '5,000 / seat' },
   { label: 'Max export resolution', starter: '720p',  pro: '4K',        ultra: '4K' },
-  { label: 'Max video length',      starter: '4s',    pro: '12s',       ultra: '20s' },
-  { label: 'Concurrent renders',    starter: '1',     pro: '4',         ultra: '8' },
   { label: 'Priority queue',        starter: '—',     pro: '✓',         ultra: '✓' },
   { section: 'Editing' },
   { label: 'Outpaint & expand',         starter: '—',     pro: '✓',         ultra: '✓' },
-  { label: 'Personal model training',   starter: '—',     pro: '2 / month', ultra: 'Unlimited' },
-  { label: 'Batch renders',             starter: '—',     pro: 'Up to 50',  ultra: 'Up to 200' },
   { section: 'Collaboration' },
   { label: 'Team workspaces',     starter: '—', pro: '—', ultra: '✓' },
   { label: 'Client review links', starter: '—', pro: '—', ultra: '✓' },
@@ -216,6 +196,8 @@ export default function Pricing() {
   const hasPaidActive = currentSub?.status === 'Active' &&
     (currentSub.plan === SubscriptionPlan.Pro || currentSub.plan === SubscriptionPlan.Ultra);
 
+  const isOnUltra = isCurrent(SubscriptionPlan.Ultra);
+
   const ctaLabel = (plan: SubscriptionPlan, defaultLabel: string) => {
     if (isCurrent(plan)) return 'Current plan';
     if (loading === plan) return 'Opening checkout…';
@@ -228,32 +210,10 @@ export default function Pricing() {
       {/* ── PAGE HEAD ── */}
       <div className="pr-container">
         <div className="pr-page-head">
-          <div className="pr-eyebrow">
-            <span className="pr-eyebrow-tag">Pricing</span>
-            <span>3 free renders a day, forever</span>
-          </div>
           <h1 className="pr-page-title">One price. <em>Endless ideas.</em></h1>
           <p className="pr-page-sub">
             Start free. Upgrade only when you're shipping work. Every plan includes 4K renders, commercial license, and zero watermarks.
           </p>
-
-          {/* Billing toggle */}
-          <div className="pr-billing">
-            <div className={`pr-billing-switch${billing === 'annual' ? ' pr-billing-switch--annual' : ''}`}>
-              <span className="pr-billing-pill" aria-hidden />
-              <button
-                type="button"
-                className={billing === 'monthly' ? 'pr-billing-btn--active' : ''}
-                onClick={() => setBilling('monthly')}
-              >Monthly</button>
-              <button
-                type="button"
-                className={billing === 'annual' ? 'pr-billing-btn--active' : ''}
-                onClick={() => setBilling('annual')}
-              >Annual</button>
-            </div>
-            <span className="pr-save-badge">SAVE 20%</span>
-          </div>
         </div>
       </div>
 
@@ -284,6 +244,10 @@ export default function Pricing() {
               >
                 {loading === 'cancel' ? 'Cancelling…' : 'Cancel Free plan'}
               </button>
+            ) : isOnUltra ? (
+              <button type="button" className="pr-tier-cta" disabled>
+                You are already on Ultra
+              </button>
             ) : (
               <button
                 type="button"
@@ -302,9 +266,9 @@ export default function Pricing() {
             <div className="pr-tier-divider" />
             <div className="pr-tier-features-title">Includes</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>30</b> credits / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>10</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>720p exports</span></li>
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Image + 4s video</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Image &amp; video generation</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Basic edits &amp; presets</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span className="pr-muted">Community support</span></li>
             </ul>
@@ -334,6 +298,10 @@ export default function Pricing() {
               >
                 {loading === 'cancel' ? 'Cancelling…' : 'Cancel Pro plan'}
               </button>
+            ) : isOnUltra ? (
+              <button type="button" className="pr-tier-cta pr-tier-cta--primary" disabled>
+                You are already on Ultra
+              </button>
             ) : (
               <button
                 type="button"
@@ -348,11 +316,10 @@ export default function Pricing() {
               </button>
             )}
             <div className="pr-tier-divider" />
-            <div className="pr-tier-features-title">Everything in Starter, plus</div>
+            <div className="pr-tier-features-title">Everything in Starter</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>1,000</b> credits / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>500</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>4K</b> exports, no watermark</span></li>
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Up to <b>12s</b> video clips</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Advanced timeline + outpaint</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Priority renders (queue-skip)</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Commercial license</span></li>
@@ -404,9 +371,9 @@ export default function Pricing() {
               </button>
             )}
             <div className="pr-tier-divider" />
-            <div className="pr-tier-features-title">Everything in Pro, plus</div>
+            <div className="pr-tier-features-title">Everything in Pro</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>5,000</b> credits / seat / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>2,000</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Team workspaces &amp; roles</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Shared asset &amp; prompt library</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Client review links</span></li>
@@ -417,29 +384,6 @@ export default function Pricing() {
           </article>
 
         </div>
-
-        {/* ── CREDIT PACKS ── */}
-        <section className="pr-packs">
-          <div className="pr-packs-head">
-            <div>
-              <div className="pr-section-tag">Top-ups</div>
-              <h2 className="pr-packs-title">Need a few more <em>renders?</em></h2>
-              <p className="pr-packs-sub">One-time credit packs that never expire. Stack them on any plan.</p>
-            </div>
-          </div>
-          <div className="pr-pack-grid">
-            {CREDIT_PACKS.map((pack) => (
-              <button key={pack.credits} type="button" className="pr-pack">
-                {pack.best && <span className="pr-pack-best">Best value</span>}
-                <div className="pr-pack-credits">
-                  {pack.credits}<span className="pr-pack-credits-sm">credits</span>
-                </div>
-                <div className="pr-pack-price"><b>{pack.price}</b></div>
-                <div className="pr-pack-ratio">{pack.ratio}</div>
-              </button>
-            ))}
-          </div>
-        </section>
 
         {/* ── COMPARISON TABLE ── */}
         <section className="pr-compare">
@@ -517,8 +461,17 @@ export default function Pricing() {
             <p>Dedicated GPU pools, custom retention, BYO-key, and procurement-friendly billing. We'll build a plan around your workflow.</p>
           </div>
           <div className="pr-ent-actions">
-            <button type="button" className="pr-ent-btn">Read enterprise docs</button>
-            <button type="button" className="pr-ent-btn pr-ent-btn--primary">
+            <button
+              type="button"
+              className="pr-ent-btn pr-ent-btn--primary"
+              onClick={() => {
+                if (!hasPaidActive) {
+                  toast.error('Talk to sales is available on Pro and Ultra plans');
+                  return;
+                }
+                window.dispatchEvent(new CustomEvent('movyai:open-support'));
+              }}
+            >
               Talk to sales
               <Icon icon="mdi:arrow-right" width={12} />
             </button>

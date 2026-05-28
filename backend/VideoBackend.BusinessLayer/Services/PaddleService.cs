@@ -101,25 +101,30 @@ public class PaddleService : IPaddleService
         if (string.IsNullOrEmpty(_apiKey) || string.IsNullOrWhiteSpace(paddleSubscriptionId) || string.IsNullOrWhiteSpace(newPriceId))
             return null;
 
-        var body = JsonSerializer.Serialize(new
+        var prorationModes = new[] { "prorated_immediately", "do_not_bill" };
+        foreach (var mode in prorationModes)
         {
-            items = new[] { new { price_id = newPriceId, quantity = 1 } },
-            proration_billing_mode = "prorated_immediately"
-        });
+            var body = JsonSerializer.Serialize(new
+            {
+                items = new[] { new { price_id = newPriceId, quantity = 1 } },
+                proration_billing_mode = mode
+            });
 
-        var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBase}/subscriptions/{paddleSubscriptionId}");
-        req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-        req.Content = new StringContent(body, Encoding.UTF8, "application/json");
+            var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBase}/subscriptions/{paddleSubscriptionId}");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            req.Content = new StringContent(body, Encoding.UTF8, "application/json");
 
-        var resp = await _http.SendAsync(req);
-        if (!resp.IsSuccessStatusCode)
-        {
+            var resp = await _http.SendAsync(req);
+            if (resp.IsSuccessStatusCode)
+                return await GetSubscriptionAsync(paddleSubscriptionId);
+
             var err = await resp.Content.ReadAsStringAsync();
-            Console.WriteLine($"[PADDLE] Update {paddleSubscriptionId} failed {resp.StatusCode}: {err}");
-            return null;
-        }
+            Console.WriteLine($"[PADDLE] Update {paddleSubscriptionId} ({mode}) failed {resp.StatusCode}: {err}");
 
-        return await GetSubscriptionAsync(paddleSubscriptionId);
+            if (!err.Contains("subscription_trialing_items_update_invalid_options"))
+                return null;
+        }
+        return null;
     }
 
     public async Task<bool> CancelSubscriptionAsync(string paddleSubscriptionId)
@@ -127,18 +132,40 @@ public class PaddleService : IPaddleService
         if (string.IsNullOrEmpty(_apiKey) || string.IsNullOrWhiteSpace(paddleSubscriptionId))
             return false;
 
-        var req = new HttpRequestMessage(HttpMethod.Post, $"{_apiBase}/subscriptions/{paddleSubscriptionId}/cancel");
-        req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
-        req.Content = new StringContent("{\"effective_from\":\"next_billing_period\"}", Encoding.UTF8, "application/json");
-
-        var resp = await _http.SendAsync(req);
-        if (!resp.IsSuccessStatusCode)
+        for (var attempt = 0; attempt < 2; attempt++)
         {
+            var req = new HttpRequestMessage(HttpMethod.Post, $"{_apiBase}/subscriptions/{paddleSubscriptionId}/cancel");
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            req.Content = new StringContent("{\"effective_from\":\"immediately\"}", Encoding.UTF8, "application/json");
+
+            var resp = await _http.SendAsync(req);
+            if (resp.IsSuccessStatusCode) return true;
+
             var err = await resp.Content.ReadAsStringAsync();
             Console.WriteLine($"[PADDLE] Cancel {paddleSubscriptionId} failed {resp.StatusCode}: {err}");
+
+            if (err.Contains("subscription_update_when_canceled") ||
+                err.Contains("subscription_already_canceled") ||
+                err.Contains("\"status\":\"canceled\""))
+                return true;
+
+            if (attempt == 0 && err.Contains("subscription_locked_pending_changes"))
+            {
+                var clearReq = new HttpRequestMessage(new HttpMethod("PATCH"), $"{_apiBase}/subscriptions/{paddleSubscriptionId}");
+                clearReq.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+                clearReq.Content = new StringContent("{\"scheduled_change\":null,\"proration_billing_mode\":\"do_not_bill\"}", Encoding.UTF8, "application/json");
+                var clearResp = await _http.SendAsync(clearReq);
+                if (!clearResp.IsSuccessStatusCode)
+                {
+                    var clearErr = await clearResp.Content.ReadAsStringAsync();
+                    Console.WriteLine($"[PADDLE] Clear scheduled_change failed {clearResp.StatusCode}: {clearErr}");
+                    return false;
+                }
+                continue;
+            }
             return false;
         }
-        return true;
+        return false;
     }
 
     public bool VerifyWebhookSignature(string signatureHeader, string rawBody)

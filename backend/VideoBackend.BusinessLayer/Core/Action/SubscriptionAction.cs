@@ -65,6 +65,8 @@ public class SubscriptionAction
         _context.Subscriptions.Add(entity);
         await _context.SaveChangesAsync();
 
+        GrantCreditsForPlan(userId, null, plan);
+
         return ToDto(entity);
     }
 
@@ -166,7 +168,9 @@ public class SubscriptionAction
         {
             var ok = await _paddle.CancelSubscriptionAsync(s.PaddleSubscriptionId);
             if (!ok) return false;
+            s.Status = SubscriptionStatus.Cancelled;
             s.CancelledAt = DateTime.UtcNow;
+            s.EndDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -201,6 +205,32 @@ public class SubscriptionAction
         await UpsertFromPaddleAsync(userId.Value, snapshot, plan.Value);
     }
 
+    private static int GetPlanCredits(SubscriptionPlan plan) => plan switch
+    {
+        SubscriptionPlan.Starter => 10,
+        SubscriptionPlan.Pro => 500,
+        SubscriptionPlan.Ultra => 2000,
+        _ => 0
+    };
+
+    private static void GrantCreditsForPlan(Guid userId, SubscriptionPlan? oldPlan, SubscriptionPlan newPlan)
+    {
+        var newCredits = GetPlanCredits(newPlan);
+        if (newCredits <= 0) return;
+
+        var toGrant = oldPlan is null
+            ? newCredits
+            : Math.Max(0, newCredits - GetPlanCredits(oldPlan.Value));
+
+        if (toGrant == 0) return;
+
+        using var users = new UserContext();
+        var u = users.Users.Find(userId);
+        if (u is null) return;
+        u.Credits += toGrant;
+        users.SaveChanges();
+    }
+
     private async Task<SubscriptionDto> UpsertFromPaddleAsync(Guid userId, PaddleSubscriptionSnapshot snapshot, SubscriptionPlan plan)
     {
         var others = _context.Subscriptions
@@ -214,6 +244,9 @@ public class SubscriptionAction
 
         var existing = await _context.Subscriptions
             .FirstOrDefaultAsync(x => x.PaddleSubscriptionId == snapshot.Id);
+
+        var oldPlan = existing?.Plan;
+        var wasActive = existing?.Status == SubscriptionStatus.Active;
 
         if (existing is null)
         {
@@ -243,6 +276,12 @@ public class SubscriptionAction
         }
 
         await _context.SaveChangesAsync();
+
+        if (existing.Status == SubscriptionStatus.Active)
+        {
+            GrantCreditsForPlan(userId, wasActive ? oldPlan : null, plan);
+        }
+
         return ToDto(existing);
     }
 

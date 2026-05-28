@@ -15,7 +15,6 @@ const PROMPTS = [
   'Time-lapse of a city waking up at golden hour',
 ];
 
-const BRANDS = ['NORTHWIND', 'Lumen & Co.', '// kindred', 'Atelier', 'PARALLEL', 'Field Notes', 'studio.eight'];
 
 export default function Explore() {
   const navigate = useNavigate();
@@ -81,13 +80,6 @@ export default function Explore() {
       <section className="ex-hero">
         <div className="ex-container">
 
-          {/* Eyebrow badge */}
-          <div className="ex-eyebrow">
-            <span className="ex-eyebrow-tag">New</span>
-            <span><b>MovyAI v3</b> — 4K cinematic video from a single prompt</span>
-            <span className="ex-eyebrow-chev">→</span>
-          </div>
-
           {/* Headline */}
           <h1 className="ex-hero-title">
             Films from a <em>sentence.</em>
@@ -123,29 +115,8 @@ export default function Explore() {
               aria-label="Generate"
               onClick={(e) => { e.stopPropagation(); navigate(paths.video); }}
             >
-              <Icon icon="mdi:arrow-right" width={18} color="#fff" />
+              <Icon icon="mdi:arrow-right" width={28} color="#fff" />
             </button>
-          </div>
-
-          {/* Meta row */}
-          <div className="ex-meta">
-            <span>No credit card</span>
-            <span className="ex-dot" />
-            <span>3 free renders / day</span>
-            <span className="ex-dot" />
-            <span>Commercial license</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── LOGO STRIP ── */}
-      <section className="ex-logos">
-        <div className="ex-container">
-          <div className="ex-logos-label">Trusted by creative teams at</div>
-          <div className="ex-logos-row">
-            {BRANDS.map((b) => (
-              <span key={b} className="ex-logo">{b}</span>
-            ))}
           </div>
         </div>
       </section>

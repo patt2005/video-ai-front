@@ -38,7 +38,8 @@ public class UserAction
                 RegisterDate = u.RegisterDate,
                 IsBlocked = u.IsBlocked,
                 IsEmailVerified = u.IsEmailVerified,
-                AvatarUrl = u.AvatarUrl
+                AvatarUrl = u.AvatarUrl,
+                Credits = u.Credits
             })
             .ToListAsync();
     }
@@ -56,7 +57,8 @@ public class UserAction
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
             IsEmailVerified = u.IsEmailVerified,
-            AvatarUrl = u.AvatarUrl
+            AvatarUrl = u.AvatarUrl,
+            Credits = u.Credits
         };
     }
 
@@ -83,7 +85,8 @@ public class UserAction
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
             IsEmailVerified = u.IsEmailVerified,
-            AvatarUrl = u.AvatarUrl
+            AvatarUrl = u.AvatarUrl,
+            Credits = u.Credits
         };
     }
 
@@ -104,7 +107,8 @@ public class UserAction
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
             IsEmailVerified = u.IsEmailVerified,
-            AvatarUrl = u.AvatarUrl
+            AvatarUrl = u.AvatarUrl,
+            Credits = u.Credits
         };
     }
 
@@ -131,7 +135,8 @@ public class UserAction
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
             IsEmailVerified = u.IsEmailVerified,
-            AvatarUrl = u.AvatarUrl
+            AvatarUrl = u.AvatarUrl,
+            Credits = u.Credits
         };
     }
 
@@ -271,7 +276,8 @@ public class UserAction
             RegisterDate = u.RegisterDate,
             IsBlocked = u.IsBlocked,
             IsEmailVerified = u.IsEmailVerified,
-            AvatarUrl = u.AvatarUrl
+            AvatarUrl = u.AvatarUrl,
+            Credits = u.Credits
         };
     }
 

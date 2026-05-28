@@ -2,6 +2,11 @@ import type { User, UserRole } from '../types/user/user';
 import type { AxiosInstance } from 'axios';
 
 export const userService = {
+    async getMe(api: AxiosInstance): Promise<User> {
+        const response = await api.get<User>('/api/User/me');
+        return response.data;
+    },
+
     async getUsers(api: AxiosInstance): Promise<User[]> {
         const response = await api.get<User[]>('/api/User');
         return response.data;

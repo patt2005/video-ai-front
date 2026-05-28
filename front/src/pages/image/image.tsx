@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { toast } from 'sonner';
@@ -7,6 +7,11 @@ import '../../styles/image.css';
 import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { SHOWCASE_IMAGES } from '../../_mock/images';
 import { imageService } from '../../services/imageService';
+import { activeImageTask } from '../../utils/activeTask';
+import { userService } from '../../services/userService';
+import { useApi } from '../../hooks/useApi';
+
+const IMAGE_COST: Record<ImageResolution, number> = { '1K': 1, '2K': 2, '4K': 5 };
 
 const SIZES = ['1:1', '16:9', '9:16', '4:3'] as const;
 type ImageSize = typeof SIZES[number];
@@ -22,7 +27,8 @@ const SIZE_GLYPHS: Record<ImageSize, { w: number; h: number }> = {
 };
 
 export default function Image() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const api = useApi();
   const [searchParams] = useSearchParams();
   const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
   const [selectedSize, setSelectedSize] = useState<ImageSize>('1:1');
@@ -57,25 +63,81 @@ export default function Image() {
     }, 600);
 
     try {
-      const resultUrl = await imageService.generateImageAndPoll(
-        { prompt, size: selectedSize, resolution: selectedResolution, imageUrls: [] }
-      );
+      const taskId = await imageService.generateImage({
+        prompt,
+        size: selectedSize,
+        resolution: selectedResolution,
+        imageUrls: [],
+      });
+      activeImageTask.set({
+        taskId,
+        prompt,
+        size: selectedSize,
+        resolution: selectedResolution,
+        startedAt: Date.now(),
+      });
+
+      const resultUrl = await imageService.pollUntilDone(taskId);
 
       clearInterval(fakeInterval);
       toast.loading('Generating image… 100%', { id: toastId, description: 'Done!' });
       setGeneratedImage(resultUrl);
       setResultModalOpen(true);
+      activeImageTask.clear();
       setTimeout(() => toast.dismiss(toastId), 400);
     } catch (err) {
       clearInterval(fakeInterval);
-      toast.error('Generation failed', {
-        id: toastId,
-        description: err instanceof Error ? err.message : 'Something went wrong.',
-      });
+      activeImageTask.clear();
+      const status = (err as { response?: { status?: number; data?: { error?: string } } })?.response?.status;
+      if (status === 402) {
+        const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Not enough credits';
+        toast.error('Not enough credits', {
+          id: toastId,
+          description: `${message} Upgrade your plan in /pricing.`,
+        });
+      } else {
+        toast.error('Generation failed', {
+          id: toastId,
+          description: err instanceof Error ? err.message : 'Something went wrong.',
+        });
+      }
     } finally {
       setIsGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (!user?.id) return;
+    userService.getMe(api).then((fresh) => updateUser({ credits: fresh.credits })).catch(() => {});
+  }, [api, user?.id, updateUser]);
+
+  useEffect(() => {
+    const active = activeImageTask.get();
+    if (!active) return;
+
+    setIsGenerating(true);
+    setPrompt(active.prompt);
+    const toastId = toast.loading('Resuming generation…', {
+      description: 'Picking up where you left off.',
+    });
+
+    imageService.pollUntilDone(active.taskId)
+      .then((url) => {
+        setGeneratedImage(url);
+        setResultModalOpen(true);
+        activeImageTask.clear();
+        toast.success('Image ready', { id: toastId });
+      })
+      .catch((err) => {
+        activeImageTask.clear();
+        toast.error('Could not resume generation', {
+          id: toastId,
+          description: err instanceof Error ? err.message : 'Task expired or failed.',
+        });
+      })
+      .finally(() => setIsGenerating(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="img-page">
@@ -83,7 +145,6 @@ export default function Image() {
       {/* ── PAGE HEADER ── */}
       <div className="img-container">
         <div className="img-page-head">
-          <div className="img-page-tag">Image studio</div>
           <h1 className="img-page-title">From an idea to a <em>finished image.</em></h1>
           <p className="img-page-sub">Describe a scene, pick a model, render at 4K. Use a reference to lock style, subject or composition.</p>
         </div>
@@ -100,7 +161,6 @@ export default function Image() {
             <div className="img-field">
               <div className="img-field-label">
                 <span>Prompt</span>
-                <span className="img-field-hint">{prompt.length} / 1000</span>
               </div>
               <textarea
                 className="img-prompt"
@@ -149,7 +209,7 @@ export default function Image() {
             <div className="img-field">
               <div className="img-field-label">
                 <span>Resolution</span>
-                <span className="img-field-hint">1 · 2 · 5 credits</span>
+                <span className="img-field-hint">{IMAGE_COST[selectedResolution]} credit{IMAGE_COST[selectedResolution] === 1 ? '' : 's'}</span>
               </div>
               <div className="img-segments img-segments--3" role="radiogroup">
                 {RESOLUTIONS.map((r) => (
@@ -181,8 +241,8 @@ export default function Image() {
                 ) : (
                   <>
                     <Icon icon="mdi:auto-awesome" width={16} />
-                    Generate
-                    <span className="img-kbd">⌘ ↵</span>
+                    Generate · {IMAGE_COST[selectedResolution]} cr
+                    <span className="img-kbd">{user?.credits ?? 0} left</span>
                   </>
                 )}
               </button>

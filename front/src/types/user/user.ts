@@ -14,4 +14,5 @@ export interface User {
     isBlocked: boolean;
     isEmailVerified: boolean;
     avatarUrl?: string | null;
+    credits?: number;
 }

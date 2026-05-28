@@ -46,6 +46,12 @@ export default function SupportFab() {
     }, [open, user?.email, email]);
 
     useEffect(() => {
+        const handler = () => setOpen(true);
+        window.addEventListener('movyai:open-support', handler);
+        return () => window.removeEventListener('movyai:open-support', handler);
+    }, []);
+
+    useEffect(() => {
         if (!open || planLabel !== 'Ultra') return;
         let cancelled = false;
         const load = async () => {

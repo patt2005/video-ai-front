@@ -15,8 +15,7 @@ public class SubscriptionActionExecution : SubscriptionAction, ISubscriptionActi
     public Task<List<SubscriptionDto>> GetAllSubscriptionActionExecution()
         => GetAllSubscriptionAction();
 
-    
-    
+
     public Task<SubscriptionDto?> GetSubscriptionByUserIdActionExecution(Guid userId)
         => GetSubscriptionByUserIdAction(userId);
 

@@ -11,12 +11,44 @@ using EntityTask = VideoBackend.Domain.Entities.Task.Task;
 
 namespace VideoBackend.BusinessLayer.Core;
 
+public class InsufficientCreditsException : Exception
+{
+    public int Required { get; }
+    public int Available { get; }
+    public InsufficientCreditsException(int required, int available)
+        : base($"Need {required} credits, have {available}.")
+    {
+        Required = required;
+        Available = available;
+    }
+}
+
 public class ImageActions
 {
     private static readonly HttpClient _http = new();
 
+    private static int GetImageCost(string? resolution) => (resolution ?? "").ToUpperInvariant() switch
+    {
+        "1K" => 1,
+        "2K" => 2,
+        "4K" => 5,
+        _ => 1
+    };
+
     protected GenerateImageResponse GenerateImageActionExecution(GenerateImageDto dto, Guid userId)
     {
+        var cost = GetImageCost(dto.Resolution);
+
+        using (var users = new UserContext())
+        {
+            var u = users.Users.Find(userId)
+                ?? throw new KeyNotFoundException("User not found");
+            if (u.Credits < cost)
+                throw new InsufficientCreditsException(cost, u.Credits);
+            u.Credits -= cost;
+            users.SaveChanges();
+        }
+
         var hasImages = dto.ImageUrls != null && dto.ImageUrls.Count > 0;
         var model = hasImages ? "nano-banana-2-new-edit" : "nano-banana-2-new";
 
@@ -82,6 +114,7 @@ public class ImageActions
             ContentId = content.Id,
             Status = GenerationStatus.Pending,
             PoyoTaskId = poyoTaskId,
+            CreditsSpent = cost,
         };
 
         db.Contents.Add(content);
@@ -150,6 +183,17 @@ public class ImageActions
         else if (status == "failed")
         {
             task.Status = GenerationStatus.Failed;
+            if (task.CreditsSpent > 0)
+            {
+                using var users = new UserContext();
+                var u = users.Users.Find(task.UserId);
+                if (u != null)
+                {
+                    u.Credits += task.CreditsSpent;
+                    users.SaveChanges();
+                }
+                task.CreditsSpent = 0;
+            }
             db.SaveChanges();
         }
 

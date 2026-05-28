@@ -6,6 +6,11 @@ import { useAuth } from '../../contexts/authContext';
 import '../../styles/Video.css';
 import { VideoResultModal } from '../../components/modals/videoResultModal';
 import { videoService, type VideoModel, type VideoAspectRatio } from '../../services/videoService';
+import { activeVideoTask } from '../../utils/activeTask';
+import { userService } from '../../services/userService';
+import { useApi } from '../../hooks/useApi';
+
+const VIDEO_COST = 8;
 
 const HERO_VIDEO_URL = 'https://static.cdn-luma.com/files/9addaf78a63cfe17/hero-shorter.mp4';
 const ARROW_ICON_SIZE = 20;
@@ -19,7 +24,8 @@ const MODELS: { id: VideoModel; label: string }[] = [
 const ASPECT_RATIOS: VideoAspectRatio[] = ['16:9', '9:16'];
 
 export default function Video() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  const api = useApi();
   const [searchParams] = useSearchParams();
   const [prompt, setPrompt] = useState(searchParams.get('prompt') ?? '');
   const [selectedModel, setSelectedModel] = useState<VideoModel>('Veo31Fast');
@@ -74,32 +80,80 @@ export default function Video() {
     }, 1500);
 
     try {
-      const imageUrls: string[] = [];
+      const { taskId } = await videoService.createTask({
+        prompt: promptText,
+        aspectRatio: selectedRatio,
+        model: selectedModel,
+        imageUrls: [],
+      });
+      activeVideoTask.set({
+        taskId,
+        prompt: promptText,
+        ratio: selectedRatio,
+        model: selectedModel,
+        startedAt: Date.now(),
+      });
 
-      const url = await videoService.generateVideoAndPoll(
-        {
-          prompt: promptText,
-          aspectRatio: selectedRatio,
-          model: selectedModel,
-          imageUrls,
-        }
-      );
+      const url = await videoService.pollUntilDone(taskId);
 
       clearInterval(fakeInterval);
       toast.loading('Generating video… 100%', { id: toastId, description: 'Done!' });
       setResultVideoUrl(url);
       setResultModalOpen(true);
+      activeVideoTask.clear();
       setTimeout(() => toast.dismiss(toastId), 400);
     } catch (err) {
       clearInterval(fakeInterval);
-      toast.error('Generation failed', {
-        id: toastId,
-        description: err instanceof Error ? err.message : 'Something went wrong.',
-      });
+      activeVideoTask.clear();
+      const status = (err as { response?: { status?: number; data?: { error?: string } } })?.response?.status;
+      if (status === 402) {
+        const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Not enough credits';
+        toast.error('Not enough credits', {
+          id: toastId,
+          description: `${message} Upgrade your plan in /pricing.`,
+        });
+      } else {
+        toast.error('Generation failed', {
+          id: toastId,
+          description: err instanceof Error ? err.message : 'Something went wrong.',
+        });
+      }
     } finally {
       setIsGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (!user?.id) return;
+    userService.getMe(api).then((fresh) => updateUser({ credits: fresh.credits })).catch(() => {});
+  }, [api, user?.id, updateUser]);
+
+  useEffect(() => {
+    const active = activeVideoTask.get();
+    if (!active) return;
+
+    setIsGenerating(true);
+    const toastId = toast.loading('Resuming video generation…', {
+      description: 'Picking up where you left off.',
+    });
+
+    videoService.pollUntilDone(active.taskId)
+      .then((url) => {
+        setResultVideoUrl(url);
+        setResultModalOpen(true);
+        activeVideoTask.clear();
+        toast.success('Video ready', { id: toastId });
+      })
+      .catch((err) => {
+        activeVideoTask.clear();
+        toast.error('Could not resume video', {
+          id: toastId,
+          description: err instanceof Error ? err.message : 'Task expired or failed.',
+        });
+      })
+      .finally(() => setIsGenerating(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="video-page">
@@ -121,6 +175,9 @@ export default function Video() {
           <h1 className="video-page-title">Create your video</h1>
           <p className="video-page-subtitle">
             Add a reference image (optional), describe your idea, then hit the arrow to generate.
+          </p>
+          <p className="video-page-credits">
+            Cost: <strong>{VIDEO_COST} credits</strong> · Balance: <strong>{user?.credits ?? 0} credits</strong>
           </p>
         </header>
 

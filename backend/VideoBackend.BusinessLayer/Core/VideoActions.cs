@@ -13,6 +13,7 @@ namespace VideoBackend.BusinessLayer.Core;
 
 public class VideoActions
 {
+    private const int VideoCost = 8;
     private static readonly HttpClient _http = new();
 
     private static string MapModel(VideoModel model) => model switch
@@ -25,6 +26,16 @@ public class VideoActions
 
     protected GenerateVideoResponse GenerateVideoActionExecution(GenerateVideoDto dto, Guid userId)
     {
+        using (var users = new UserContext())
+        {
+            var u = users.Users.Find(userId)
+                ?? throw new KeyNotFoundException("User not found");
+            if (u.Credits < VideoCost)
+                throw new InsufficientCreditsException(VideoCost, u.Credits);
+            u.Credits -= VideoCost;
+            users.SaveChanges();
+        }
+
         // Build input object — image_urls only for fast/quality models
         var model = MapModel(dto.Model);
         object input;
@@ -84,6 +95,7 @@ public class VideoActions
             ContentId = content.Id,
             Status = GenerationStatus.Pending,
             PoyoTaskId = poyoTaskId,
+            CreditsSpent = VideoCost,
         };
 
         db.Contents.Add(content);
@@ -150,6 +162,17 @@ public class VideoActions
         else if (status == "failed")
         {
             task.Status = GenerationStatus.Failed;
+            if (task.CreditsSpent > 0)
+            {
+                using var users = new UserContext();
+                var u = users.Users.Find(task.UserId);
+                if (u != null)
+                {
+                    u.Credits += task.CreditsSpent;
+                    users.SaveChanges();
+                }
+                task.CreditsSpent = 0;
+            }
             db.SaveChanges();
         }
 
