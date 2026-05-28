@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { object, string, ValidationError } from 'yup';
 import { useAuth } from '../../contexts/authContext';
 import { paths } from '../../routes/paths';
@@ -109,9 +109,9 @@ export default function Login() {
                     </div>
 
                     <div className="login-form-row">
-                        <button type="button" className="login-forgot">
+                        <Link to={paths.forgotPassword} className="login-forgot">
                             Forgot password?
-                        </button>
+                        </Link>
                         <button className="login-primary" type="submit">
                             Log in
                         </button>

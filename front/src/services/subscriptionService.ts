@@ -1,7 +1,21 @@
 import type { AxiosInstance } from 'axios';
-import type { Subscription, SubscriptionPlan } from '../types/subscription/subscription';
+import type { PaddleConfig, Subscription, SubscriptionPlan } from '../types/subscription/subscription';
 
 export const subscriptionService = {
+    async getPaddleConfig(api: AxiosInstance): Promise<PaddleConfig> {
+        const response = await api.get<PaddleConfig>('/api/Subscription/config');
+        return response.data;
+    },
+
+    async syncFromPaddle(api: AxiosInstance, paddleSubscriptionId: string): Promise<Subscription> {
+        const response = await api.post<Subscription>('/api/Subscription/sync', { paddleSubscriptionId });
+        return response.data;
+    },
+
+    async cancelMine(api: AxiosInstance): Promise<void> {
+        await api.patch('/api/Subscription/me/cancel');
+    },
+
     async getAll(api: AxiosInstance): Promise<Subscription[]> {
         const response = await api.get<Subscription[]>('/api/Subscription');
         return response.data;

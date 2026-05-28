@@ -299,6 +299,59 @@ public class UserAction
         return Convert.ToBase64String(bytes);
     }
 
+    protected async Task RequestPasswordResetAction(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user is null || user.IsBlocked) return;
+
+        var existing = _context.PasswordResetTokens
+            .Where(t => t.UserId == user.Id && t.UsedAt == null && t.ExpiresAt > DateTime.UtcNow);
+        foreach (var t in existing) t.UsedAt = DateTime.UtcNow;
+
+        var token = GenerateRefreshTokenString();
+        _context.PasswordResetTokens.Add(new PasswordResetToken
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            Token = token,
+            ExpiresAt = DateTime.UtcNow.AddHours(1),
+            CreatedAt = DateTime.UtcNow
+        });
+        await _context.SaveChangesAsync();
+
+        try
+        {
+            await _emailSender.SendPasswordResetEmailAsync(user.Email, token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EMAIL ERROR] Password reset send failed: {ex.Message}");
+        }
+    }
+
+    protected async Task<bool> ResetPasswordAction(string token, string newPassword)
+    {
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrEmpty(newPassword) || newPassword.Length < 8)
+            return false;
+
+        var stored = await _context.PasswordResetTokens.FirstOrDefaultAsync(t => t.Token == token);
+        if (stored is null || stored.UsedAt is not null || stored.ExpiresAt < DateTime.UtcNow)
+            return false;
+
+        var user = await _context.Users.FindAsync(stored.UserId);
+        if (user is null || user.IsBlocked) return false;
+
+        user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+        stored.UsedAt = DateTime.UtcNow;
+
+        var activeRefresh = _context.RefreshTokens
+            .Where(r => r.UserId == user.Id && r.RevokedAt == null);
+        foreach (var r in activeRefresh) r.RevokedAt = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
     protected async Task SendVerificationCodeAction(string email)
     {
         // Invalidate any previous unused codes for this email
@@ -330,6 +383,13 @@ public class UserAction
         if (stored is null) return false;
 
         stored.Used = true;
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user is not null && !user.IsEmailVerified)
+        {
+            user.IsEmailVerified = true;
+        }
+
         await _context.SaveChangesAsync();
         return true;
     }

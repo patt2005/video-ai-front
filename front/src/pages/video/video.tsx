@@ -16,7 +16,7 @@ const MODELS: { id: VideoModel; label: string }[] = [
   { id: 'Veo31Quality', label: 'Quality' },
 ];
 
-const ASPECT_RATIOS: VideoAspectRatio[] = ['16:9', '9:16', '1:1', '4:3'];
+const ASPECT_RATIOS: VideoAspectRatio[] = ['16:9', '9:16'];
 
 export default function Video() {
   const { user } = useAuth();
@@ -58,9 +58,20 @@ export default function Video() {
     const promptText = prompt;
     setIsGenerating(true);
     setPrompt('');
-    const toastId = toast.loading('Generating video…', {
+    const toastId = toast.loading('Generating video… 0%', {
       description: 'Videos take 90–300 seconds. Hang tight.',
     });
+
+    let fakeProgress = 0;
+    const fakeInterval = setInterval(() => {
+      if (fakeProgress >= 95) return;
+      const increment = fakeProgress < 40 ? 1.2 : fakeProgress < 70 ? 0.6 : fakeProgress < 90 ? 0.25 : 0.1;
+      fakeProgress = Math.min(95, fakeProgress + increment);
+      toast.loading(`Generating video… ${Math.floor(fakeProgress)}%`, {
+        id: toastId,
+        description: 'Videos take 90–300 seconds. Hang tight.',
+      });
+    }, 1500);
 
     try {
       const imageUrls: string[] = [];
@@ -71,16 +82,16 @@ export default function Video() {
           aspectRatio: selectedRatio,
           model: selectedModel,
           imageUrls,
-        },
-        (progress) => {
-          toast.loading(`Generating video… ${progress}%`, { id: toastId });
         }
       );
 
+      clearInterval(fakeInterval);
+      toast.loading('Generating video… 100%', { id: toastId, description: 'Done!' });
       setResultVideoUrl(url);
       setResultModalOpen(true);
-      toast.dismiss(toastId);
+      setTimeout(() => toast.dismiss(toastId), 400);
     } catch (err) {
+      clearInterval(fakeInterval);
       toast.error('Generation failed', {
         id: toastId,
         description: err instanceof Error ? err.message : 'Something went wrong.',

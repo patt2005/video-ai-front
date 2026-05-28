@@ -84,4 +84,44 @@ public class ResendEmailSender : IEmailSender
             Console.WriteLine($"[EMAIL FALLBACK] Verification link for {toEmail}: {link}");
         }
     }
+
+    public async Task SendPasswordResetEmailAsync(string toEmail, string token)
+    {
+        var link = $"{_appBaseUrl}/reset-password?token={Uri.EscapeDataString(token)}";
+
+        if (string.IsNullOrEmpty(_apiKey))
+        {
+            Console.WriteLine($"[EMAIL FALLBACK] Resend not configured. Password reset link for {toEmail}: {link}");
+            return;
+        }
+
+        var html = $@"
+<div style=""font-family:sans-serif;max-width:480px;margin:0 auto"">
+  <h2 style=""color:#7c3aed"">Reset your MovyAI password</h2>
+  <p style=""font-size:15px"">We received a request to reset the password for your MovyAI account.</p>
+  <p style=""text-align:center;margin:28px 0"">
+    <a href=""{link}"" style=""display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600"">Reset password</a>
+  </p>
+  <p style=""font-size:13px;color:#888"">This link expires in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>
+  <p style=""font-size:12px;color:#aaa;word-break:break-all"">Or copy this URL into your browser:<br>{link}</p>
+</div>";
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails");
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+        request.Content = new StringContent(JsonSerializer.Serialize(new
+        {
+            from = _fromEmail,
+            to = new[] { toEmail },
+            subject = "Reset your MovyAI password",
+            html
+        }), Encoding.UTF8, "application/json");
+
+        var response = await _http.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"[EMAIL ERROR] Resend returned {response.StatusCode}: {body}");
+            Console.WriteLine($"[EMAIL FALLBACK] Password reset link for {toEmail}: {link}");
+        }
+    }
 }

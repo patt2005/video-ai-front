@@ -11,4 +11,6 @@ public class SubscriptionDto
     public DateTime StartDate { get; set; }
     public DateTime? EndDate { get; set; }
     public DateTime? CancelledAt { get; set; }
+    public string? PaddleSubscriptionId { get; set; }
+    public DateTime? NextBillDate { get; set; }
 }

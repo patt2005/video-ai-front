@@ -43,7 +43,10 @@ public class BusinessLogic
     public IImageAction ImageAction() => new ImageActionExecution();
 
     public ISubscriptionAction SubscriptionAction()
-        => new SubscriptionActionExecution(_subscriptionContext);
+        => new SubscriptionActionExecution(_subscriptionContext, new PaddleService(_configuration), _configuration);
+
+    public IPaddleService PaddleService()
+        => new PaddleService(_configuration);
 
     public IFileAction FileAction() => new FileActionExecution(_configuration);
 

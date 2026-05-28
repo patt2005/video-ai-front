@@ -56,4 +56,10 @@ public class UserActionExecution : UserAction, IUserAction
 
     public Task<bool> ResendVerificationEmailActionExecution(Guid userId)
         => ResendVerificationEmailAction(userId);
+
+    public Task RequestPasswordResetActionExecution(string email)
+        => RequestPasswordResetAction(email);
+
+    public Task<bool> ResetPasswordActionExecution(string token, string newPassword)
+        => ResetPasswordAction(token, newPassword);
 }

@@ -54,4 +54,17 @@ export const authService = {
     async resendVerification(api: AxiosInstance): Promise<void> {
         await api.post('/api/User/me/ResendVerification');
     },
+
+    async forgotPassword(api: AxiosInstance, email: string): Promise<void> {
+        await api.post('/api/User/ForgotPassword', { email });
+    },
+
+    async resetPassword(api: AxiosInstance, token: string, newPassword: string): Promise<boolean> {
+        try {
+            await api.post('/api/User/ResetPassword', { token, newPassword });
+            return true;
+        } catch {
+            return false;
+        }
+    },
 };

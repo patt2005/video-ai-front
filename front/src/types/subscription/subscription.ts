@@ -22,4 +22,13 @@ export interface Subscription {
     startDate: string;
     endDate: string | null;
     cancelledAt: string | null;
+    paddleSubscriptionId: string | null;
+    nextBillDate: string | null;
+}
+
+export interface PaddleConfig {
+    environment: string;
+    clientToken: string;
+    priceProId: string;
+    priceUltraId: string;
 }
