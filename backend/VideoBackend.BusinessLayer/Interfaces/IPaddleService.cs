@@ -14,6 +14,8 @@ public class PaddleSubscriptionSnapshot
 public interface IPaddleService
 {
     Task<PaddleSubscriptionSnapshot?> GetSubscriptionAsync(string paddleSubscriptionId);
+    Task<PaddleSubscriptionSnapshot?> GetLatestSubscriptionForCustomerAsync(string customerId);
     Task<bool> CancelSubscriptionAsync(string paddleSubscriptionId);
+    Task<PaddleSubscriptionSnapshot?> UpdateSubscriptionPriceAsync(string paddleSubscriptionId, string newPriceId);
     bool VerifyWebhookSignature(string signatureHeader, string rawBody);
 }

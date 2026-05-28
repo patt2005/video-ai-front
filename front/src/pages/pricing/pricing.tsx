@@ -99,7 +99,7 @@ export default function Pricing() {
   const { config: paddleConfig, ready: paddleReady, openCheckout } = usePaddle();
   const navigate = useNavigate();
   const [currentSub, setCurrentSub] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState<SubscriptionPlan | 'cancel' | null>(null);
+  const [loading, setLoading] = useState<SubscriptionPlan | 'cancel' | 'upgrade' | null>(null);
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -152,9 +152,12 @@ export default function Pricing() {
         email: user.email,
         userId: user.id,
         handlers: {
-          onCompleted: async (paddleSubscriptionId) => {
+          onCompleted: async ({ paddleSubscriptionId, paddleCustomerId }) => {
             try {
-              const sub = await subscriptionService.syncFromPaddle(api, paddleSubscriptionId);
+              const sub = await subscriptionService.syncFromPaddle(api, {
+                paddleSubscriptionId: paddleSubscriptionId || undefined,
+                paddleCustomerId: paddleCustomerId || undefined,
+              });
               setCurrentSub(sub);
               toast.success(`Now on ${plan} plan`);
             } catch {
@@ -182,6 +185,26 @@ export default function Pricing() {
       toast.success('Subscription cancelled');
     } catch {
       toast.error('Failed to cancel subscription');
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleUpgradeToUltra = async () => {
+    if (!currentSub || currentSub.plan !== SubscriptionPlan.Pro) return;
+    if (!currentSub.paddleSubscriptionId) {
+      toast.error('Your Pro plan is not linked to Paddle. Cancel and subscribe again via checkout.');
+      return;
+    }
+    if (!window.confirm('Upgrade to Ultra now? You will be charged the prorated difference (~$30) immediately and renewed at $49/month.')) return;
+    try {
+      setLoading('upgrade');
+      const updated = await subscriptionService.changeMyPlan(api, SubscriptionPlan.Ultra);
+      setCurrentSub(updated);
+      toast.success('Upgraded to Ultra');
+    } catch (err) {
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to upgrade';
+      toast.error(message);
     } finally {
       setLoading(null);
     }
@@ -231,20 +254,6 @@ export default function Pricing() {
             </div>
             <span className="pr-save-badge">SAVE 20%</span>
           </div>
-
-          {hasPaidActive && (
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
-              <button
-                type="button"
-                className="pr-tier-cta"
-                style={{ maxWidth: 240, margin: '0 auto' }}
-                onClick={handleCancel}
-                disabled={loading !== null}
-              >
-                {loading === 'cancel' ? 'Cancelling…' : 'Cancel subscription'}
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -266,14 +275,30 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' && BILLED.Starter.annual.includes('save') ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Starter[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta"
-              onClick={() => handleSubscribe(SubscriptionPlan.Starter)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Starter)}
-            >
-              {ctaLabel(SubscriptionPlan.Starter, 'Get started')}
-            </button>
+            {isCurrent(SubscriptionPlan.Starter) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Free plan'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={() => handleSubscribe(SubscriptionPlan.Starter)}
+                disabled={loading !== null || hasPaidActive}
+                title={hasPaidActive ? `Cancel your ${currentSub?.plan} plan first` : undefined}
+              >
+                {hasPaidActive
+                  ? `Cancel ${currentSub?.plan} plan first`
+                  : loading === SubscriptionPlan.Starter
+                    ? 'Starting…'
+                    : 'Get started'}
+              </button>
+            )}
             <div className="pr-tier-divider" />
             <div className="pr-tier-features-title">Includes</div>
             <ul className="pr-tier-features">
@@ -300,17 +325,28 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Pro[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta pr-tier-cta--primary"
-              onClick={() => handleSubscribe(SubscriptionPlan.Pro)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Pro)}
-            >
-              {ctaLabel(SubscriptionPlan.Pro, 'Start Pro')}
-              {!isCurrent(SubscriptionPlan.Pro) && loading !== SubscriptionPlan.Pro && (
-                <Icon icon="mdi:arrow-right" width={12} />
-              )}
-            </button>
+            {isCurrent(SubscriptionPlan.Pro) ? (
+              <button
+                type="button"
+                className="pr-tier-cta pr-tier-cta--primary"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Pro plan'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta pr-tier-cta--primary"
+                onClick={() => handleSubscribe(SubscriptionPlan.Pro)}
+                disabled={loading !== null}
+              >
+                {ctaLabel(SubscriptionPlan.Pro, 'Start Pro')}
+                {!isCurrent(SubscriptionPlan.Pro) && loading !== SubscriptionPlan.Pro && (
+                  <Icon icon="mdi:arrow-right" width={12} />
+                )}
+              </button>
+            )}
             <div className="pr-tier-divider" />
             <div className="pr-tier-features-title">Everything in Starter, plus</div>
             <ul className="pr-tier-features">
@@ -338,14 +374,35 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Ultra[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta"
-              onClick={() => handleSubscribe(SubscriptionPlan.Ultra)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Ultra)}
-            >
-              {ctaLabel(SubscriptionPlan.Ultra, 'Start Ultra')}
-            </button>
+            {isCurrent(SubscriptionPlan.Ultra) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Ultra plan'}
+              </button>
+            ) : isCurrent(SubscriptionPlan.Pro) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleUpgradeToUltra}
+                disabled={loading !== null}
+                title="Upgrade now and pay the prorated difference"
+              >
+                {loading === 'upgrade' ? 'Upgrading…' : 'Upgrade to Ultra (+$30)'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={() => handleSubscribe(SubscriptionPlan.Ultra)}
+                disabled={loading !== null}
+              >
+                {ctaLabel(SubscriptionPlan.Ultra, 'Start Ultra')}
+              </button>
+            )}
             <div className="pr-tier-divider" />
             <div className="pr-tier-features-title">Everything in Pro, plus</div>
             <ul className="pr-tier-features">

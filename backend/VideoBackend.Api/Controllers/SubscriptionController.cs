@@ -78,6 +78,8 @@ public class SubscriptionController : ControllerBase
             return BadRequest(new { error = "Paid plans must be activated via Paddle checkout" });
 
         var sub = await _subscription.SubscribeActionExecution(userId.Value, dto.Plan);
+        if (sub is null)
+            return BadRequest(new { error = "Cancel your active paid plan before switching to Starter" });
         return Ok(sub);
     }
 
@@ -87,11 +89,22 @@ public class SubscriptionController : ControllerBase
         var userId = GetCurrentUserId();
         if (userId is null) return Unauthorized();
 
-        if (string.IsNullOrWhiteSpace(dto.PaddleSubscriptionId))
-            return BadRequest(new { error = "PaddleSubscriptionId is required" });
+        if (string.IsNullOrWhiteSpace(dto.PaddleSubscriptionId) && string.IsNullOrWhiteSpace(dto.PaddleCustomerId))
+            return BadRequest(new { error = "paddleSubscriptionId or paddleCustomerId is required" });
 
-        var sub = await _subscription.SyncFromPaddleActionExecution(userId.Value, dto.PaddleSubscriptionId);
+        var sub = await _subscription.SyncFromPaddleActionExecution(userId.Value, dto.PaddleSubscriptionId, dto.PaddleCustomerId);
         if (sub is null) return BadRequest(new { error = "Could not sync subscription from Paddle" });
+        return Ok(sub);
+    }
+
+    [HttpPatch("me/change-plan")]
+    public async Task<IActionResult> ChangeMyPlan([FromBody] SubscribeDto dto)
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+
+        var sub = await _subscription.ChangeMyPlanActionExecution(userId.Value, dto.Plan);
+        if (sub is null) return BadRequest(new { error = "Could not change plan. Make sure you have an active paid subscription and the target plan is different." });
         return Ok(sub);
     }
 
