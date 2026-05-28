@@ -40,6 +40,14 @@ public class FileController : ControllerBase
             return BadRequest("key is required");
 
         var url = await _fileAction.GetPresignedUrl(key);
-        return Redirect(url);
+
+        using var http = new HttpClient();
+        var response = await http.GetAsync(url, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+            return StatusCode((int)response.StatusCode, "Failed to fetch file from storage");
+
+        var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
+        var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        return File(stream, contentType);
     }
 }

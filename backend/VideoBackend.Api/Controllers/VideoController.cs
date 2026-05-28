@@ -10,7 +10,6 @@ namespace VideoBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class VideoController : ControllerBase
 {
     internal IVideoAction _videoAction;

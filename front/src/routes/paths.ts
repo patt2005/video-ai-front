@@ -11,4 +11,6 @@ export const paths = {
     publicProfile: '/profile/:userId',
     pricing: '/pricing',
     verifyEmail: '/verify-email',
+    terms: '/terms',
+    privacy: '/privacy',
 };

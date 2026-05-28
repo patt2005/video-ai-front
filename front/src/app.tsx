@@ -16,6 +16,8 @@ import SupportFab from './components/SupportFab';
 import Profile from './pages/profile/profile';
 import PublicProfile from './pages/profile/publicProfile';
 import Pricing from './pages/pricing/pricing';
+import Terms from './pages/legal/terms';
+import Privacy from './pages/legal/privacy';
 import './App.css';
 import {paths} from './routes/paths.ts';
 import {UserRole} from "./types/user/user.ts";
@@ -41,6 +43,10 @@ function AppLayout() {
     const location = useLocation();
     const isVideoPage = location.pathname === paths.video || location.pathname === paths.root;
     const isPricingPage = location.pathname === paths.pricing;
+    const isSignupPage = location.pathname === paths.signup;
+    const isLoginPage = location.pathname === paths.login;
+    const isAdminPage = location.pathname === paths.admin || location.pathname.startsWith(paths.admin + '/');
+    const isLegalPage = location.pathname === paths.terms || location.pathname === paths.privacy;
 
     return (
         <>
@@ -48,13 +54,15 @@ function AppLayout() {
             <div className="app-shell">
                 <Header />
                 <div className="main-area">
-                <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''}`}>
+                <main className={`page-content ${isVideoPage ? 'page-content--video' : ''} ${isPricingPage ? 'page-content--pricing' : ''} ${isSignupPage ? 'page-content--signup' : ''} ${isLoginPage ? 'page-content--login' : ''} ${isAdminPage ? 'page-content--admin' : ''} ${isLegalPage ? 'page-content--legal' : ''}`}>
                     {/*<HealthCheck />*/}
                     <Routes>
                         <Route path={paths.login} element={<Login />} />
                         <Route path={paths.signup} element={<SignUp />} />
                         <Route path={paths.verifyEmail} element={<VerifyEmail />} />
                         <Route path={paths.pricing} element={<Pricing />} />
+                        <Route path={paths.terms} element={<Terms />} />
+                        <Route path={paths.privacy} element={<Privacy />} />
 
                         <Route path={paths.root} element={<RootRoute />} />
                         <Route path={paths.image} element={<Image />} />
