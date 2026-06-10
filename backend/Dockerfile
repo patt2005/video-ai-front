@@ -3,16 +3,16 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution and project files first for layer caching
-COPY VideoBackend.sln ./
-COPY VideoBackend.Api/VideoBackend.Api.csproj VideoBackend.Api/
-COPY VideoBackend.BusinessLayer/VideoBackend.BusinessLayer.csproj VideoBackend.BusinessLayer/
-COPY VideoBackend.DataAccessLayer/VideoBackend.DataAccessLayer.csproj VideoBackend.DataAccessLayer/
-COPY VideoBackend.Domain/VideoBackend.Domain.csproj VideoBackend.Domain/
+COPY backend/VideoBackend.sln ./
+COPY backend/VideoBackend.Api/VideoBackend.Api.csproj VideoBackend.Api/
+COPY backend/VideoBackend.BusinessLayer/VideoBackend.BusinessLayer.csproj VideoBackend.BusinessLayer/
+COPY backend/VideoBackend.DataAccessLayer/VideoBackend.DataAccessLayer.csproj VideoBackend.DataAccessLayer/
+COPY backend/VideoBackend.Domain/VideoBackend.Domain.csproj VideoBackend.Domain/
 
 RUN dotnet restore
 
 # Copy the rest of the source
-COPY . .
+COPY backend/ .
 
 # Publish the API project
 RUN dotnet publish VideoBackend.Api/VideoBackend.Api.csproj \
