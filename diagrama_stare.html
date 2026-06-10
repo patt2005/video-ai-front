@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diagrama de Stare – MovyAI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .page {
+      background: white;
+      width: 500px;
+      padding: 30px 40px 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    }
+    h2 { font-size: 13px; font-weight: bold; margin-bottom: 2px; color: #222; }
+    .subtitle { font-size: 10px; color: #666; margin-bottom: 24px; }
+    svg { display: block; margin: 0 auto; }
+  </style>
+</head>
+<body>
+<div class="page">
+  <h2>Diagrama de Stare – MovyAI</h2>
+  <p class="subtitle">user:genereazaContinut()</p>
+
+  <svg width="420" height="760" viewBox="0 0 420 760" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+        <polygon points="0 0,8 3,0 6" fill="#333"/>
+      </marker>
+    </defs>
+
+    <!-- INITIAL -->
+    <circle cx="210" cy="28" r="10" fill="#222"/>
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="38" x2="210" y2="68"/>
+
+    <!-- STATE 1: Neautentificat -->
+    <rect x="80" y="70" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="92" x2="340" y2="92" stroke="#555" stroke-width="1"/>
+    <text x="210" y="83" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">Neautentificat</text>
+    <text x="92" y="108" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ authService:login()</text>
+
+    <!-- [date gresite] loop -->
+    <text x="10" y="84" font-size="10" font-family="Arial" font-style="italic" fill="#333">[date gresite]</text>
+    <path fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"
+          d="M 80 96 C 30 96 30 116 80 116"/>
+
+    <!-- arrow → STATE 2 -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="122" x2="210" y2="158"/>
+    <text x="218" y="145" font-size="10" font-family="Arial" font-style="italic" fill="#333">[autentificat]</text>
+
+    <!-- STATE 2: Autentificat -->
+    <rect x="80" y="160" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="182" x2="340" y2="182" stroke="#555" stroke-width="1"/>
+    <text x="210" y="173" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">Autentificat</text>
+    <text x="92" y="198" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ userService:getMe()</text>
+
+    <!-- arrow → STATE 3 -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="212" x2="210" y2="248"/>
+
+    <!-- STATE 3: Selectat -->
+    <rect x="80" y="250" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="272" x2="340" y2="272" stroke="#555" stroke-width="1"/>
+    <text x="210" y="263" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">Selectat</text>
+    <text x="92" y="288" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ user:selecteazaFunctie()</text>
+
+    <!-- arrow → STATE 4 -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="302" x2="210" y2="338"/>
+
+    <!-- STATE 4: Initiat -->
+    <rect x="80" y="340" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="362" x2="340" y2="362" stroke="#555" stroke-width="1"/>
+    <text x="210" y="353" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">Initiat</text>
+    <text x="92" y="378" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ taskService:creeazaTask(prompt)</text>
+
+    <!-- arrow → STATE 5 -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="392" x2="210" y2="428"/>
+
+    <!-- STATE 5: In procesare -->
+    <rect x="80" y="430" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="452" x2="340" y2="452" stroke="#555" stroke-width="1"/>
+    <text x="210" y="443" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">In procesare</text>
+    <text x="92" y="468" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ taskService:pollStatus(taskId)</text>
+
+    <!-- [in asteptare] loop -->
+    <text x="10" y="443" font-size="10" font-family="Arial" font-style="italic" fill="#333">[in asteptare]</text>
+    <path fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"
+          d="M 80 456 C 30 456 30 436 80 436"/>
+
+    <!-- [finalizat] guard -->
+    <text x="218" y="504" font-size="10" font-family="Arial" font-style="italic" fill="#333">[finalizat]</text>
+
+    <!-- arrow → STATE 6 -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="482" x2="210" y2="518"/>
+
+    <!-- STATE 6: Generat -->
+    <rect x="80" y="520" width="260" height="52" rx="10" fill="white" stroke="#555" stroke-width="1.4"/>
+    <line x1="80" y1="542" x2="340" y2="542" stroke="#555" stroke-width="1"/>
+    <text x="210" y="533" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial" font-weight="bold">Generat</text>
+    <text x="92" y="558" dominant-baseline="middle" font-size="10" font-family="Arial" font-style="italic">entry/ app:afiseazaRezultat()</text>
+
+    <!-- [alta generare] back to STATE 3 -->
+    <text x="10" y="570" font-size="10" font-family="Arial" font-style="italic" fill="#333">[alta generare]</text>
+    <path fill="none" stroke="#333" stroke-width="1.5" marker-end="url(#arr)"
+          d="M 80 546 C 28 546 28 263 80 263"/>
+
+    <!-- [gata] guard -->
+    <text x="218" y="594" font-size="10" font-family="Arial" font-style="italic" fill="#333">[gata]</text>
+
+    <!-- arrow → FINAL -->
+    <line stroke="#333" stroke-width="1.5" marker-end="url(#arr)" x1="210" y1="572" x2="210" y2="706"/>
+
+    <!-- FINAL -->
+    <circle cx="210" cy="720" r="14" fill="none" stroke="#222" stroke-width="2.5"/>
+    <circle cx="210" cy="720" r="9" fill="#222"/>
+  </svg>
+</div>
+</body>
+</html>

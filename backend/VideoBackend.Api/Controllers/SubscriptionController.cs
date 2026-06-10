@@ -35,10 +35,10 @@ public class SubscriptionController : ControllerBase
     {
         return Ok(new PaddleConfigDto
         {
-            Environment = _configuration["Paddle:Environment"] ?? "sandbox",
-            ClientToken = _configuration["Paddle:ClientToken"] ?? string.Empty,
-            PriceProId = _configuration["Paddle:PricePro"] ?? string.Empty,
-            PriceUltraId = _configuration["Paddle:PriceUltra"] ?? string.Empty
+            Environment = Environment.GetEnvironmentVariable("PADDLE_ENVIRONMENT") ?? "sandbox",
+            ClientToken = Environment.GetEnvironmentVariable("PADDLE_CLIENT_TOKEN") ?? string.Empty,
+            PriceProId = Environment.GetEnvironmentVariable("PADDLE_PRICE_PRO") ?? string.Empty,
+            PriceUltraId = Environment.GetEnvironmentVariable("PADDLE_PRICE_ULTRA") ?? string.Empty
         });
     }
 
