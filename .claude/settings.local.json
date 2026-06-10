@@ -5,7 +5,16 @@
       "Bash(open *)",
       "Bash(git pull *)",
       "Bash(git add *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(brew install *)",
+      "Bash(pdftoppm -v)",
+      "Bash(pdftotext *)",
+      "Bash(python3 -c \"import google.auth; print\\('ok'\\)\")",
+      "Bash(pip3 install *)",
+      "Bash(python3 -c \"import reportlab; print\\('ok'\\)\")",
+      "Bash(python3 *)",
+      "Bash(pip3 show *)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|js|jsx\\)$\")"
     ]
   }
 }
