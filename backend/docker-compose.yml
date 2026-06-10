@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=${DATABASE_URL}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER:-VideoBackend}
+      - Jwt__Audience=${JWT_AUDIENCE:-VideoBackendUsers}
+      - Poyo__ApiKey=${POYO_API_KEY}
+      - S3__Bucket=${S3_BUCKET}
+      - S3__AccessKey=${S3_ACCESS_KEY}
+      - S3__SecretKey=${S3_SECRET_KEY}
+      - S3__Endpoint=${S3_ENDPOINT:-https://t3.storageapi.dev}
+      - Resend__ApiKey=${RESEND_API_KEY}
+      - Resend__FromEmail=${RESEND_FROM_EMAIL:-onboarding@resend.dev}
+      - Paddle__Environment=${PADDLE_ENVIRONMENT:-sandbox}
+      - Paddle__ApiKey=${PADDLE_API_KEY}
+      - Paddle__ClientToken=${PADDLE_CLIENT_TOKEN}
+      - Paddle__WebhookSecret=${PADDLE_WEBHOOK_SECRET}
+      - Paddle__PricePro=${PADDLE_PRICE_PRO}
+      - Paddle__PriceUltra=${PADDLE_PRICE_ULTRA}
+      - App__BaseUrl=${APP_BASE_URL:-http://localhost:5173}
+      - App__AllowedOrigins__0=${APP_ALLOWED_ORIGIN_0:-http://localhost:5173}

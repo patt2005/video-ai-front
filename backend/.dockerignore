@@ -1,0 +1,12 @@
+**/.git
+**/.gitignore
+**/bin
+**/obj
+**/*.user
+**/*.suo
+.vs/
+**/node_modules
+**/Dockerfile*
+**/.dockerignore
+**/*.md
+**/TestResults

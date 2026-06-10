@@ -45,11 +45,16 @@ builder.Services.AddSwaggerGen(options =>
         new string[] {}}
     });
 });
+var allowedOrigins = builder.Configuration
+    .GetSection("App:AllowedOrigins")
+    .Get<string[]>()
+    ?? new[] { "http://localhost:5173" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(frontendCorsPolicy, policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
