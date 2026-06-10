@@ -7,10 +7,12 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 VideoBackend.DataAccessLayer.DbSession.ConnectionString =
-    builder.Configuration.GetConnectionString("DefaultConnection");
+    Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 VideoBackend.DataAccessLayer.PoyoSession.ApiKey =
-    builder.Configuration["Poyo:ApiKey"];
+    Environment.GetEnvironmentVariable("Poyo__ApiKey")
+    ?? builder.Configuration["Poyo:ApiKey"];
 
 var frontendCorsPolicy = "FrontendCors";
 
@@ -45,16 +47,11 @@ builder.Services.AddSwaggerGen(options =>
         new string[] {}}
     });
 });
-var allowedOrigins = builder.Configuration
-    .GetSection("App:AllowedOrigins")
-    .Get<string[]>()
-    ?? new[] { "http://localhost:5173" };
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(frontendCorsPolicy, policy =>
     {
-        policy.WithOrigins(allowedOrigins)
+        policy.AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -63,9 +60,12 @@ builder.Services.AddDbContext<UserContext>();
 builder.Services.AddDbContext<TaskContext>();
 builder.Services.AddDbContext<ExploreVideoContext>();
 builder.Services.AddDbContext<SubscriptionContext>();
-var jwtKey = builder.Configuration["Jwt:Key"]!;
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
-var jwtAudience = builder.Configuration["Jwt:Audience"]!;
+var jwtKey = Environment.GetEnvironmentVariable("Jwt__Key")
+    ?? builder.Configuration["Jwt:Key"]!;
+var jwtIssuer = Environment.GetEnvironmentVariable("Jwt__Issuer")
+    ?? builder.Configuration["Jwt:Issuer"]!;
+var jwtAudience = Environment.GetEnvironmentVariable("Jwt__Audience")
+    ?? builder.Configuration["Jwt:Audience"]!;
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
