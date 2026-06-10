@@ -24,18 +24,7 @@ const BILLED = {
   Ultra:   { monthly: 'Per seat, billed monthly', annual: '$468/seat yearly · save $120' },
 };
 
-const CREDIT_PACKS = [
-  { credits: '500',    price: '$8',   ratio: '$0.016 / credit', best: false },
-  { credits: '2,000',  price: '$28',  ratio: '$0.014 / credit', best: false },
-  { credits: '5,000',  price: '$60',  ratio: '$0.012 / credit', best: true  },
-  { credits: '10,000', price: '$110', ratio: '$0.011 / credit', best: false },
-];
-
 const FAQ_ITEMS = [
-  {
-    q: "What's a credit, exactly?",
-    a: "One credit buys one 1K image render. 2K costs 2 credits, 4K costs 5. A second of video costs 8 credits. Your dashboard shows the price before you generate, and unused credits roll over for 90 days.",
-  },
   {
     q: 'Can I switch plans or cancel any time?',
     a: "Yes. Upgrade or downgrade instantly — we prorate the difference. Cancel any time from the billing page and you'll keep access until the end of your paid period.",
@@ -43,10 +32,6 @@ const FAQ_ITEMS = [
   {
     q: 'Do I own what I generate?',
     a: 'On Pro and Ultra, yes — full commercial license, no watermark, no royalty. On Starter, generations are for personal and evaluation use.',
-  },
-  {
-    q: 'What happens to leftover credits?',
-    a: 'Plan credits roll over for 90 days. Top-up pack credits never expire and are spent after plan credits.',
   },
   {
     q: 'How are charges handled for teams?',
@@ -60,15 +45,10 @@ const FAQ_ITEMS = [
 
 const COMPARE_ROWS: { section?: string; label?: string; starter?: string; pro?: string; ultra?: string }[] = [
   { section: 'Generation' },
-  { label: 'Monthly credits',       starter: '30',    pro: '1,000',     ultra: '5,000 / seat' },
   { label: 'Max export resolution', starter: '720p',  pro: '4K',        ultra: '4K' },
-  { label: 'Max video length',      starter: '4s',    pro: '12s',       ultra: '20s' },
-  { label: 'Concurrent renders',    starter: '1',     pro: '4',         ultra: '8' },
   { label: 'Priority queue',        starter: '—',     pro: '✓',         ultra: '✓' },
   { section: 'Editing' },
   { label: 'Outpaint & expand',         starter: '—',     pro: '✓',         ultra: '✓' },
-  { label: 'Personal model training',   starter: '—',     pro: '2 / month', ultra: 'Unlimited' },
-  { label: 'Batch renders',             starter: '—',     pro: 'Up to 50',  ultra: 'Up to 200' },
   { section: 'Collaboration' },
   { label: 'Team workspaces',     starter: '—', pro: '—', ultra: '✓' },
   { label: 'Client review links', starter: '—', pro: '—', ultra: '✓' },
@@ -99,7 +79,7 @@ export default function Pricing() {
   const { config: paddleConfig, ready: paddleReady, openCheckout } = usePaddle();
   const navigate = useNavigate();
   const [currentSub, setCurrentSub] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState<SubscriptionPlan | 'cancel' | null>(null);
+  const [loading, setLoading] = useState<SubscriptionPlan | 'cancel' | 'upgrade' | null>(null);
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
@@ -152,9 +132,12 @@ export default function Pricing() {
         email: user.email,
         userId: user.id,
         handlers: {
-          onCompleted: async (paddleSubscriptionId) => {
+          onCompleted: async ({ paddleSubscriptionId, paddleCustomerId }) => {
             try {
-              const sub = await subscriptionService.syncFromPaddle(api, paddleSubscriptionId);
+              const sub = await subscriptionService.syncFromPaddle(api, {
+                paddleSubscriptionId: paddleSubscriptionId || undefined,
+                paddleCustomerId: paddleCustomerId || undefined,
+              });
               setCurrentSub(sub);
               toast.success(`Now on ${plan} plan`);
             } catch {
@@ -187,11 +170,33 @@ export default function Pricing() {
     }
   };
 
+  const handleUpgradeToUltra = async () => {
+    if (!currentSub || currentSub.plan !== SubscriptionPlan.Pro) return;
+    if (!currentSub.paddleSubscriptionId) {
+      toast.error('Your Pro plan is not linked to Paddle. Cancel and subscribe again via checkout.');
+      return;
+    }
+    if (!window.confirm('Upgrade to Ultra now? You will be charged the prorated difference (~$30) immediately and renewed at $49/month.')) return;
+    try {
+      setLoading('upgrade');
+      const updated = await subscriptionService.changeMyPlan(api, SubscriptionPlan.Ultra);
+      setCurrentSub(updated);
+      toast.success('Upgraded to Ultra');
+    } catch (err) {
+      const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Failed to upgrade';
+      toast.error(message);
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const isCurrent = (plan: SubscriptionPlan) =>
     currentSub?.status === 'Active' && currentSub?.plan === plan;
 
   const hasPaidActive = currentSub?.status === 'Active' &&
     (currentSub.plan === SubscriptionPlan.Pro || currentSub.plan === SubscriptionPlan.Ultra);
+
+  const isOnUltra = isCurrent(SubscriptionPlan.Ultra);
 
   const ctaLabel = (plan: SubscriptionPlan, defaultLabel: string) => {
     if (isCurrent(plan)) return 'Current plan';
@@ -205,46 +210,10 @@ export default function Pricing() {
       {/* ── PAGE HEAD ── */}
       <div className="pr-container">
         <div className="pr-page-head">
-          <div className="pr-eyebrow">
-            <span className="pr-eyebrow-tag">Pricing</span>
-            <span>3 free renders a day, forever</span>
-          </div>
           <h1 className="pr-page-title">One price. <em>Endless ideas.</em></h1>
           <p className="pr-page-sub">
             Start free. Upgrade only when you're shipping work. Every plan includes 4K renders, commercial license, and zero watermarks.
           </p>
-
-          {/* Billing toggle */}
-          <div className="pr-billing">
-            <div className={`pr-billing-switch${billing === 'annual' ? ' pr-billing-switch--annual' : ''}`}>
-              <span className="pr-billing-pill" aria-hidden />
-              <button
-                type="button"
-                className={billing === 'monthly' ? 'pr-billing-btn--active' : ''}
-                onClick={() => setBilling('monthly')}
-              >Monthly</button>
-              <button
-                type="button"
-                className={billing === 'annual' ? 'pr-billing-btn--active' : ''}
-                onClick={() => setBilling('annual')}
-              >Annual</button>
-            </div>
-            <span className="pr-save-badge">SAVE 20%</span>
-          </div>
-
-          {hasPaidActive && (
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
-              <button
-                type="button"
-                className="pr-tier-cta"
-                style={{ maxWidth: 240, margin: '0 auto' }}
-                onClick={handleCancel}
-                disabled={loading !== null}
-              >
-                {loading === 'cancel' ? 'Cancelling…' : 'Cancel subscription'}
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -266,20 +235,40 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' && BILLED.Starter.annual.includes('save') ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Starter[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta"
-              onClick={() => handleSubscribe(SubscriptionPlan.Starter)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Starter)}
-            >
-              {ctaLabel(SubscriptionPlan.Starter, 'Get started')}
-            </button>
+            {isCurrent(SubscriptionPlan.Starter) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Free plan'}
+              </button>
+            ) : isOnUltra ? (
+              <button type="button" className="pr-tier-cta" disabled>
+                You are already on Ultra
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={() => handleSubscribe(SubscriptionPlan.Starter)}
+                disabled={loading !== null || hasPaidActive}
+                title={hasPaidActive ? `Cancel your ${currentSub?.plan} plan first` : undefined}
+              >
+                {hasPaidActive
+                  ? `Cancel ${currentSub?.plan} plan first`
+                  : loading === SubscriptionPlan.Starter
+                    ? 'Starting…'
+                    : 'Get started'}
+              </button>
+            )}
             <div className="pr-tier-divider" />
             <div className="pr-tier-features-title">Includes</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>30</b> credits / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>10</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>720p exports</span></li>
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Image + 4s video</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Image &amp; video generation</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Basic edits &amp; presets</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span className="pr-muted">Community support</span></li>
             </ul>
@@ -300,23 +289,37 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Pro[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta pr-tier-cta--primary"
-              onClick={() => handleSubscribe(SubscriptionPlan.Pro)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Pro)}
-            >
-              {ctaLabel(SubscriptionPlan.Pro, 'Start Pro')}
-              {!isCurrent(SubscriptionPlan.Pro) && loading !== SubscriptionPlan.Pro && (
-                <Icon icon="mdi:arrow-right" width={12} />
-              )}
-            </button>
+            {isCurrent(SubscriptionPlan.Pro) ? (
+              <button
+                type="button"
+                className="pr-tier-cta pr-tier-cta--primary"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Pro plan'}
+              </button>
+            ) : isOnUltra ? (
+              <button type="button" className="pr-tier-cta pr-tier-cta--primary" disabled>
+                You are already on Ultra
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta pr-tier-cta--primary"
+                onClick={() => handleSubscribe(SubscriptionPlan.Pro)}
+                disabled={loading !== null}
+              >
+                {ctaLabel(SubscriptionPlan.Pro, 'Start Pro')}
+                {!isCurrent(SubscriptionPlan.Pro) && loading !== SubscriptionPlan.Pro && (
+                  <Icon icon="mdi:arrow-right" width={12} />
+                )}
+              </button>
+            )}
             <div className="pr-tier-divider" />
-            <div className="pr-tier-features-title">Everything in Starter, plus</div>
+            <div className="pr-tier-features-title">Everything in Starter</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>1,000</b> credits / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>500</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>4K</b> exports, no watermark</span></li>
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Up to <b>12s</b> video clips</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Advanced timeline + outpaint</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Priority renders (queue-skip)</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Commercial license</span></li>
@@ -338,18 +341,39 @@ export default function Pricing() {
             <div className={`pr-tier-billed${billing === 'annual' ? ' pr-tier-billed--savings' : ''}`}>
               {BILLED.Ultra[billing]}
             </div>
-            <button
-              type="button"
-              className="pr-tier-cta"
-              onClick={() => handleSubscribe(SubscriptionPlan.Ultra)}
-              disabled={loading !== null || isCurrent(SubscriptionPlan.Ultra)}
-            >
-              {ctaLabel(SubscriptionPlan.Ultra, 'Start Ultra')}
-            </button>
+            {isCurrent(SubscriptionPlan.Ultra) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleCancel}
+                disabled={loading !== null}
+              >
+                {loading === 'cancel' ? 'Cancelling…' : 'Cancel Ultra plan'}
+              </button>
+            ) : isCurrent(SubscriptionPlan.Pro) ? (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={handleUpgradeToUltra}
+                disabled={loading !== null}
+                title="Upgrade now and pay the prorated difference"
+              >
+                {loading === 'upgrade' ? 'Upgrading…' : 'Upgrade to Ultra (+$30)'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="pr-tier-cta"
+                onClick={() => handleSubscribe(SubscriptionPlan.Ultra)}
+                disabled={loading !== null}
+              >
+                {ctaLabel(SubscriptionPlan.Ultra, 'Start Ultra')}
+              </button>
+            )}
             <div className="pr-tier-divider" />
-            <div className="pr-tier-features-title">Everything in Pro, plus</div>
+            <div className="pr-tier-features-title">Everything in Pro</div>
             <ul className="pr-tier-features">
-              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>5,000</b> credits / seat / month</span></li>
+              <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span><b>2,000</b> credits / month</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Team workspaces &amp; roles</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Shared asset &amp; prompt library</span></li>
               <li><span className="pr-feat-check"><Icon icon="mdi:check" width={10} style={{ color: '#A78BFA' }} /></span><span>Client review links</span></li>
@@ -360,29 +384,6 @@ export default function Pricing() {
           </article>
 
         </div>
-
-        {/* ── CREDIT PACKS ── */}
-        <section className="pr-packs">
-          <div className="pr-packs-head">
-            <div>
-              <div className="pr-section-tag">Top-ups</div>
-              <h2 className="pr-packs-title">Need a few more <em>renders?</em></h2>
-              <p className="pr-packs-sub">One-time credit packs that never expire. Stack them on any plan.</p>
-            </div>
-          </div>
-          <div className="pr-pack-grid">
-            {CREDIT_PACKS.map((pack) => (
-              <button key={pack.credits} type="button" className="pr-pack">
-                {pack.best && <span className="pr-pack-best">Best value</span>}
-                <div className="pr-pack-credits">
-                  {pack.credits}<span className="pr-pack-credits-sm">credits</span>
-                </div>
-                <div className="pr-pack-price"><b>{pack.price}</b></div>
-                <div className="pr-pack-ratio">{pack.ratio}</div>
-              </button>
-            ))}
-          </div>
-        </section>
 
         {/* ── COMPARISON TABLE ── */}
         <section className="pr-compare">
@@ -460,8 +461,17 @@ export default function Pricing() {
             <p>Dedicated GPU pools, custom retention, BYO-key, and procurement-friendly billing. We'll build a plan around your workflow.</p>
           </div>
           <div className="pr-ent-actions">
-            <button type="button" className="pr-ent-btn">Read enterprise docs</button>
-            <button type="button" className="pr-ent-btn pr-ent-btn--primary">
+            <button
+              type="button"
+              className="pr-ent-btn pr-ent-btn--primary"
+              onClick={() => {
+                if (!hasPaidActive) {
+                  toast.error('Talk to sales is available on Pro and Ultra plans');
+                  return;
+                }
+                window.dispatchEvent(new CustomEvent('movyai:open-support'));
+              }}
+            >
               Talk to sales
               <Icon icon="mdi:arrow-right" width={12} />
             </button>

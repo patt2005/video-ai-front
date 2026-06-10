@@ -54,32 +54,24 @@ async function pollStatus(taskId: string): Promise<VideoStatusResponse> {
     return data;
 }
 
-async function generateVideoAndPoll(
-    params: CreateVideoTaskParams,
+function pollUntilDone(
+    taskId: string,
     onProgress?: (progress: number) => void,
     intervalMs = 5000,
-    maxWaitMs = 360000
+    maxWaitMs = 900000
 ): Promise<string> {
-    const { taskId } = await createTask(params);
     const start = Date.now();
-
     return new Promise<string>((resolve, reject) => {
         const interval = setInterval(async () => {
             try {
                 const result = await pollStatus(taskId);
-
-                if (onProgress) {
-                    onProgress(result.progress ?? 0);
-                }
+                if (onProgress) onProgress(result.progress ?? 0);
 
                 if (result.status === 'finished') {
                     clearInterval(interval);
                     const url = result.videoUrls?.[0];
-                    if (url) {
-                        resolve(url);
-                    } else {
-                        reject(new Error('Generation finished but no video URL returned.'));
-                    }
+                    if (url) resolve(url);
+                    else reject(new Error('Generation finished but no video URL returned.'));
                 } else if (result.status === 'failed') {
                     clearInterval(interval);
                     reject(new Error(result.errorMessage ?? 'Video generation failed.'));
@@ -95,8 +87,19 @@ async function generateVideoAndPoll(
     });
 }
 
+async function generateVideoAndPoll(
+    params: CreateVideoTaskParams,
+    onProgress?: (progress: number) => void,
+    intervalMs = 5000,
+    maxWaitMs = 360000
+): Promise<string> {
+    const { taskId } = await createTask(params);
+    return pollUntilDone(taskId, onProgress, intervalMs, maxWaitMs);
+}
+
 export const videoService = {
     createTask,
     pollStatus,
+    pollUntilDone,
     generateVideoAndPoll,
 };

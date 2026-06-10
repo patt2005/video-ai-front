@@ -13,4 +13,5 @@ public class Task
     public Content? Content { get; set; }
     public GenerationStatus Status { get; set; }
     public string? PoyoTaskId { get; set; }
+    public int CreditsSpent { get; set; }
 }

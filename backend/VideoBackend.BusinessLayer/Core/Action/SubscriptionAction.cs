@@ -38,7 +38,7 @@ public class SubscriptionAction
         return s is null ? null : ToDto(s);
     }
 
-    protected async Task<SubscriptionDto> SubscribeAction(Guid userId, SubscriptionPlan plan)
+    protected async Task<SubscriptionDto?> SubscribeAction(Guid userId, SubscriptionPlan plan)
     {
         var existing = await _context.Subscriptions
             .Where(x => x.UserId == userId && x.Status == SubscriptionStatus.Active)
@@ -46,6 +46,9 @@ public class SubscriptionAction
 
         if (existing is not null)
         {
+            if (plan == SubscriptionPlan.Starter && existing.Plan != SubscriptionPlan.Starter)
+                return null;
+
             existing.Plan = plan;
             await _context.SaveChangesAsync();
             return ToDto(existing);
@@ -61,6 +64,8 @@ public class SubscriptionAction
         };
         _context.Subscriptions.Add(entity);
         await _context.SaveChangesAsync();
+
+        GrantCreditsForPlan(userId, null, plan);
 
         return ToDto(entity);
     }
@@ -96,9 +101,22 @@ public class SubscriptionAction
         return ToDto(s);
     }
 
-    protected async Task<SubscriptionDto?> SyncFromPaddleAction(Guid userId, string paddleSubscriptionId)
+    protected async Task<SubscriptionDto?> SyncFromPaddleAction(Guid userId, string? paddleSubscriptionId, string? paddleCustomerId)
     {
-        var snapshot = await _paddle.GetSubscriptionAsync(paddleSubscriptionId);
+        PaddleSubscriptionSnapshot? snapshot = null;
+
+        if (!string.IsNullOrWhiteSpace(paddleSubscriptionId))
+            snapshot = await _paddle.GetSubscriptionAsync(paddleSubscriptionId);
+
+        if (snapshot is null && !string.IsNullOrWhiteSpace(paddleCustomerId))
+        {
+            for (var attempt = 0; attempt < 5 && snapshot is null; attempt++)
+            {
+                snapshot = await _paddle.GetLatestSubscriptionForCustomerAsync(paddleCustomerId);
+                if (snapshot is null) await Task.Delay(1000);
+            }
+        }
+
         if (snapshot is null) return null;
 
         var plan = MapPriceToPlan(snapshot.PriceId);
@@ -109,6 +127,32 @@ public class SubscriptionAction
         }
 
         return await UpsertFromPaddleAsync(userId, snapshot, plan.Value);
+    }
+
+    protected async Task<SubscriptionDto?> ChangeMyPlanAction(Guid userId, SubscriptionPlan newPlan)
+    {
+        if (newPlan == SubscriptionPlan.Starter) return null;
+
+        var s = await _context.Subscriptions
+            .Where(x => x.UserId == userId && x.Status == SubscriptionStatus.Active)
+            .OrderByDescending(x => x.StartDate)
+            .FirstOrDefaultAsync();
+
+        if (s is null || s.Plan == newPlan) return null;
+        if (string.IsNullOrEmpty(s.PaddleSubscriptionId)) return null;
+
+        var newPriceId = newPlan == SubscriptionPlan.Pro
+            ? _configuration["Paddle:PricePro"]
+            : _configuration["Paddle:PriceUltra"];
+        if (string.IsNullOrEmpty(newPriceId)) return null;
+
+        var snapshot = await _paddle.UpdateSubscriptionPriceAsync(s.PaddleSubscriptionId, newPriceId);
+        if (snapshot is null) return null;
+
+        var mapped = MapPriceToPlan(snapshot.PriceId);
+        if (mapped is null) return null;
+
+        return await UpsertFromPaddleAsync(userId, snapshot, mapped.Value);
     }
 
     protected async Task<bool> CancelMyAction(Guid userId)
@@ -124,7 +168,9 @@ public class SubscriptionAction
         {
             var ok = await _paddle.CancelSubscriptionAsync(s.PaddleSubscriptionId);
             if (!ok) return false;
+            s.Status = SubscriptionStatus.Cancelled;
             s.CancelledAt = DateTime.UtcNow;
+            s.EndDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -159,6 +205,32 @@ public class SubscriptionAction
         await UpsertFromPaddleAsync(userId.Value, snapshot, plan.Value);
     }
 
+    private static int GetPlanCredits(SubscriptionPlan plan) => plan switch
+    {
+        SubscriptionPlan.Starter => 10,
+        SubscriptionPlan.Pro => 500,
+        SubscriptionPlan.Ultra => 2000,
+        _ => 0
+    };
+
+    private static void GrantCreditsForPlan(Guid userId, SubscriptionPlan? oldPlan, SubscriptionPlan newPlan)
+    {
+        var newCredits = GetPlanCredits(newPlan);
+        if (newCredits <= 0) return;
+
+        var toGrant = oldPlan is null
+            ? newCredits
+            : Math.Max(0, newCredits - GetPlanCredits(oldPlan.Value));
+
+        if (toGrant == 0) return;
+
+        using var users = new UserContext();
+        var u = users.Users.Find(userId);
+        if (u is null) return;
+        u.Credits += toGrant;
+        users.SaveChanges();
+    }
+
     private async Task<SubscriptionDto> UpsertFromPaddleAsync(Guid userId, PaddleSubscriptionSnapshot snapshot, SubscriptionPlan plan)
     {
         var others = _context.Subscriptions
@@ -172,6 +244,9 @@ public class SubscriptionAction
 
         var existing = await _context.Subscriptions
             .FirstOrDefaultAsync(x => x.PaddleSubscriptionId == snapshot.Id);
+
+        var oldPlan = existing?.Plan;
+        var wasActive = existing?.Status == SubscriptionStatus.Active;
 
         if (existing is null)
         {
@@ -201,6 +276,12 @@ public class SubscriptionAction
         }
 
         await _context.SaveChangesAsync();
+
+        if (existing.Status == SubscriptionStatus.Active)
+        {
+            GrantCreditsForPlan(userId, wasActive ? oldPlan : null, plan);
+        }
+
         return ToDto(existing);
     }
 

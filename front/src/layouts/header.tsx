@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import '../styles/Header.css';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {Icon} from '@iconify/react';
@@ -44,6 +44,8 @@ export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
   const { theme, toggleTheme } = useTheme();
   const { isLoggedIn, logout } = useAuth();
 
@@ -54,6 +56,22 @@ export default function Header() {
     { label: 'Edit', to: paths.edit },
   ];
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (menuRef.current?.contains(target)) return;
+      if (toggleRef.current?.contains(target)) return;
+      setMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, [menuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -126,6 +144,7 @@ export default function Header() {
         </div>
 
         <button
+          ref={toggleRef}
           type="button"
           className="header-hamburger"
           aria-label={menuOpen ? 'Închide meniul' : 'Deschide meniul'}
@@ -138,7 +157,7 @@ export default function Header() {
         </button>
       </div>
 
-      <div className={`header-mobile-menu ${menuOpen ? 'is-open' : ''}`}>
+      <div ref={menuRef} className={`header-mobile-menu ${menuOpen ? 'is-open' : ''}`}>
         <nav className="mobile-nav" aria-label="Navigare mobilă">
           <button
             type="button"

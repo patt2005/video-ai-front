@@ -59,33 +59,24 @@ async function pollStatus(taskId: string): Promise<ImageStatusResponse> {
     return data;
 }
 
-async function generateImageAndPoll(
-    params: CreateImageParams,
+function pollUntilDone(
+    taskId: string,
     onProgress?: (progress: number) => void,
     intervalMs = 3000,
-    maxWaitMs = 300000
+    maxWaitMs = 600000
 ): Promise<string> {
-    const taskId = await generateImage(params);
-
     const start = Date.now();
-
     return new Promise<string>((resolve, reject) => {
         const interval = setInterval(async () => {
             try {
                 const result = await pollStatus(taskId);
-
-                if (onProgress) {
-                    onProgress(result.progress ?? 0);
-                }
+                if (onProgress) onProgress(result.progress ?? 0);
 
                 if (result.status === 'finished') {
                     clearInterval(interval);
                     const url = result.imageUrls?.[0];
-                    if (url) {
-                        resolve(url);
-                    } else {
-                        reject(new Error('Generation finished but no image URL returned.'));
-                    }
+                    if (url) resolve(url);
+                    else reject(new Error('Generation finished but no image URL returned.'));
                 } else if (result.status === 'failed') {
                     clearInterval(interval);
                     reject(new Error(result.errorMessage ?? 'Image generation failed.'));
@@ -101,8 +92,19 @@ async function generateImageAndPoll(
     });
 }
 
+async function generateImageAndPoll(
+    params: CreateImageParams,
+    onProgress?: (progress: number) => void,
+    intervalMs = 3000,
+    maxWaitMs = 300000
+): Promise<string> {
+    const taskId = await generateImage(params);
+    return pollUntilDone(taskId, onProgress, intervalMs, maxWaitMs);
+}
+
 export const imageService = {
     generateImage,
     pollStatus,
+    pollUntilDone,
     generateImageAndPoll,
 };

@@ -139,7 +139,6 @@ export default function Edit() {
             <div className="ed-field">
               <div className="ed-field-label">
                 <span>Edit prompt</span>
-                <span className="ed-field-hint">{prompt.length} / 600</span>
               </div>
               <textarea
                 className="ed-prompt"

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VideoBackend.BusinessLayer;
+using VideoBackend.BusinessLayer.Core;
 using VideoBackend.BusinessLayer.Interfaces;
 using VideoBackend.DataAccessLayer.Context;
 using VideoBackend.Domain.Models.Video;
@@ -34,8 +35,15 @@ public class VideoController : ControllerBase
         if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
             return Unauthorized("Invalid token");
 
-        var result = _videoAction.GenerateVideo(dto, userId);
-        return Ok(result);
+        try
+        {
+            var result = _videoAction.GenerateVideo(dto, userId);
+            return Ok(result);
+        }
+        catch (InsufficientCreditsException ex)
+        {
+            return StatusCode(402, new { error = ex.Message, required = ex.Required, available = ex.Available });
+        }
     }
 
     [HttpGet("status/{taskId:guid}")]

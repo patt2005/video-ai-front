@@ -12,4 +12,5 @@ public class UserDto
     public bool IsBlocked { get; set; }
     public bool IsEmailVerified { get; set; }
     public string? AvatarUrl { get; set; }
+    public int Credits { get; set; }
 }

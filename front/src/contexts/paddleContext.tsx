@@ -4,8 +4,13 @@ import { useApi } from '../hooks/useApi';
 import { subscriptionService } from '../services/subscriptionService';
 import type { PaddleConfig } from '../types/subscription/subscription';
 
+type CheckoutCompletion = {
+    paddleSubscriptionId: string;
+    paddleCustomerId: string;
+};
+
 type CheckoutHandlers = {
-    onCompleted?: (paddleSubscriptionId: string) => void;
+    onCompleted?: (result: CheckoutCompletion) => void;
     onClosed?: () => void;
 };
 
@@ -45,8 +50,14 @@ export function PaddleProvider({ children }: { children: ReactNode }) {
             eventCallback: (event) => {
                 const name = event?.name;
                 if (name === 'checkout.completed') {
-                    const subId = event?.data?.subscription_id ?? '';
-                    handlersRef.current?.onCompleted?.(String(subId));
+                    const data = event?.data as Record<string, unknown> | undefined;
+                    const customer = data?.customer as { id?: string } | undefined;
+                    const subId = (data?.subscription_id as string | undefined) ?? '';
+                    const customerId = customer?.id ?? '';
+                    handlersRef.current?.onCompleted?.({
+                        paddleSubscriptionId: String(subId),
+                        paddleCustomerId: String(customerId),
+                    });
                 } else if (name === 'checkout.closed') {
                     handlersRef.current?.onClosed?.();
                 }

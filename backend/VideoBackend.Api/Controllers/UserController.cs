@@ -46,6 +46,16 @@ public class UserController : ControllerBase
         return Ok(user);
     }
 
+    [HttpGet("me")]
+    public async Task<IActionResult> GetMe()
+    {
+        var userId = GetCurrentUserId();
+        if (userId is null) return Unauthorized();
+        var u = await _user.GetUserByIdActionExecution(userId.Value);
+        if (u is null) return NotFound();
+        return Ok(u);
+    }
+
     [HttpGet("{id:guid}/public")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPublicProfile(Guid id)
@@ -62,6 +72,18 @@ public class UserController : ControllerBase
         var updated = await _user.UpdateUserActionExecution(id, request.User, request.NewPassword);
         if (updated is null) return NotFound();
         return Ok(updated);
+    }
+
+    [HttpPatch("{id:guid}/credits")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> AddCredits(Guid id, [FromBody] AddCreditsRequest request)
+    {
+        using var ctx = new UserContext();
+        var u = await ctx.Users.FindAsync(id);
+        if (u is null) return NotFound();
+        u.Credits += request.Delta;
+        await ctx.SaveChangesAsync();
+        return Ok(new { id = u.Id, credits = u.Credits });
     }
 
     [HttpPatch("{id:guid}/role")]
@@ -255,4 +277,9 @@ public class UpdateUserRequest
 public class UpdateRoleRequest
 {
     public UserRole Role { get; set; }
+}
+
+public class AddCreditsRequest
+{
+    public int Delta { get; set; }
 }

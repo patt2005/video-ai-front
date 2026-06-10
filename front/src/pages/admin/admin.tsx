@@ -437,7 +437,7 @@ export default function Admin() {
                                                             title={user.isBlocked ? 'Unblock' : 'Block'}
                                                             onClick={() => toggleBlock(user)}
                                                         >
-                                                            <Icon icon={user.isBlocked ? 'mdi:account-check-outline' : 'mdi:account-cancel-outline'} width={14} />
+                                                            {user.isBlocked ? 'Unblock' : 'Block'}
                                                         </button>
                                                         <button
                                                             type="button"
@@ -445,7 +445,7 @@ export default function Admin() {
                                                             title="Delete user"
                                                             onClick={() => setUserToDelete(user)}
                                                         >
-                                                            <Icon icon="mdi:trash-can-outline" width={14} />
+                                                            Delete
                                                         </button>
                                                     </div>
                                                 </td>

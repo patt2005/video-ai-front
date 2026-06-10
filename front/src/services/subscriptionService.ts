@@ -7,13 +7,21 @@ export const subscriptionService = {
         return response.data;
     },
 
-    async syncFromPaddle(api: AxiosInstance, paddleSubscriptionId: string): Promise<Subscription> {
-        const response = await api.post<Subscription>('/api/Subscription/sync', { paddleSubscriptionId });
+    async syncFromPaddle(
+        api: AxiosInstance,
+        params: { paddleSubscriptionId?: string; paddleCustomerId?: string }
+    ): Promise<Subscription> {
+        const response = await api.post<Subscription>('/api/Subscription/sync', params);
         return response.data;
     },
 
     async cancelMine(api: AxiosInstance): Promise<void> {
         await api.patch('/api/Subscription/me/cancel');
+    },
+
+    async changeMyPlan(api: AxiosInstance, plan: SubscriptionPlan): Promise<Subscription> {
+        const response = await api.patch<Subscription>('/api/Subscription/me/change-plan', { plan });
+        return response.data;
     },
 
     async getAll(api: AxiosInstance): Promise<Subscription[]> {

@@ -69,7 +69,8 @@ export default function Profile() {
         if (!user?.id) return;
         taskService.getByUserId(api, user.id).then(setAllTasks).catch(() => setAllTasks([]));
         subscriptionService.getMine(api).then(setSubscription).catch(() => setSubscription(null));
-    }, [api, user?.id]);
+        userService.getMe(api).then((fresh) => updateUser({ credits: fresh.credits })).catch(() => {});
+    }, [api, user?.id, updateUser]);
 
     const userTasks = useMemo(() => {
         if (!taskSearch.trim()) return allTasks;
@@ -186,6 +187,10 @@ export default function Profile() {
             </div>
 
             <div className="profile-stats">
+                <div className="profile-stat">
+                    <span className="profile-stat-value">{user.credits ?? 0}</span>
+                    <span className="profile-stat-label">Credits</span>
+                </div>
                 <div className="profile-stat">
                     <span className="profile-stat-value">{stats.total}</span>
                     <span className="profile-stat-label">Total tasks</span>
