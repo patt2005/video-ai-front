@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5014';
+const BASE_URL = 'https://video-ai-front-production.up.railway.app';
 
 function authHeaders() {
     const token = localStorage.getItem('token');

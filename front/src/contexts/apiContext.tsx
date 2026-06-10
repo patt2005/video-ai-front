@@ -11,9 +11,10 @@ type ApiProviderProps = {
     children: ReactNode;
 };
 
-const API_BASE_URL = 'http://localhost:5014';
+const API_BASE_URL = 'https://video-ai-front-production.up.railway.app';
 
 let refreshPromise: Promise<string> | null = null;
+let isRedirecting = false;
 
 async function refreshAccessToken(): Promise<string> {
     if (refreshPromise) return refreshPromise;
@@ -31,6 +32,15 @@ async function refreshAccessToken(): Promise<string> {
     } finally {
         refreshPromise = null;
     }
+}
+
+function clearAuthAndRedirect() {
+    if (isRedirecting) return;
+    isRedirecting = true;
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('movyai_user');
+    window.location.href = '/login';
 }
 
 export function ApiProvider({ children }: ApiProviderProps) {
@@ -63,9 +73,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
                         originalRequest.headers.set('Authorization', `Bearer ${newToken}`);
                         return instance.request(originalRequest);
                     } catch {
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('refresh_token');
-                        window.location.href = '/login';
+                        clearAuthAndRedirect();
                         return Promise.reject(error);
                     }
                 }

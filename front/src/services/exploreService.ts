@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { ExploreVideo } from '../types/video/exploreVideo';
 
-const BASE_URL = 'http://localhost:5014';
+const BASE_URL = 'https://video-ai-front-production.up.railway.app';
 
 interface ExploreVideoDto {
   id: string;

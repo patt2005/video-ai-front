@@ -15,7 +15,7 @@ import { VideoResultModal } from '../../components/modals/videoResultModal';
 import { paths } from '../../routes/paths';
 import '../../styles/Profile.css';
 
-const API_BASE_URL = 'http://localhost:5014';
+const API_BASE_URL = 'https://video-ai-front-production.up.railway.app';
 
 function resolveAvatarUrl(url: string | null | undefined): string | null {
     if (!url) return null;

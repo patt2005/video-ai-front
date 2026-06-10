@@ -7,7 +7,7 @@ import { ImageResultModal } from '../../components/modals/imageResultModal';
 import { VideoResultModal } from '../../components/modals/videoResultModal';
 import '../../styles/publicProfile.css';
 
-const BASE_URL = 'http://localhost:5014';
+const BASE_URL = 'https://video-ai-front-production.up.railway.app';
 
 interface PublicUser {
   id: string;
